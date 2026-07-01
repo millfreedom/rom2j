@@ -1,0 +1,46 @@
+package ua.millfreedom.rom2.model;
+
+/**
+ * Java enum port of the native Shop::ShelfFlags enum at /classes/Shop/ShelfFlags.
+ */
+public enum ShelfFlagValues {
+    MATERIAL_IRON(0x00000001),
+    MATERIAL_BRONZE(0x00000002),
+    MATERIAL_STEEL(0x00000004),
+    MATERIAL_SILVER(0x00000008),
+    MATERIAL_GOLD(0x00000010),
+    MATERIAL_MITHRILL(0x00000020),
+    MATERIAL_ADAMANTIUM(0x00000040),
+    MATERIAL_METEORIC(0x00000080),
+    MATERIAL_WOOD(0x00000100),
+    MATERIAL_MAGIC_WOOD(0x00000200),
+    MATERIAL_LEATHER(0x00000400),
+    MATERIAL_HARD_LEATHER(0x00000800),
+    MATERIAL_DRAGON_LEATHER(0x00001000),
+    MATERIAL_CRYSTAL(0x00002000),
+    MATERIAL_NONE(0x00004000),
+    RARITY_COMMON(0x00008000),
+    RARITY_UNCOMMON(0x00010000),
+    RARITY_RARE(0x00020000),
+    RARITY_VERY_RARE(0x00040000),
+    RARITY_ELVEN(0x00080000),
+    RARITY_BAD(0x00100000),
+    RARITY_GOOD(0x00200000),
+    TYPE_WEAPON(0x00400000),
+    TYPE_SHIELD(0x00800000),
+    TYPE_ARMOR(0x01000000),
+    TYPE_MAGIC(0x02000000),
+    TYPE_OTHER(0x04000000),
+    TYPE_STAFF(0x08000000),
+    EXTRA_COMMON(0x10000000),
+    EXTRA_MAGIC(0x20000000);
+
+    public final int value;
+
+    /**
+     * not ported. Stores one native ShelfFlags bit value.
+     */
+    ShelfFlagValues(int value) {
+        this.value = value;
+    }
+}
