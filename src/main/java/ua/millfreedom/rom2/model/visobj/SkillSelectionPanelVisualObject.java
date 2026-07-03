@@ -477,12 +477,17 @@ public class SkillSelectionPanelVisualObject extends CVisualObject {
 
     /**
      * Java helper extracted from SkillSelectionPanelVisualObject::GetOptionIndexAtScreenPoint @0042D1A3.
-     * Fully ported.
+     * Native performs an unchecked linear bitmap-memory read; Java maps reads outside the modeled bitmap bytes to
+     * the background marker, which cannot match a selectable option.
      */
     private byte getHitMaskByte(int localX, int localY) {
         GameBitmapFrame frame = optionHitMaskBitmap.frames.getFirst();
         int offset = localY * frame.xSize() + localX;
-        return frame.data()[offset];
+        byte[] data = frame.data();
+        if (offset < 0 || offset >= data.length) {
+            return 0;
+        }
+        return data[offset];
     }
 
     /**
