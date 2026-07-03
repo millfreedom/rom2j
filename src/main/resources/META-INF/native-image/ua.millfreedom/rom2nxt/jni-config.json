@@ -1,0 +1,1992 @@
+[
+  {
+    "name": "com.sun.jna.Callback"
+  },
+  {
+    "name": "com.sun.jna.CallbackReference",
+    "methods": [
+      {
+        "name": "getCallback",
+        "parameterTypes": [
+          "java.lang.Class",
+          "com.sun.jna.Pointer",
+          "boolean"
+        ]
+      },
+      {
+        "name": "getFunctionPointer",
+        "parameterTypes": [
+          "com.sun.jna.Callback",
+          "boolean"
+        ]
+      },
+      {
+        "name": "getNativeString",
+        "parameterTypes": [
+          "java.lang.Object",
+          "boolean"
+        ]
+      },
+      {
+        "name": "initializeThread",
+        "parameterTypes": [
+          "com.sun.jna.Callback",
+          "com.sun.jna.CallbackReference$AttachOptions"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "com.sun.jna.CallbackReference$AttachOptions"
+  },
+  {
+    "name": "com.sun.jna.FromNativeConverter",
+    "methods": [
+      {
+        "name": "nativeType",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.sun.jna.IntegerType",
+    "fields": [
+      {
+        "name": "value"
+      }
+    ]
+  },
+  {
+    "name": "com.sun.jna.JNIEnv"
+  },
+  {
+    "name": "com.sun.jna.Native",
+    "methods": [
+      {
+        "name": "dispose",
+        "parameterTypes": []
+      },
+      {
+        "name": "fromNative",
+        "parameterTypes": [
+          "com.sun.jna.FromNativeConverter",
+          "java.lang.Object",
+          "java.lang.reflect.Method"
+        ]
+      },
+      {
+        "name": "fromNative",
+        "parameterTypes": [
+          "java.lang.Class",
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "fromNative",
+        "parameterTypes": [
+          "java.lang.reflect.Method",
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "nativeType",
+        "parameterTypes": [
+          "java.lang.Class"
+        ]
+      },
+      {
+        "name": "toNative",
+        "parameterTypes": [
+          "com.sun.jna.ToNativeConverter",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "com.sun.jna.Native$ffi_callback",
+    "methods": [
+      {
+        "name": "invoke",
+        "parameterTypes": [
+          "long",
+          "long",
+          "long"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "com.sun.jna.NativeMapped",
+    "methods": [
+      {
+        "name": "toNative",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.sun.jna.Pointer",
+    "fields": [
+      {
+        "name": "peer"
+      }
+    ],
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "long"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "com.sun.jna.PointerType",
+    "fields": [
+      {
+        "name": "pointer"
+      }
+    ]
+  },
+  {
+    "name": "com.sun.jna.Structure",
+    "fields": [
+      {
+        "name": "memory"
+      },
+      {
+        "name": "typeInfo"
+      }
+    ],
+    "methods": [
+      {
+        "name": "autoRead",
+        "parameterTypes": []
+      },
+      {
+        "name": "autoWrite",
+        "parameterTypes": []
+      },
+      {
+        "name": "getTypeInfo",
+        "parameterTypes": []
+      },
+      {
+        "name": "newInstance",
+        "parameterTypes": [
+          "java.lang.Class",
+          "long"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "com.sun.jna.Structure$ByValue"
+  },
+  {
+    "name": "com.sun.jna.Structure$FFIType$FFITypes",
+    "fields": [
+      {
+        "name": "ffi_type_double"
+      },
+      {
+        "name": "ffi_type_float"
+      },
+      {
+        "name": "ffi_type_longdouble"
+      },
+      {
+        "name": "ffi_type_pointer"
+      },
+      {
+        "name": "ffi_type_sint16"
+      },
+      {
+        "name": "ffi_type_sint32"
+      },
+      {
+        "name": "ffi_type_sint64"
+      },
+      {
+        "name": "ffi_type_sint8"
+      },
+      {
+        "name": "ffi_type_uint16"
+      },
+      {
+        "name": "ffi_type_uint32"
+      },
+      {
+        "name": "ffi_type_uint64"
+      },
+      {
+        "name": "ffi_type_uint8"
+      },
+      {
+        "name": "ffi_type_void"
+      }
+    ]
+  },
+  {
+    "name": "com.sun.jna.WString",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "java.lang.Boolean",
+    "fields": [
+      {
+        "name": "TYPE"
+      },
+      {
+        "name": "value"
+      }
+    ],
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "boolean"
+        ]
+      },
+      {
+        "name": "getBoolean",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "java.lang.Byte",
+    "fields": [
+      {
+        "name": "TYPE"
+      },
+      {
+        "name": "value"
+      }
+    ],
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "byte"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "java.lang.Character",
+    "fields": [
+      {
+        "name": "TYPE"
+      },
+      {
+        "name": "value"
+      }
+    ],
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "char"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "java.lang.Class",
+    "methods": [
+      {
+        "name": "getComponentType",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.lang.Double",
+    "fields": [
+      {
+        "name": "TYPE"
+      },
+      {
+        "name": "value"
+      }
+    ],
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "double"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "java.lang.Float",
+    "fields": [
+      {
+        "name": "TYPE"
+      },
+      {
+        "name": "value"
+      }
+    ],
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "float"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "java.lang.Integer",
+    "fields": [
+      {
+        "name": "TYPE"
+      },
+      {
+        "name": "value"
+      }
+    ],
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "java.lang.Long",
+    "fields": [
+      {
+        "name": "TYPE"
+      },
+      {
+        "name": "value"
+      }
+    ],
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "long"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "java.lang.Object",
+    "methods": [
+      {
+        "name": "toString",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.lang.Short",
+    "fields": [
+      {
+        "name": "TYPE"
+      },
+      {
+        "name": "value"
+      }
+    ],
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "short"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "java.lang.String",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "byte[]"
+        ]
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "byte[]",
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "getBytes",
+        "parameterTypes": []
+      },
+      {
+        "name": "getBytes",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "toCharArray",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.lang.System",
+    "methods": [
+      {
+        "name": "getProperty",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "load",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "java.lang.Void",
+    "fields": [
+      {
+        "name": "TYPE"
+      }
+    ]
+  },
+  {
+    "name": "java.lang.reflect.Method",
+    "methods": [
+      {
+        "name": "getParameterTypes",
+        "parameterTypes": []
+      },
+      {
+        "name": "getReturnType",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.nio.Buffer",
+    "methods": [
+      {
+        "name": "position",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.nio.ByteBuffer",
+    "methods": [
+      {
+        "name": "array",
+        "parameterTypes": []
+      },
+      {
+        "name": "arrayOffset",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.nio.CharBuffer",
+    "methods": [
+      {
+        "name": "array",
+        "parameterTypes": []
+      },
+      {
+        "name": "arrayOffset",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.nio.DoubleBuffer",
+    "methods": [
+      {
+        "name": "array",
+        "parameterTypes": []
+      },
+      {
+        "name": "arrayOffset",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.nio.FloatBuffer",
+    "methods": [
+      {
+        "name": "array",
+        "parameterTypes": []
+      },
+      {
+        "name": "arrayOffset",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.nio.IntBuffer",
+    "methods": [
+      {
+        "name": "array",
+        "parameterTypes": []
+      },
+      {
+        "name": "arrayOffset",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.nio.LongBuffer",
+    "methods": [
+      {
+        "name": "array",
+        "parameterTypes": []
+      },
+      {
+        "name": "arrayOffset",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.nio.ShortBuffer",
+    "methods": [
+      {
+        "name": "array",
+        "parameterTypes": []
+      },
+      {
+        "name": "arrayOffset",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "[Lsun.java2d.loops.GraphicsPrimitive;"
+  },
+  {
+    "methods": [
+      {
+        "name": "handleNativeNotification",
+        "parameterTypes": [
+          "int"
+        ]
+      }
+    ],
+    "name": "com.apple.eawt._AppEventHandler"
+  },
+  {
+    "methods": [
+      {
+        "name": "initMenuStates",
+        "parameterTypes": [
+          "boolean",
+          "boolean",
+          "boolean",
+          "boolean"
+        ]
+      }
+    ],
+    "name": "com.apple.eawt._AppMenuBarHandler"
+  },
+  {
+    "methods": [
+      {
+        "name": "callback",
+        "parameterTypes": [
+          "java.lang.Object[]"
+        ]
+      }
+    ],
+    "name": "com.sun.jna.CallbackProxy"
+  },
+  {
+    "methods": [
+      {
+        "name": "getApiVersion",
+        "parameterTypes": []
+      }
+    ],
+    "name": "com.formdev.flatlaf.ui.FlatNativeLibrary"
+  },
+  {
+    "methods": [
+      {
+        "name": "getWindowButtonsBounds",
+        "parameterTypes": [
+          "java.awt.Window"
+        ]
+      },
+      {
+        "name": "isWindowFullScreen",
+        "parameterTypes": [
+          "java.awt.Window"
+        ]
+      },
+      {
+        "name": "setWindowButtonsSpacing",
+        "parameterTypes": [
+          "java.awt.Window",
+          "int"
+        ]
+      },
+      {
+        "name": "setWindowRoundedBorder",
+        "parameterTypes": [
+          "java.awt.Window",
+          "float",
+          "float",
+          "int"
+        ]
+      },
+      {
+        "name": "showFileChooser",
+        "parameterTypes": [
+          "java.awt.Window",
+          "int",
+          "boolean",
+          "java.lang.String",
+          "java.lang.String",
+          "java.lang.String",
+          "java.lang.String",
+          "java.lang.String",
+          "java.lang.String",
+          "java.lang.String",
+          "int",
+          "int",
+          "com.formdev.flatlaf.ui.FlatNativeMacLibrary$FileChooserCallback",
+          "int",
+          "java.lang.String[]",
+          "int[]"
+        ]
+      },
+      {
+        "name": "showMessageDialog",
+        "parameterTypes": [
+          "long",
+          "int",
+          "java.lang.String",
+          "java.lang.String",
+          "int",
+          "java.lang.String[]"
+        ]
+      },
+      {
+        "name": "toggleWindowFullScreen",
+        "parameterTypes": [
+          "java.awt.Window"
+        ]
+      }
+    ],
+    "name": "com.formdev.flatlaf.ui.FlatNativeMacLibrary"
+  },
+  {
+    "methods": [
+      {
+        "name": "approve",
+        "parameterTypes": [
+          "java.lang.String[]",
+          "int",
+          "long"
+        ]
+      }
+    ],
+    "name": "com.formdev.flatlaf.ui.FlatNativeMacLibrary$FileChooserCallback"
+  },
+  {
+    "fields": [
+      {
+        "name": "extraAlpha"
+      },
+      {
+        "name": "rule"
+      }
+    ],
+    "name": "java.awt.AlphaComposite"
+  },
+  {
+    "methods": [
+      {
+        "name": "getRGB",
+        "parameterTypes": []
+      }
+    ],
+    "name": "java.awt.Color"
+  },
+  {
+    "fields": [
+      {
+        "name": "peer"
+      }
+    ],
+    "name": "java.awt.Component"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "int",
+          "int",
+          "int",
+          "int"
+        ]
+      }
+    ],
+    "name": "java.awt.DisplayMode"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "int",
+          "int",
+          "int",
+          "int"
+        ]
+      }
+    ],
+    "name": "java.awt.Insets"
+  },
+  {
+    "methods": [
+      {
+        "name": "getButtonDownMasks",
+        "parameterTypes": []
+      }
+    ],
+    "name": "java.awt.event.InputEvent"
+  },
+  {
+    "fields": [
+      {
+        "name": "m00"
+      },
+      {
+        "name": "m01"
+      },
+      {
+        "name": "m02"
+      },
+      {
+        "name": "m10"
+      },
+      {
+        "name": "m11"
+      },
+      {
+        "name": "m12"
+      }
+    ],
+    "name": "java.awt.geom.AffineTransform"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "int",
+          "byte[]",
+          "int",
+          "float[]",
+          "int"
+        ]
+      }
+    ],
+    "name": "java.awt.geom.GeneralPath"
+  },
+  {
+    "fields": [
+      {
+        "name": "numTypes"
+      },
+      {
+        "name": "pointTypes"
+      },
+      {
+        "name": "windingRule"
+      }
+    ],
+    "name": "java.awt.geom.Path2D"
+  },
+  {
+    "fields": [
+      {
+        "name": "floatCoords"
+      }
+    ],
+    "name": "java.awt.geom.Path2D$Float"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "double",
+          "double"
+        ]
+      }
+    ],
+    "name": "java.awt.geom.Point2D$Double"
+  },
+  {
+    "fields": [
+      {
+        "name": "x"
+      },
+      {
+        "name": "y"
+      }
+    ],
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "float",
+          "float"
+        ]
+      }
+    ],
+    "name": "java.awt.geom.Point2D$Float"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "double",
+          "double",
+          "double",
+          "double"
+        ]
+      }
+    ],
+    "name": "java.awt.geom.Rectangle2D$Double"
+  },
+  {
+    "fields": [
+      {
+        "name": "height"
+      },
+      {
+        "name": "width"
+      },
+      {
+        "name": "x"
+      },
+      {
+        "name": "y"
+      }
+    ],
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "float",
+          "float",
+          "float",
+          "float"
+        ]
+      }
+    ],
+    "name": "java.awt.geom.Rectangle2D$Float"
+  },
+  {
+    "fields": [
+      {
+        "name": "colorSpace"
+      },
+      {
+        "name": "colorSpaceType"
+      },
+      {
+        "name": "isAlphaPremultiplied"
+      },
+      {
+        "name": "is_sRGB"
+      },
+      {
+        "name": "nBits"
+      },
+      {
+        "name": "numComponents"
+      },
+      {
+        "name": "supportsAlpha"
+      },
+      {
+        "name": "transparency"
+      }
+    ],
+    "methods": [
+      {
+        "name": "getRGBdefault",
+        "parameterTypes": []
+      }
+    ],
+    "name": "java.awt.image.ColorModel"
+  },
+  {
+    "fields": [
+      {
+        "name": "allgrayopaque"
+      },
+      {
+        "name": "map_size"
+      },
+      {
+        "name": "rgb"
+      },
+      {
+        "name": "transparent_index"
+      }
+    ],
+    "name": "java.awt.image.IndexColorModel"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "add",
+        "parameterTypes": [
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "contains",
+        "parameterTypes": [
+          "java.lang.Object"
+        ]
+      }
+    ],
+    "name": "java.util.ArrayList"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.String",
+          "java.lang.String",
+          "java.lang.String"
+        ]
+      }
+    ],
+    "name": "java.util.Locale"
+  },
+  {
+    "methods": [
+      {
+        "name": "notifyToolkitThreadBusy",
+        "parameterTypes": []
+      },
+      {
+        "name": "notifyToolkitThreadFree",
+        "parameterTypes": []
+      }
+    ],
+    "name": "sun.awt.AWTAutoShutdown"
+  },
+  {
+    "fields": [
+      {
+        "name": "INTVAL_STROKE_PURE"
+      }
+    ],
+    "name": "sun.awt.SunHints"
+  },
+  {
+    "methods": [
+      {
+        "name": "registerFont",
+        "parameterTypes": [
+          "java.lang.String",
+          "java.lang.String"
+        ]
+      }
+    ],
+    "name": "sun.font.CFontManager"
+  },
+  {
+    "methods": [
+      {
+        "name": "charToGlyph",
+        "parameterTypes": [
+          "int"
+        ]
+      }
+    ],
+    "name": "sun.font.CharToGlyphMapper"
+  },
+  {
+    "methods": [
+      {
+        "name": "canDisplay",
+        "parameterTypes": [
+          "char"
+        ]
+      },
+      {
+        "name": "charToGlyph",
+        "parameterTypes": [
+          "int"
+        ]
+      },
+      {
+        "name": "charToVariationGlyph",
+        "parameterTypes": [
+          "int",
+          "int"
+        ]
+      },
+      {
+        "name": "getMapper",
+        "parameterTypes": []
+      },
+      {
+        "name": "getTableBytes",
+        "parameterTypes": [
+          "int"
+        ]
+      }
+    ],
+    "name": "sun.font.Font2D"
+  },
+  {
+    "methods": [
+      {
+        "name": "getGlyphMetrics",
+        "parameterTypes": [
+          "int"
+        ]
+      }
+    ],
+    "name": "sun.font.FontStrike"
+  },
+  {
+    "fields": [
+      {
+        "name": "gposx"
+      },
+      {
+        "name": "gposy"
+      },
+      {
+        "name": "images"
+      },
+      {
+        "name": "lcdRGBOrder"
+      },
+      {
+        "name": "lcdSubPixPos"
+      },
+      {
+        "name": "len"
+      },
+      {
+        "name": "positions"
+      },
+      {
+        "name": "usePositions"
+      }
+    ],
+    "name": "sun.font.GlyphList"
+  },
+  {
+    "fields": [
+      {
+        "name": "pScalerContext"
+      }
+    ],
+    "methods": [
+      {
+        "name": "adjustPoint",
+        "parameterTypes": [
+          "java.awt.geom.Point2D$Float"
+        ]
+      },
+      {
+        "name": "getGlyphPoint",
+        "parameterTypes": [
+          "int",
+          "int"
+        ]
+      }
+    ],
+    "name": "sun.font.PhysicalStrike"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "float",
+          "float",
+          "float",
+          "float",
+          "float",
+          "float",
+          "float",
+          "float",
+          "float",
+          "float"
+        ]
+      }
+    ],
+    "name": "sun.font.StrikeMetrics"
+  },
+  {
+    "methods": [
+      {
+        "name": "readBlock",
+        "parameterTypes": [
+          "java.nio.ByteBuffer",
+          "int",
+          "int"
+        ]
+      },
+      {
+        "name": "readBytes",
+        "parameterTypes": [
+          "int",
+          "int"
+        ]
+      }
+    ],
+    "name": "sun.font.TrueTypeFont"
+  },
+  {
+    "methods": [
+      {
+        "name": "readFile",
+        "parameterTypes": [
+          "java.nio.ByteBuffer"
+        ]
+      }
+    ],
+    "name": "sun.font.Type1Font"
+  },
+  {
+    "methods": [
+      {
+        "name": "addRecord",
+        "parameterTypes": [
+          "java.lang.Object",
+          "long",
+          "long"
+        ]
+      }
+    ],
+    "name": "sun.java2d.Disposer"
+  },
+  {
+    "name": "sun.java2d.InvalidPipeException"
+  },
+  {
+    "name": "sun.java2d.NullSurfaceData"
+  },
+  {
+    "fields": [
+      {
+        "name": "clipRegion"
+      },
+      {
+        "name": "composite"
+      },
+      {
+        "name": "eargb"
+      },
+      {
+        "name": "lcdTextContrast"
+      },
+      {
+        "name": "pixel"
+      },
+      {
+        "name": "strokeHint"
+      }
+    ],
+    "name": "sun.java2d.SunGraphics2D"
+  },
+  {
+    "fields": [
+      {
+        "name": "pData"
+      },
+      {
+        "name": "valid"
+      }
+    ],
+    "name": "sun.java2d.SurfaceData"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "long",
+          "sun.java2d.loops.SurfaceType",
+          "sun.java2d.loops.CompositeType",
+          "sun.java2d.loops.SurfaceType"
+        ]
+      }
+    ],
+    "name": "sun.java2d.loops.Blit"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "long",
+          "sun.java2d.loops.SurfaceType",
+          "sun.java2d.loops.CompositeType",
+          "sun.java2d.loops.SurfaceType"
+        ]
+      }
+    ],
+    "name": "sun.java2d.loops.BlitBg"
+  },
+  {
+    "fields": [
+      {
+        "name": "AnyAlpha"
+      },
+      {
+        "name": "Src"
+      },
+      {
+        "name": "SrcNoEa"
+      },
+      {
+        "name": "SrcOver"
+      },
+      {
+        "name": "SrcOverNoEa"
+      },
+      {
+        "name": "Xor"
+      }
+    ],
+    "name": "sun.java2d.loops.CompositeType"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "long",
+          "sun.java2d.loops.SurfaceType",
+          "sun.java2d.loops.CompositeType",
+          "sun.java2d.loops.SurfaceType"
+        ]
+      }
+    ],
+    "name": "sun.java2d.loops.DrawGlyphList"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "long",
+          "sun.java2d.loops.SurfaceType",
+          "sun.java2d.loops.CompositeType",
+          "sun.java2d.loops.SurfaceType"
+        ]
+      }
+    ],
+    "name": "sun.java2d.loops.DrawGlyphListAA"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "long",
+          "sun.java2d.loops.SurfaceType",
+          "sun.java2d.loops.CompositeType",
+          "sun.java2d.loops.SurfaceType"
+        ]
+      }
+    ],
+    "name": "sun.java2d.loops.DrawGlyphListLCD"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "long",
+          "sun.java2d.loops.SurfaceType",
+          "sun.java2d.loops.CompositeType",
+          "sun.java2d.loops.SurfaceType"
+        ]
+      }
+    ],
+    "name": "sun.java2d.loops.DrawLine"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "long",
+          "sun.java2d.loops.SurfaceType",
+          "sun.java2d.loops.CompositeType",
+          "sun.java2d.loops.SurfaceType"
+        ]
+      }
+    ],
+    "name": "sun.java2d.loops.DrawParallelogram"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "long",
+          "sun.java2d.loops.SurfaceType",
+          "sun.java2d.loops.CompositeType",
+          "sun.java2d.loops.SurfaceType"
+        ]
+      }
+    ],
+    "name": "sun.java2d.loops.DrawPath"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "long",
+          "sun.java2d.loops.SurfaceType",
+          "sun.java2d.loops.CompositeType",
+          "sun.java2d.loops.SurfaceType"
+        ]
+      }
+    ],
+    "name": "sun.java2d.loops.DrawPolygons"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "long",
+          "sun.java2d.loops.SurfaceType",
+          "sun.java2d.loops.CompositeType",
+          "sun.java2d.loops.SurfaceType"
+        ]
+      }
+    ],
+    "name": "sun.java2d.loops.DrawRect"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "long",
+          "sun.java2d.loops.SurfaceType",
+          "sun.java2d.loops.CompositeType",
+          "sun.java2d.loops.SurfaceType"
+        ]
+      }
+    ],
+    "name": "sun.java2d.loops.FillParallelogram"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "long",
+          "sun.java2d.loops.SurfaceType",
+          "sun.java2d.loops.CompositeType",
+          "sun.java2d.loops.SurfaceType"
+        ]
+      }
+    ],
+    "name": "sun.java2d.loops.FillPath"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "long",
+          "sun.java2d.loops.SurfaceType",
+          "sun.java2d.loops.CompositeType",
+          "sun.java2d.loops.SurfaceType"
+        ]
+      }
+    ],
+    "name": "sun.java2d.loops.FillRect"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "long",
+          "sun.java2d.loops.SurfaceType",
+          "sun.java2d.loops.CompositeType",
+          "sun.java2d.loops.SurfaceType"
+        ]
+      }
+    ],
+    "name": "sun.java2d.loops.FillSpans"
+  },
+  {
+    "fields": [
+      {
+        "name": "pNativePrim"
+      }
+    ],
+    "name": "sun.java2d.loops.GraphicsPrimitive"
+  },
+  {
+    "methods": [
+      {
+        "name": "register",
+        "parameterTypes": [
+          "sun.java2d.loops.GraphicsPrimitive[]"
+        ]
+      }
+    ],
+    "name": "sun.java2d.loops.GraphicsPrimitiveMgr"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "long",
+          "sun.java2d.loops.SurfaceType",
+          "sun.java2d.loops.CompositeType",
+          "sun.java2d.loops.SurfaceType"
+        ]
+      }
+    ],
+    "name": "sun.java2d.loops.MaskBlit"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "long",
+          "sun.java2d.loops.SurfaceType",
+          "sun.java2d.loops.CompositeType",
+          "sun.java2d.loops.SurfaceType"
+        ]
+      }
+    ],
+    "name": "sun.java2d.loops.MaskFill"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "long",
+          "sun.java2d.loops.SurfaceType",
+          "sun.java2d.loops.CompositeType",
+          "sun.java2d.loops.SurfaceType"
+        ]
+      }
+    ],
+    "name": "sun.java2d.loops.ScaledBlit"
+  },
+  {
+    "fields": [
+      {
+        "name": "Any3Byte"
+      },
+      {
+        "name": "Any4Byte"
+      },
+      {
+        "name": "AnyByte"
+      },
+      {
+        "name": "AnyColor"
+      },
+      {
+        "name": "AnyInt"
+      },
+      {
+        "name": "AnyShort"
+      },
+      {
+        "name": "ByteBinary1Bit"
+      },
+      {
+        "name": "ByteBinary2Bit"
+      },
+      {
+        "name": "ByteBinary4Bit"
+      },
+      {
+        "name": "ByteGray"
+      },
+      {
+        "name": "ByteIndexed"
+      },
+      {
+        "name": "ByteIndexedBm"
+      },
+      {
+        "name": "FourByteAbgr"
+      },
+      {
+        "name": "FourByteAbgrPre"
+      },
+      {
+        "name": "Index12Gray"
+      },
+      {
+        "name": "Index8Gray"
+      },
+      {
+        "name": "IntArgb"
+      },
+      {
+        "name": "IntArgbBm"
+      },
+      {
+        "name": "IntArgbPre"
+      },
+      {
+        "name": "IntBgr"
+      },
+      {
+        "name": "IntRgb"
+      },
+      {
+        "name": "IntRgbx"
+      },
+      {
+        "name": "OpaqueColor"
+      },
+      {
+        "name": "ThreeByteBgr"
+      },
+      {
+        "name": "Ushort4444Argb"
+      },
+      {
+        "name": "Ushort555Rgb"
+      },
+      {
+        "name": "Ushort555Rgbx"
+      },
+      {
+        "name": "Ushort565Rgb"
+      },
+      {
+        "name": "UshortGray"
+      },
+      {
+        "name": "UshortIndexed"
+      }
+    ],
+    "name": "sun.java2d.loops.SurfaceType"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "long",
+          "sun.java2d.loops.SurfaceType",
+          "sun.java2d.loops.CompositeType",
+          "sun.java2d.loops.SurfaceType"
+        ]
+      }
+    ],
+    "name": "sun.java2d.loops.TransformHelper"
+  },
+  {
+    "fields": [
+      {
+        "name": "alphaMask"
+      },
+      {
+        "name": "xorColor"
+      },
+      {
+        "name": "xorPixel"
+      }
+    ],
+    "name": "sun.java2d.loops.XORComposite"
+  },
+  {
+    "fields": [
+      {
+        "name": "pConfigInfo"
+      }
+    ],
+    "name": "sun.java2d.opengl.CGLGraphicsConfig"
+  },
+  {
+    "name": "sun.java2d.opengl.CGLGraphicsConfig$CGLBufferCaps"
+  },
+  {
+    "name": "sun.java2d.opengl.CGLGraphicsConfig$CGLGCDisposerRecord"
+  },
+  {
+    "name": "sun.java2d.opengl.CGLGraphicsConfig$CGLImageCaps"
+  },
+  {
+    "fields": [
+      {
+        "name": "scale"
+      }
+    ],
+    "name": "sun.java2d.opengl.CGLLayer"
+  },
+  {
+    "fields": [
+      {
+        "name": "graphicsConfig"
+      },
+      {
+        "name": "height"
+      },
+      {
+        "name": "width"
+      }
+    ],
+    "name": "sun.java2d.opengl.CGLSurfaceData"
+  },
+  {
+    "name": "sun.java2d.opengl.CGLSurfaceData$CGLLayerSurfaceData"
+  },
+  {
+    "name": "sun.java2d.opengl.CGLSurfaceData$CGLOffScreenSurfaceData"
+  },
+  {
+    "name": "sun.java2d.opengl.CGLVolatileSurfaceManager"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLAnyCompositeBlit"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLBlitLoops"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLBufImgOps"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLContext"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLContext$OGLContextCaps"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLDrawImage"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLGeneralBlit"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLGeneralTransformedBlit"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLGraphicsConfig"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLMaskBlit"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLMaskFill"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLPaints"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLPaints$Gradient"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLPaints$LinearGradient"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLPaints$MultiGradient"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLPaints$RadialGradient"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLPaints$Texture"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLRTTSurfaceToSurfaceBlit"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLRTTSurfaceToSurfaceScale"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLRTTSurfaceToSurfaceTransform"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLRenderQueue"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLRenderQueue$QueueFlusher"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLRenderer"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLRenderer$Tracer"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLRenderer$Tracer$1"
+  },
+  {
+    "fields": [
+      {
+        "name": "OpenGLSurface"
+      },
+      {
+        "name": "OpenGLSurfaceRTT"
+      },
+      {
+        "name": "OpenGLTexture"
+      },
+      {
+        "name": "graphicsConfig"
+      },
+      {
+        "name": "isBIOpShaderEnabled"
+      },
+      {
+        "name": "isFBObjectEnabled"
+      },
+      {
+        "name": "isGradShaderEnabled"
+      },
+      {
+        "name": "isLCDShaderEnabled"
+      },
+      {
+        "name": "nativeHeight"
+      },
+      {
+        "name": "nativeWidth"
+      },
+      {
+        "name": "type"
+      }
+    ],
+    "name": "sun.java2d.opengl.OGLSurfaceData"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLSurfaceData$1"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLSurfaceDataProxy"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLSurfaceToSurfaceBlit"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLSurfaceToSurfaceScale"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLSurfaceToSurfaceTransform"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLSurfaceToSwBlit"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLSwToSurfaceBlit"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLSwToSurfaceScale"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLSwToSurfaceTransform"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLSwToTextureBlit"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLTextRenderer"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLTextRenderer$Tracer"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLTextureToSurfaceBlit"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLTextureToSurfaceScale"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLTextureToSurfaceTransform"
+  },
+  {
+    "name": "sun.java2d.opengl.OGLUtilities"
+  },
+  {
+    "methods": [
+      {
+        "name": "drawInMTLContext",
+        "parameterTypes": []
+      }
+    ],
+    "name": "sun.java2d.metal.MTLLayer"
+  },
+  {
+    "fields": [
+      {
+        "name": "nativeHeight"
+      },
+      {
+        "name": "nativeWidth"
+      }
+    ],
+    "name": "sun.java2d.metal.MTLSurfaceData"
+  },
+  {
+    "name": "sun.java2d.metal.MTLSurfaceData$MTLLayerSurfaceData"
+  },
+  {
+    "name": "sun.java2d.metal.MTLSurfaceData$MTLOffScreenSurfaceData"
+  },
+  {
+    "fields": [
+      {
+        "name": "bands"
+      },
+      {
+        "name": "endIndex"
+      },
+      {
+        "name": "hix"
+      },
+      {
+        "name": "hiy"
+      },
+      {
+        "name": "lox"
+      },
+      {
+        "name": "loy"
+      }
+    ],
+    "name": "sun.java2d.pipe.Region"
+  },
+  {
+    "fields": [
+      {
+        "name": "curIndex"
+      },
+      {
+        "name": "numXbands"
+      },
+      {
+        "name": "region"
+      }
+    ],
+    "name": "sun.java2d.pipe.RegionIterator"
+  },
+  {
+    "fields": [
+      {
+        "name": "platformWindow"
+      }
+    ],
+    "name": "sun.lwawt.LWWindowPeer"
+  },
+  {
+    "fields": [
+      {
+        "name": "ptr"
+      }
+    ],
+    "name": "sun.lwawt.macosx.CFRetainedResource"
+  },
+  {
+    "methods": [
+      {
+        "name": "deliverMoveResizeEvent",
+        "parameterTypes": [
+          "int",
+          "int",
+          "int",
+          "int",
+          "boolean"
+        ]
+      },
+      {
+        "name": "deliverWindowFocusEvent",
+        "parameterTypes": [
+          "boolean",
+          "sun.lwawt.macosx.CPlatformWindow"
+        ]
+      },
+      {
+        "name": "isBlocked",
+        "parameterTypes": []
+      },
+      {
+        "name": "isVisible",
+        "parameterTypes": []
+      },
+      {
+        "name": "windowDidBecomeMain",
+        "parameterTypes": []
+      }
+    ],
+    "name": "sun.lwawt.macosx.CPlatformWindow"
+  },
+  {
+    "methods": [
+      {
+        "name": "installToolkitThreadInJava",
+        "parameterTypes": []
+      }
+    ],
+    "name": "sun.lwawt.macosx.LWCToolkit"
+  }
+]

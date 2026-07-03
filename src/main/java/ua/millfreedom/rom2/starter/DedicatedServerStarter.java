@@ -21,7 +21,6 @@ import com.jthemedetecor.OsThemeDetector;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import java.awt.GraphicsEnvironment;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
@@ -63,9 +62,7 @@ public final class DedicatedServerStarter {
     public static void main(String[] args) {
         installSystemAwareSwingLookAndFeel();
         int exitCode = runFromArgs(args);
-        if (exitCode != 0) {
-            System.exit(exitCode);
-        }
+        System.exit(exitCode);
     }
 
     /**
@@ -246,10 +243,7 @@ public final class DedicatedServerStarter {
         if (!options.swingUiEnabled()) {
             return null;
         }
-        if (GraphicsEnvironment.isHeadless()) {
-            System.err.println("Swing UI requested but Java is running headless; continuing with stdout console.");
-            return null;
-        }
+        installSystemAwareSwingLookAndFeel();
         return DedicatedServerSwingConsole.createAndShow(mainWindow);
     }
 
@@ -332,7 +326,7 @@ public final class DedicatedServerStarter {
      */
     private static String usage() {
         return "Usage: DedicatedServerStarter [--config " + ServerConfigurationLoader.DEFAULT_CONFIG_PATH
-                + "] [--map 10.alm] [--bind 0.0.0.0] "
+                + "] [--map kids3.alm] [--bind 0.0.0.0] "
                 + "[--exit-after-ms 5000] [--no-ui]";
     }
 

@@ -91,12 +91,16 @@ public class CStructure extends CGameObject {
 
     /**
      * vtbl +0x2C: CStructure::DrawShadow @00461890.
-     * Full port. Native row/frame selection, terrain shadow slope, and smoothing overlay are mapped through
-     * CSprite256::DrawWithRenderEffect.
+     * Native row/frame selection, terrain shadow slope, and smoothing overlay are mapped through
+     * CSprite256::DrawWithRenderEffect for real registry ShadowY values. Java culls registry sentinel-scale ShadowY
+     * values so smoothed global lighting does not reveal shadows that native's snap/original viewport kept off-screen.
      */
     @Override
     public void drawShadow(int viewTileX, int viewTileY) {
         StructureDef def = getStructureDef();
+        if (def.hasSentinelShadowY()) {
+            return;
+        }
         int shadowSlope = resolveShadowSlope();
         double shadowAngle = Math.tan(pMapVisualObject.mapDescriptor.getShadowAngle());
         int firstStructureRow = viewTileY + pMapVisualObject.view.y - tileY;

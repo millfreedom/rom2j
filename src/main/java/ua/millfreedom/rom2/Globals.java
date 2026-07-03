@@ -1,6 +1,5 @@
 package ua.millfreedom.rom2;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import ua.millfreedom.rom2.model.CGameLighting;
 import ua.millfreedom.rom2.model.CMousePointer;
 import ua.millfreedom.rom2.model.CRect;

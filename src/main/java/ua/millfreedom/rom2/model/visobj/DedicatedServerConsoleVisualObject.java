@@ -249,7 +249,7 @@ public class DedicatedServerConsoleVisualObject extends HandlerVisualObject {
         if (nChar == VK_RETURN) {
             ChatTextAction action = ChatTextAction.global;
             action.ID.set(ChatTextAction.ACTION_ID);
-            action.senderIdAndChannel.set(0);
+            action.firstPayloadDword.set(0);
             action.playerID.set(0);
             action.text.set(readConsoleInputText(consoleInput));
             String submittedText = action.text.get();

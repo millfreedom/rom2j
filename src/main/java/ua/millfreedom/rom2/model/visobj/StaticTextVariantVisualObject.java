@@ -3,6 +3,7 @@ package ua.millfreedom.rom2.model.visobj;
 import ua.millfreedom.rom2.Globals;
 import ua.millfreedom.rom2.model.CBitmapFont;
 import ua.millfreedom.rom2.model.CRect;
+import ua.millfreedom.rom2.model.action.ChatTextAction;
 import ua.millfreedom.rom2.model.palette.Palette16;
 
 /**
@@ -35,7 +36,11 @@ public class StaticTextVariantVisualObject extends StaticTextVisualObject {
         getValue(submittedText);
         setValue("");
         draw();
-        Globals.mainWindow.getMapVisual().sendChatTextAction(submittedText.toString(), 4, 0);
+        Globals.mainWindow.getMapVisual().sendChatTextAction(
+                submittedText.toString(),
+                ChatTextAction.CHAT_DELIVERY_BROADCAST,
+                0
+        );
         return 1;
     }
 

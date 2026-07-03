@@ -243,6 +243,9 @@ public final class MapVisualObject extends CVisualObject {
     // MapVisualObject_Base +0x70 / MapVisualObject +0x74.
     public int renderFrameDirty;
 
+    // not ported. Java-only guard so render frames do not repeat a full lighting refresh for the same game minute.
+    private int lastTimeFlowLightingTimeValue = Integer.MIN_VALUE;
+
     // MapVisualObject_Base +0x74 / MapVisualObject +0x78.
     public int pendingCameraDeltaX;
 
@@ -847,7 +850,7 @@ public final class MapVisualObject extends CVisualObject {
         CMainWindow mainWindow = Globals.mainWindow;
         if (GAMEPLAY.isSetIn(mainWindow.dialogsMask) && mapDescriptor != null) {
             if (mainWindow.chatOpen != 0) {
-                mainWindow.pStatusBanner4b0VisualObject.onKeyDown(nChar);
+                mainWindow.pChatVisualObject.onKeyDown(nChar);
                 return 0;
             }
             if (VK_HELP < nChar && nChar < AFTER_NUMBER_KEYS) {
@@ -915,7 +918,7 @@ public final class MapVisualObject extends CVisualObject {
             }
             switch (nChar) {
                 case VK_BACK -> gameListControl.deinit();
-                case VK_RETURN -> mainWindow.focusStatusBannerInput();
+                case VK_RETURN -> mainWindow.focusChatInput();
                 case VK_SPACE -> {
                     if (mainWindow.chatOpen == 0) {
                         if (pCUnit == null || pCUnit.HP > -0x28) {
@@ -1577,13 +1580,13 @@ public final class MapVisualObject extends CVisualObject {
      * Native: MapVisualObject::SendChatTextAction @0041ACE5.
      * Fully ported.
      */
-    public void sendChatTextAction(String text, int channel, int recipientPlayerIndex) {
+    public void sendChatTextAction(String text, int deliveryType, int recipientPlayerIndex) {
         ChatTextAction action = ChatTextAction.global;
         action.ID.set(ChatTextAction.ACTION_ID);
         action.netID.set(resolveGameActionNetID());
         action.playerID.set(0);
         action.text.set(text);
-        action.senderIdAndChannel.set(resolveChatTargetPlayerId(recipientPlayerIndex) | (channel << 8));
+        action.firstPayloadDword.set(resolveChatTargetPlayerId(recipientPlayerIndex) | (deliveryType << 8));
         if (CServerApp.hasActiveRemoteConnection()) {
             CServerApp.sendClientGameAction(action);
         } else if (CServerApp.hasActiveLocalConnection() && Globals.gameServer != null) {
@@ -2617,7 +2620,12 @@ public final class MapVisualObject extends CVisualObject {
         drawModeledMapFrame(screenRect);
         Globals.mousePointer.update();
         drawRightPanelLeftChrome(screenRect);
-        gameListControl.draw();
+        if (!Globals.mainWindow.pChatVisualObject.suppressesGameListDraw()) {
+            if (Globals.mainWindow.sessionMode != CMainWindow.SESSION_MODE_DEDICATED_SERVER) {
+                Globals.mainWindow.pChatVisualObject.refreshDefaultGameListLayout();
+            }
+            gameListControl.draw();
+        }
         updateRenderStats();
         drawRenderStatsOverlay(screenRect);
         drawNetworkStatsOverlay(screenRect);
@@ -4120,7 +4128,7 @@ public final class MapVisualObject extends CVisualObject {
         if (Globals.gamePreferences.shadows == 0) {
             return;
         }
-        Point drawPoint = terrainVisualDrawPoint(col, row, tileAverageHeight, visualObject, sprite, frame, shadowSkew);
+        Point drawPoint = terrainVisualShadowDrawPoint(col, row, tileAverageHeight, visualObject, sprite, shadowSkew);
         sprite.drawWithRenderEffect(drawPoint.x, drawPoint.y, frame, Globals.lighting.shadowLength, shadowSlope, false);
     }
 
@@ -4137,7 +4145,7 @@ public final class MapVisualObject extends CVisualObject {
             int shadowSlope,
             int shadowSkew
     ) {
-        Point drawPoint = terrainVisualDrawPoint(col, row, tileAverageHeight, visualObject, sprite, frame, shadowSkew);
+        Point drawPoint = terrainVisualShadowDrawPoint(col, row, tileAverageHeight, visualObject, sprite, shadowSkew);
         sprite.drawWithRenderEffect(drawPoint.x, drawPoint.y, frame, Globals.lighting.lightHeight, shadowSlope, false);
     }
 
@@ -4173,6 +4181,21 @@ public final class MapVisualObject extends CVisualObject {
     ) {
         Point drawPoint = terrainVisualDrawPoint(col, row, tileAverageHeight, visualObject, sprite, frame, 0);
         sprite.drawFrameClippedY(drawPoint.x, drawPoint.y, frame, brightness, palette, false);
+    }
+
+    /**
+     * Native support extracted from MapVisualObject::RenderFrame @00406F43 terrain visual-object shadow coordinate math.
+     * Native anchors terrain visual-object shadows with sprite frame 0 while drawing the current animated frame.
+     */
+    private Point terrainVisualShadowDrawPoint(
+            int col,
+            int row,
+            int tileAverageHeight,
+            VObject visualObject,
+            CSprite256 sprite,
+            int shadowSkew
+    ) {
+        return terrainVisualDrawPoint(col, row, tileAverageHeight, visualObject, sprite, 0, shadowSkew);
     }
 
     /**
@@ -5314,7 +5337,7 @@ public final class MapVisualObject extends CVisualObject {
         clampPendingCameraDeltaToMapBounds();
 
         if (getChildById(STATUS_BANNER_INPUT_DIALOG.id) != null) {
-            Globals.mainWindow.pStatusBanner4b0VisualObject.refreshMapPanelLayout();
+            Globals.mainWindow.pChatVisualObject.refreshMapPanelLayout();
         }
     }
 
@@ -5356,7 +5379,10 @@ public final class MapVisualObject extends CVisualObject {
         if (cursor == null) {
             cursor = resolveMapCursorInsideViewport(mainWindow);
         }
-        if (isPointInsideChild(getChildById(2), mouseX, mouseY)
+        CCursor chatResizeCursor = mainWindow.pChatVisualObject.resizeCursorForPoint(mouseX, mouseY);
+        if (chatResizeCursor != null) {
+            cursor = chatResizeCursor;
+        } else if (isPointInsideChild(getChildById(2), mouseX, mouseY)
                 || isPointInsideChild(getChildById(3), mouseX, mouseY)) {
             cursor = CMousePointer.Cursor_Default;
         }
@@ -7460,7 +7486,8 @@ public final class MapVisualObject extends CVisualObject {
 
     /**
      * Native: MapVisualObject::RefreshTimeFlowLighting @0041D3B9.
-     * Fully ported.
+     * Java refreshes every game minute so CGameLighting can expose smooth per-minute samples instead of native
+     * 20-minute interval jumps.
      */
     public void refreshTimeFlowLighting(boolean forceRefresh) {
         if (GAMEPLAY.isUnsetIn(Globals.mainWindow.dialogsMask)) {
@@ -7470,12 +7497,13 @@ public final class MapVisualObject extends CVisualObject {
         int serverLoopCounter = Globals.mainWindow.serverLoopCounter;
         int timeValue = (serverLoopCounter >>> 4) + 0x168;
         boolean scheduledRefresh = (serverLoopCounter & 0xF) == 0
-                && timeValue % 0x14 == 0
+                && timeValue != lastTimeFlowLightingTimeValue
                 && Globals.gamePreferences.showTimeFlow != 0;
         if (!scheduledRefresh && !forceRefresh) {
             return;
         }
 
+        lastTimeFlowLightingTimeValue = timeValue;
         CGameLighting.UpdateGlobalLighting(timeValue);
         mapDescriptor.recalculateTerrainLighting(1, 1, 0, 0);
         applyTerrainLightOverrides();

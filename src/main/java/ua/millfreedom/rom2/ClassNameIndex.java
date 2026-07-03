@@ -1,7 +1,11 @@
 package ua.millfreedom.rom2;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,12 +20,15 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Stream;
 
+import static java.util.function.Predicate.not;
+
 /**
  * Startup class index used by archive runtime-class compatibility checks.
  * Scans classpath entries once and caches name -> FQCN mapping.
  */
 public final class ClassNameIndex {
     private static final String BASE_PACKAGE_PREFIX = ClassNameIndex.class.getPackageName() + ".";
+    private static final String STATIC_INDEX_RESOURCE = "ua/millfreedom/rom2/class-name-index.txt";
     private static final ClassNameIndex INSTANCE = new ClassNameIndex();
 
     private final Map<String, List<String>> index;
@@ -52,6 +59,7 @@ public final class ClassNameIndex {
     // not ported.
     private static Map<String, List<String>> buildIndex() {
         Map<String, Set<String>> tmp = new HashMap<>();
+        loadStaticIndex(tmp);
         String classPath = System.getProperty("java.class.path", "");
         String[] entries = classPath.split(File.pathSeparator);
         for (String entry : entries) {
@@ -69,6 +77,23 @@ public final class ClassNameIndex {
             }
         }
         return freeze(tmp);
+    }
+
+    // not ported.
+    private static void loadStaticIndex(Map<String, Set<String>> out) {
+        try (InputStream stream = ClassNameIndex.class.getClassLoader().getResourceAsStream(STATIC_INDEX_RESOURCE)) {
+            if (stream == null) {
+                return;
+            }
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+                reader.lines()
+                        .map(String::trim)
+                        .filter(not(String::isEmpty))
+                        .filter(line -> !line.startsWith("#"))
+                        .forEach(line -> addBinaryName(out, line));
+            }
+        } catch (IOException ignored) {
+        }
     }
 
     // not ported.

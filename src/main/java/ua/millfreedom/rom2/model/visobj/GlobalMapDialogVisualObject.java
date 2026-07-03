@@ -10,7 +10,7 @@ import ua.millfreedom.rom2.model.sound.SoundSystem;
 import ua.millfreedom.rom2.model.world.ScenarioLocation;
 import ua.millfreedom.rom2.res.Resources;
 
-import java.awt.*;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,7 +96,7 @@ public class GlobalMapDialogVisualObject extends HandlerVisualObject {
     //0xe0
     public final List<Point> travelRoutePoints = new ArrayList<>();
     //0xf4
-    public final Dimension heroBitmapSize = new Dimension();
+    public final CSize heroBitmapSize = new CSize();
     //0xfc
     public final Point heroDrawPoint = new Point();
     //0x104

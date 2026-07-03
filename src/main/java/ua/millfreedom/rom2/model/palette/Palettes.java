@@ -18,6 +18,11 @@ public final class Palettes {
     private static final int UNIT_OWNER_PALETTE_COUNT = 0x10;
     private static final int UNIT_OWNER_PALETTE_BYTES = 0x400;
     private static final int UNIT_OWNER_COMPLEMENT_COLOR_INDEX = 0xA4;
+    private static final int MESSAGE_PRIMARY_UNIT_PALETTE_INDEX = 2;
+    private static final int MESSAGE_DIM_UNIT_PALETTE_INDEX = 7;
+    private static final int CHAT_DELIVERY_ALLIED_UNIT_PALETTE_INDEX = 1;
+    private static final int CHAT_DELIVERY_PRIVATE_UNIT_PALETTE_INDEX = 4;
+    private static final int CHAT_DELIVERY_SHOUT_UNIT_PALETTE_INDEX = 0;
 
     public static final int SIZE16 = 16;
     public static final int SIZE256 = 256;
@@ -56,13 +61,13 @@ public final class Palettes {
      * initializer @0047636C, constructor @0047637B, atexit wrapper @0047638A, destructor @0047639C.
      */
     public static final List<CGamePalette> unitGamePalettes = new ArrayList<>();
-    public static final Palette16[] unitPaletteComplements = new Palette16[UNIT_OWNER_PALETTE_COUNT];
+    public static final Palette16[] unitPaletteComplements = initUnitPaletteComplements();
     private static Palette16 messagePrimary = gray;
     private static Palette16 messageDim = grayDim;
-    private static Palette16 messageAccent = gray;
-    private static Palette16 messagePlayerSlot4 = gray;
-    private static Palette16 messagePlayerSlot1 = gray;
-    private static Palette16 messagePlayerSlot0 = gray;
+    private static Palette16 chatSayOrBroadcast = gray;
+    private static Palette16 chatPrivate = gray;
+    private static Palette16 chatAllied = gray;
+    private static Palette16 chatShout = gray;
 
     static {
         p16 = initP16();
@@ -122,19 +127,19 @@ public final class Palettes {
         if (messageColors == 0) {
             messagePrimary = gray;
             messageDim = grayDim;
-            messageAccent = gray;
-            messagePlayerSlot1 = gray;
-            messagePlayerSlot4 = gray;
-            messagePlayerSlot0 = gray;
+            chatSayOrBroadcast = gray;
+            chatAllied = gray;
+            chatPrivate = gray;
+            chatShout = gray;
             return;
         }
 
-        messagePrimary = p16.get(2);
-        messageDim = p16.get(7);
-        messageAccent = orangeish;
-        messagePlayerSlot1 = p16.get(1);
-        messagePlayerSlot4 = p16.get(4);
-        messagePlayerSlot0 = p16.get(0);
+        messagePrimary = unitOwnerTextPalette(MESSAGE_PRIMARY_UNIT_PALETTE_INDEX);
+        messageDim = unitOwnerTextPalette(MESSAGE_DIM_UNIT_PALETTE_INDEX);
+        chatSayOrBroadcast = orangeish;
+        chatAllied = unitOwnerTextPalette(CHAT_DELIVERY_ALLIED_UNIT_PALETTE_INDEX);
+        chatPrivate = unitOwnerTextPalette(CHAT_DELIVERY_PRIVATE_UNIT_PALETTE_INDEX);
+        chatShout = unitOwnerTextPalette(CHAT_DELIVERY_SHOUT_UNIT_PALETTE_INDEX);
     }
 
     /**
@@ -152,31 +157,38 @@ public final class Palettes {
     }
 
     /**
-     * Native support extracted from message palette pointer `PTR_g_gray_005f17fc`.
+     * Native support extracted from chat delivery 0/4 palette pointer `PTR_chatSayOrBroadcastPalette_005f17fc`.
      */
-    public static Palette16 messageAccent() {
-        return messageAccent;
+    public static Palette16 chatSayOrBroadcast() {
+        return chatSayOrBroadcast;
     }
 
     /**
-     * Native support extracted from message palette pointer `PTR_g_gray_005f1800`.
+     * Native support extracted from chat delivery 2 palette pointer `PTR_chatPrivatePalette_005f1800`.
      */
-    public static Palette16 messagePlayerSlot4() {
-        return messagePlayerSlot4;
+    public static Palette16 chatPrivate() {
+        return chatPrivate;
     }
 
     /**
-     * Native support extracted from message palette pointer `PTR_g_gray_005f1804`.
+     * Native support extracted from chat delivery 1 palette pointer `PTR_chatAlliedPalette_005f1804`.
      */
-    public static Palette16 messagePlayerSlot1() {
-        return messagePlayerSlot1;
+    public static Palette16 chatAllied() {
+        return chatAllied;
     }
 
     /**
-     * Native support extracted from message palette pointer `PTR_g_gray_005f1808`.
+     * Native support extracted from chat delivery 3 palette pointer `PTR_chatShoutPalette_005f1808`.
      */
-    public static Palette16 messagePlayerSlot0() {
-        return messagePlayerSlot0;
+    public static Palette16 chatShout() {
+        return chatShout;
+    }
+
+    /**
+     * Native support extracted from `g_pal16Colors[index] @0061FAC8`.
+     */
+    public static Palette16 unitOwnerTextPalette(int paletteIndex) {
+        return unitPaletteComplements[paletteIndex];
     }
 
     /**
@@ -194,11 +206,11 @@ public final class Palettes {
     /**
      * Native support extracted from the trailing `human.pal` bootstrap in UnitTypes::loadUnitTypes @00479B1E and
      * owner-palette rebuild in Global::RefreshGamePalettes @0047E345. Populates Java equivalents of native
-     * `GamePaletteArray_units @00622960` and `g_palComplements @0061FAC8`.
+     * `GamePaletteArray_units @00622960` and `g_pal16Colors @0061FAC8`.
      */
     public static void loadUnitOwnerPalettes() {
         unitGamePalettes.clear();
-        Arrays.fill(unitPaletteComplements, null);
+        clearUnitPaletteComplements();
 
         ByteBuffer humanPaletteData = Globals.gameFileManager.get(HUMAN_UNIT_PALETTE_PATH).duplicate().order(ByteOrder.LITTLE_ENDIAN);
         for (int paletteIndex = 0; paletteIndex < UNIT_OWNER_PALETTE_COUNT; paletteIndex++) {
@@ -206,7 +218,7 @@ public final class Palettes {
             CGamePalette gamePalette = new CGamePalette();
             gamePalette.init(rawPalette, UNIT_OWNER_PALETTE_COUNT, 2, 1);
             unitGamePalettes.add(gamePalette);
-            unitPaletteComplements[paletteIndex] = buildUnitPaletteComplement(gamePalette);
+            writeUnitPaletteComplement(gamePalette, unitPaletteComplements[paletteIndex]);
         }
 
         CGamePalette grayscalePalette = new CGamePalette();
@@ -232,16 +244,36 @@ public final class Palettes {
     }
 
     /**
-     * Native support extracted from the `g_palComplements[i1][j1][0..1]` writes in UnitTypes::loadUnitTypes @00479B1E.
+     * Native support extracted from zeroed storage backing `g_pal16Colors @0061FAC8`.
      */
-    private static Palette16 buildUnitPaletteComplement(CGamePalette gamePalette) {
-        RGB16[] complement = new RGB16[SIZE16];
+    private static Palette16[] initUnitPaletteComplements() {
+        Palette16[] palettes = new Palette16[UNIT_OWNER_PALETTE_COUNT];
+        for (int paletteIndex = 0; paletteIndex < UNIT_OWNER_PALETTE_COUNT; paletteIndex++) {
+            RGB16[] data = new RGB16[SIZE16];
+            Arrays.fill(data, RGB16.BLACK);
+            palettes[paletteIndex] = new Palette16(data);
+        }
+        return palettes;
+    }
+
+    /**
+     * not ported. Clears Java's preallocated `g_pal16Colors @0061FAC8` mirror before rebuilding it.
+     */
+    private static void clearUnitPaletteComplements() {
+        for (Palette16 unitPaletteComplement : unitPaletteComplements) {
+            Arrays.fill(unitPaletteComplement.data(), RGB16.BLACK);
+        }
+    }
+
+    /**
+     * Native support extracted from the `g_pal16Colors[i1][j1][0..1]` writes in UnitTypes::loadUnitTypes @00479B1E.
+     */
+    private static void writeUnitPaletteComplement(CGamePalette gamePalette, Palette16 target) {
         for (int pairIndex = 0; pairIndex < 8; pairIndex++) {
             RGB16 color = gamePalette.paletteData[0x0F - pairIndex].data()[UNIT_OWNER_COMPLEMENT_COLOR_INDEX];
-            complement[pairIndex * 2] = color;
-            complement[pairIndex * 2 + 1] = color;
+            target.data()[pairIndex * 2] = color;
+            target.data()[pairIndex * 2 + 1] = color;
         }
-        return new Palette16(complement);
     }
 
     /**

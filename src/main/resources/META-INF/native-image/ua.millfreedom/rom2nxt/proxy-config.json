@@ -1,0 +1,17 @@
+[
+  {
+    "interfaces": [
+      "com.sun.jna.platform.mac.SystemB"
+    ]
+  },
+  {
+    "interfaces": [
+      "de.jangassen.jfa.foundation.FoundationLibrary"
+    ]
+  },
+  {
+    "interfaces": [
+      "oshi.jna.platform.mac.SystemB"
+    ]
+  }
+]

@@ -6,6 +6,7 @@ import ua.millfreedom.rom2.CFile.LEWriter;
 import ua.millfreedom.rom2.dserver.DedicatedServerPlayerStatus;
 import ua.millfreedom.rom2.dserver.DedicatedServerStatusSnapshot;
 import ua.millfreedom.rom2.model.*;
+import ua.millfreedom.rom2.model.action.ChatTextAction;
 import ua.millfreedom.rom2.model.action.LoginRequestAction;
 import ua.millfreedom.rom2.model.control.*;
 import ua.millfreedom.rom2.model.enums.MessageCodes;
@@ -165,7 +166,7 @@ public class CMainWindow extends CFrameWnd {
     //0x134
     public StartupLogoDialogVisualObject pStartupLogoDialogVisualObject;
     //0x138
-    public StatusBanner4b0VisualObject pStatusBanner4b0VisualObject;
+    public ChatVisualObject pChatVisualObject;
     //0x13c
     public LoadDialogVisualObject pLoadDialogVisualObject;
     //0x140
@@ -1509,10 +1510,10 @@ public class CMainWindow extends CFrameWnd {
             if (sessionMode != SESSION_MODE_CAMPAIGN) {
                 playGameplayMusicPlaylist();
             }
-        } else if (dialog == pStatusBanner4b0VisualObject) {
-            pMapVisualObject.removeChild(pStatusBanner4b0VisualObject);
+        } else if (dialog == pChatVisualObject) {
+            pMapVisualObject.removeChild(pChatVisualObject);
             if (readDialogResult(dialog) == MessageCodes.DIALOG_OK) {
-                sendStatusBannerChatText();
+                sendChatInputText();
             }
         } else if (dialog == pStartupLogoDialogVisualObject) {
             dialogsMask = STARTUP_LOGO.excludeIn(dialogsMask);
@@ -1689,25 +1690,30 @@ public class CMainWindow extends CFrameWnd {
     }
 
     /**
-     * Native support extracted from the StatusBanner4b0VisualObject branch in CMainWindow::onDialogClosed @004891D8.
+     * Native support extracted from the ChatVisualObject branch in CMainWindow::onDialogClosed @004891D8.
      */
-    private void sendStatusBannerChatText() {
+    private void sendChatInputText() {
         StringBuilder text = new StringBuilder();
-        pStatusBanner4b0VisualObject.getValue(text);
+        pChatVisualObject.getValue(text);
         String chatText = text.toString();
-        char firstChar = chatText.charAt(0);
+        // Native CString::GetAt @004029E0 returns m_pchData[0], so an empty CString yields NUL.
+        char firstChar = chatText.isEmpty() ? '\0' : chatText.charAt(0);
         if (firstChar == '=') {
-            pMapVisualObject.sendChatTextAction(chatText.substring(1), 3, 0);
+            pMapVisualObject.sendChatTextAction(chatText.substring(1), ChatTextAction.CHAT_DELIVERY_SHOUT, 0);
         } else if (firstChar == '-') {
-            int recipientPlayerIndex = pStatusBanner4b0VisualObject.textBlock.chatRecipientPlayerIndex;
+            int recipientPlayerIndex = pChatVisualObject.textBlock.chatRecipientPlayerIndex;
             if (recipientPlayerIndex == -1) {
-                pMapVisualObject.sendChatTextAction(chatText.substring(1), 1, 0);
+                pMapVisualObject.sendChatTextAction(chatText.substring(1), ChatTextAction.CHAT_DELIVERY_ALLIED, 0);
             } else {
-                int messageStart = pStatusBanner4b0VisualObject.textBlock.chatRecipientPrefixLength;
-                pMapVisualObject.sendChatTextAction(chatText.substring(messageStart), 2, recipientPlayerIndex);
+                int messageStart = pChatVisualObject.textBlock.chatRecipientPrefixLength;
+                pMapVisualObject.sendChatTextAction(
+                        chatText.substring(messageStart),
+                        ChatTextAction.CHAT_DELIVERY_PRIVATE,
+                        recipientPlayerIndex
+                );
             }
         } else {
-            pMapVisualObject.sendChatTextAction(chatText, 0, 0);
+            pMapVisualObject.sendChatTextAction(chatText, ChatTextAction.CHAT_DELIVERY_SAY, 0);
         }
     }
 
@@ -4066,21 +4072,21 @@ public class CMainWindow extends CFrameWnd {
     }
 
     /**
-     * Native support extracted from StatusBanner4b0VisualObject::ShowDialog @0043B3D7 and HideDialog @0043B43F.
+     * Native support extracted from ChatVisualObject::ShowDialog @0043B3D7 and HideDialog @0043B43F.
      */
-    public void setStatusBannerInputCapture(boolean active) {
+    public void setChatInputCapture(boolean active) {
         chatOpen = active ? 1 : 0;
     }
 
     /**
-     * Native: CMainWindow::focusStatusBannerInput @0048F36E.
+     * Native: CMainWindow::focusChatInput @0048F36E.
      * Fully ported.
      */
-    public void focusStatusBannerInput() {
+    public void focusChatInput() {
         pMapVisualObject.areaEffectRefreshPending = 1;
-        pMapVisualObject.addChild(pStatusBanner4b0VisualObject);
-        pStatusBanner4b0VisualObject.refreshMapPanelLayout();
-        pStatusBanner4b0VisualObject.showDialog();
+        pMapVisualObject.addChild(pChatVisualObject);
+        pChatVisualObject.refreshMapPanelLayout();
+        pChatVisualObject.showDialog();
         inputController.draw();
         chatOpen = 1;
     }
@@ -4166,7 +4172,8 @@ public class CMainWindow extends CFrameWnd {
         pStartGameSetupDialogVisualObject = new StartGameSetupDialogVisualObject(0x466, mainLeft, mainTop, mainRight, mainBottom);
         pFameHallDialogVisualObject = new FameHallDialogVisualObject(0x4B0, mainLeft, mainTop, mainRight, mainBottom);
         pFameHallDocumentDialogVisualObject = new FameHallDocumentDialogVisualObject(0x4BA, mainLeft, mainTop, mainRight, mainBottom);
-        pStatusBanner4b0VisualObject = new StatusBanner4b0VisualObject(0x4B0, 0, 0, mapRight, 0x1E);
+        pChatVisualObject = new ChatVisualObject(0x4B0, 0, 0, mapRight, 0x1E);
+        pChatVisualObject.attachGameListControl(pMapVisualObject.gameListControl);
         chatOpen = 0;
         pDropGoldPromptVisualObject = new DropGoldPromptVisualObject(1000000000, 100, screenHeight - 200);
         pShopDialogVisualObject.initialize();
@@ -4236,7 +4243,7 @@ public class CMainWindow extends CFrameWnd {
         pKaargTownDialogVisualObject = null;
         pCreditsDialogVisualObject = null;
         pStartupLogoDialogVisualObject = null;
-        pStatusBanner4b0VisualObject = null;
+        pChatVisualObject = null;
         pFameHallDialogVisualObject = null;
         pFameHallDocumentDialogVisualObject = null;
     }

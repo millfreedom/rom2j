@@ -44,7 +44,7 @@ public class NewPlayerAction extends ChatTextAction {
         NewPlayerAction action = global;
         action.ID.set(ACTION_ID);
         action.playerID.set(targetPlayer.playerId);
-        action.senderIdAndChannel.set(packLobbyPlayerInfo(sourcePlayer));
+        action.firstPayloadDword.set(packLobbyPlayerInfo(sourcePlayer));
         action.text.set(sourcePlayer.name);
         return action;
     }
@@ -60,13 +60,13 @@ public class NewPlayerAction extends ChatTextAction {
         if (newPlayer) {
             packedInfo |= 0x02000000;
         }
-        action.senderIdAndChannel.set(packedInfo);
+        action.firstPayloadDword.set(packedInfo);
         action.text.set(player.name);
         return action;
     }
 
     /**
-     * Native support extracted from CServerApp::sendLobbyPlayerInfoSnapshot @00504D39 senderIdAndChannel packing.
+     * Native support extracted from CServerApp::sendLobbyPlayerInfoSnapshot @00504D39 firstPayloadDword packing.
      */
     private static int packLobbyPlayerInfo(Player player) {
         return (player.playerId & 0xFF)
@@ -89,7 +89,7 @@ public class NewPlayerAction extends ChatTextAction {
      */
     @Override
     public void handle(MapVisualObject mapVisualObject) {
-        int packedPlayerState = senderIdAndChannel.get();
+        int packedPlayerState = firstPayloadDword.get();
         int playerId = packedPlayerState & 0xFF;
         boolean firstClientPlayerSlotOnly = mapVisualObject.clientPlayers.size() == 1;
         CPlayer player = mapVisualObject.ensureClientPlayerById(playerId);

@@ -5,12 +5,12 @@ import ua.millfreedom.rom2.GUI;
 import ua.millfreedom.rom2.model.CBmp256;
 import ua.millfreedom.rom2.model.CBmp64k;
 import ua.millfreedom.rom2.model.CRect;
+import ua.millfreedom.rom2.model.CSize;
 import ua.millfreedom.rom2.model.GameBitmapFrame;
 import ua.millfreedom.rom2.model.sound.Sound;
 import ua.millfreedom.rom2.model.sound.SoundSystem;
 import ua.millfreedom.rom2.text.MainText;
 
-import java.awt.Dimension;
 import java.awt.Point;
 
 import static ua.millfreedom.rom2.text.GameTexts.get;
@@ -164,7 +164,7 @@ public class SkillSelectionPanelVisualObject extends CVisualObject {
     //0xb4
     public final Point[] optionDrawPoints = new Point[NATIVE_SLOT_COUNT];
     //0xdc
-    public final Dimension[] optionDrawSizes = new Dimension[NATIVE_SLOT_COUNT];
+    public final CSize[] optionDrawSizes = new CSize[NATIVE_SLOT_COUNT];
     //0x104
     public byte optionHitMarkerId0;
     //0x105
@@ -326,7 +326,7 @@ public class SkillSelectionPanelVisualObject extends CVisualObject {
             hoveredOptionGraphics[i] = null;
             rotatingHighlightOptionGraphics[i] = null;
             optionDrawPoints[i] = new Point();
-            optionDrawSizes[i] = new Dimension();
+            optionDrawSizes[i] = new CSize();
             optionStateFlags[i] = 0;
             selectionSounds[i] = null;
         }
@@ -527,7 +527,7 @@ public class SkillSelectionPanelVisualObject extends CVisualObject {
     private static void drawOptionGraphic(
             CBmp64k optionGraphic,
             Point drawPoint,
-            Dimension drawSize
+            CSize drawSize
     ) {
         optionGraphic.drawRectMasked(drawPoint.x, drawPoint.y, 0, 0, drawSize.width, drawSize.height);
     }

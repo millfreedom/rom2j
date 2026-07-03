@@ -52,7 +52,7 @@ public class PlayerKickedAction extends ChatTextAction {
         action.ID.set(ACTION_ID);
         action.text.set(player.name);
         action.playerID.set(0);
-        action.senderIdAndChannel.set((int) (short) player.playerId);
+        action.firstPayloadDword.set((int) (short) player.playerId);
         return action;
     }
 
@@ -85,7 +85,7 @@ public class PlayerKickedAction extends ChatTextAction {
      * Native support extracted from MapVisualObject::HandleGameAction @0041557B self-kick branch.
      */
     public boolean targetsCurrentPlayer(MapVisualObject mapVisualObject) {
-        return senderIdAndChannel.get() == mapVisualObject.currentPlayer.playerId;
+        return firstPayloadDword.get() == mapVisualObject.currentPlayer.playerId;
     }
 
 }

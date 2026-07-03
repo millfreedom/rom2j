@@ -829,15 +829,29 @@ public class UnitChangeAction extends CGameAction {
      * Native support extracted from MapVisualObject::HandleGameAction @004103F4.
      */
     private static void updateUnitChangeDeathState(CUnit unit) {
-        final int hp = unit.HP;
-        unit.field51_0x184 = (byte) switch (hp) {
-            case int i when i < -600 -> 5;
-            case int i when i < -40 -> 4;
-            case int i when i < -20 -> 3;
-            case int i when i < -10 -> 2;
-            case int i when i <= 0 -> 1;
-            default -> 0;
-        };
+        unit.field51_0x184 = hpToDeathState(unit.HP);
+    }
+
+    /**
+     * Native support extracted from MapVisualObject::HandleGameAction @004103F4 HP-to-death-state thresholds.
+     */
+    private static byte hpToDeathState(int hp) {
+        if (hp < -600) {
+            return 5;
+        }
+        if (hp < -40) {
+            return 4;
+        }
+        if (hp < -20) {
+            return 3;
+        }
+        if (hp < -10) {
+            return 2;
+        }
+        if (hp <= 0) {
+            return 1;
+        }
+        return 0;
     }
 
     /**

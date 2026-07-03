@@ -42,7 +42,7 @@ public class MapChecksumAction extends ChatTextAction {
      */
     @Override
     public void handle(MapVisualObject mapVisualObject) {
-        if (computeFileChecksum(text.get()) == senderIdAndChannel.get()) {
+        if (computeFileChecksum(text.get()) == firstPayloadDword.get()) {
             Globals.mainWindow.fileTransferChecksumMatched = 1;
             Globals.mainWindow.fileTransferDownloadPending = 0;
         } else {

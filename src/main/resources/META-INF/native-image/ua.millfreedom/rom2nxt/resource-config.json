@@ -1,0 +1,65 @@
+{
+  "resources": {
+    "includes": [
+      {
+        "pattern": "com/sun/jna/.*/.*"
+      },
+      {
+        "pattern": "oshi.*\\.properties"
+      },
+      {
+        "pattern": "simplelogger\\.properties"
+      },
+      {
+        "pattern": "META-INF/services/.*"
+      },
+      {
+        "pattern": "ua/millfreedom/rom2/class-name-index\\.txt"
+      },
+      {
+        "pattern": "macos/x64/org/lwjgl/.*\\.dylib"
+      },
+      {
+        "pattern": "META-INF/macos/x64/org/lwjgl/.*"
+      },
+      {
+        "pattern": "com/formdev/flatlaf/.*"
+      },
+      {
+        "pattern": "com/sun/swing/internal/plaf/basic/resources/.*"
+      },
+      {
+        "pattern": "javax/swing/text/html/default\\.css"
+      },
+      {
+        "pattern": "jdk/internal/icu/impl/data/.*"
+      }
+    ]
+  },
+  "bundles": [
+    {
+      "name": "com.formdev.flatlaf.resources.Bundle",
+      "locales": [
+        "en-CA"
+      ]
+    },
+    {
+      "name": "com.sun.swing.internal.plaf.basic.resources.basic",
+      "locales": [
+        "en-CA"
+      ]
+    },
+    {
+      "name": "sun.awt.resources.awt",
+      "locales": [
+        "en-CA"
+      ]
+    },
+    {
+      "name": "sun.awt.resources.awtosx",
+      "locales": [
+        "en-CA"
+      ]
+    }
+  ]
+}

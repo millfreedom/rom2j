@@ -206,7 +206,7 @@ public class CBaseFont implements MfcSerializable {
 
     /**
      * Native: CBaseFont::FitIntoRect @0045CCBB.
-     * Fully ported.
+     * Ported with a no-progress guard for exact-width unspaced text.
      */
     public List<String> fitIntoRect(CRect rect, String text) {
         Objects.requireNonNull(rect, "rect");
@@ -247,7 +247,7 @@ public class CBaseFont implements MfcSerializable {
                 }
             }
 
-            if (maxWidth < getTextWidth(candidateLine) && committedLength == 0) {
+            if (maxWidth <= getTextWidth(candidateLine) && committedLength == 0) {
                 committedLength = candidateLength;
             }
 

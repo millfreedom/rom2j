@@ -111,22 +111,27 @@ public class SoundConfigRootVisualObject extends CVisualObject {
     public void update() {
         CRect screenRect = new CRect();
         clientToScreen(screenRect, cRect);
-        int fontHeight = bitmapFont.getHeight();
-        for (int lineIndex = 0; lineIndex < committedLines.size(); lineIndex++) {
-            String line = committedLines.get(lineIndex);
-            if (lineIndex == 0) {
-                drawTopCommittedLine(screenRect, line, fontHeight);
-            } else {
-                int y = screenRect.bottom - fontHeight * ((committedLines.size() - lineIndex) + 1);
-                drawLine(screenRect.left, y, line, inputTextPalette);
+        Globals.renderer.pushClip(screenRect.left, screenRect.top, screenRect.right, screenRect.bottom);
+        try {
+            int fontHeight = bitmapFont.getHeight();
+            for (int lineIndex = 0; lineIndex < committedLines.size(); lineIndex++) {
+                String line = committedLines.get(lineIndex);
+                if (lineIndex == 0) {
+                    drawTopCommittedLine(screenRect, line, fontHeight);
+                } else {
+                    int y = screenRect.bottom - fontHeight * ((committedLines.size() - lineIndex) + 1);
+                    drawLine(screenRect.left, y, line, inputTextPalette);
+                }
             }
-        }
 
-        String displayText = cursorVisibleFlag == 0 ? inputText : inputText + CURSOR_SUFFIX;
-        if (committedLines.isEmpty()) {
-            drawTopCommittedLine(screenRect, displayText, fontHeight);
-        } else {
-            drawLine(screenRect.left, screenRect.bottom - fontHeight, displayText, inputTextPalette);
+            String displayText = cursorVisibleFlag == 0 ? inputText : inputText + CURSOR_SUFFIX;
+            if (committedLines.isEmpty()) {
+                drawTopCommittedLine(screenRect, displayText, fontHeight);
+            } else {
+                drawLine(screenRect.left, screenRect.bottom - fontHeight, displayText, inputTextPalette);
+            }
+        } finally {
+            Globals.renderer.popClip();
         }
     }
 

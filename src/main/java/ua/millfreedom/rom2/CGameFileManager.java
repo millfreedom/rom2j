@@ -9,13 +9,7 @@ import ua.millfreedom.rom2.res.ResFS;
 import ua.millfreedom.rom2.res.ResInFile;
 import ua.millfreedom.rom2.res.Resources;
 
-import java.io.ByteArrayInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
@@ -24,9 +18,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import static ua.millfreedom.rom2.res.Constants.*;
 import static ua.millfreedom.rom2.CFile.CFileException.Cause.BAD_PATH;
 import static ua.millfreedom.rom2.CFile.CFileException.Cause.FILE_NOT_FOUND;
+import static ua.millfreedom.rom2.res.Constants.*;
 
 
 public final class CGameFileManager implements MfcSerializable {
@@ -93,13 +87,9 @@ public final class CGameFileManager implements MfcSerializable {
      */
     public void loadNativePrimaryStartupResources() {
         //loadResources(List.of(PATCH));
-        loadResources(Arrays.asList(GRAPHICS, MAIN, PATCH, WORLD));
-        loadOptionalPrimaryStartupResource(MUSIC, () -> {
-            Globals.soundPreferences.musicAvailable = 0;
-        });
-        loadOptionalPrimaryStartupResource(VIDEO, () -> {
-            Globals.videoResourcesAvailable = false;
-        });
+        loadResources(Arrays.asList(GRAPHICS, MAIN, WORLD, PATCH));
+        loadOptionalPrimaryStartupResource(MUSIC, () -> Globals.soundPreferences.musicAvailable = 0);
+        loadOptionalPrimaryStartupResource(VIDEO, () -> Globals.videoResourcesAvailable = false);
     }
 
     /**
@@ -248,17 +238,32 @@ public final class CGameFileManager implements MfcSerializable {
      * Native: CGameFileManager::OpenFile @004E2B5D.
      * Fully ported for Java-managed resource/file buffers.
      * Java returns the opened byte buffer directly instead of the native transient ResBasicFile wrapper.
+     * Java also searching a file in that order:
+     * regular folders:
+     * - locale/
+     * - patch/
+     * -
+     *
+     * allowed directories first, then in .res in 2 passes:
+     *
+     * first one in "patch/", then - normal pass
      */
     @SneakyThrows
     public ByteBuffer openGameFileData(String path) {
         Objects.requireNonNull(path, "path");
         String normalized = copyLowerIfEnabled(path);
 
-        ByteBuffer loadedResource = data.get(normalized);
-        if (loadedResource != null && !data.isUpdated(normalized)) {
-            return loadedResource.slice().order(ByteOrder.LITTLE_ENDIAN);
+        ByteBuffer loadedResource;
+        //is it living in a locale/ or patch/?
+        if (!normalized.startsWith(PATCH) && !normalized.startsWith(LOCALE)) {
+            for (String tried : List.of(LOCALE, PATCH)) {
+                loadedResource = openGameFileData(Resources.path(tried, normalized));
+                if (loadedResource != null) {
+                    return loadedResource;
+                }
+            }
         }
-
+        //is it in a regular filesystem?
         for (String base : names) {
             Path candidate = Path.of(buildFullFileName(base, normalized));
             if (Files.exists(candidate)) {
@@ -266,7 +271,14 @@ public final class CGameFileManager implements MfcSerializable {
             }
         }
 
-        return openBundledPatchOverlayResourceData(normalized);
+        //is it in .res files?
+        loadedResource = data.get(normalized);
+        if (loadedResource != null) {
+            return loadedResource.slice().order(ByteOrder.LITTLE_ENDIAN);
+        }
+
+        //unable to find a file anywhere
+        return null;
     }
 
     /**

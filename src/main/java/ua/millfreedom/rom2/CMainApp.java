@@ -145,8 +145,24 @@ public final class CMainApp {
             if (InitInstance()) {
                 Run();
             }
-        } finally {
+        } catch (Exception exception) {
+            exitInstancePreservingStartupFailure(exception);
+            throw exception;
+        } catch (Error error) {
+            exitInstancePreservingStartupFailure(error);
+            throw error;
+        }
+        ExitInstance();
+    }
+
+    /**
+     * not ported. Keeps startup failures visible when Java cleanup also fails after partial initialization.
+     */
+    private void exitInstancePreservingStartupFailure(Throwable startupFailure) {
+        try {
             ExitInstance();
+        } catch (Throwable cleanupFailure) {
+            startupFailure.addSuppressed(cleanupFailure);
         }
     }
 

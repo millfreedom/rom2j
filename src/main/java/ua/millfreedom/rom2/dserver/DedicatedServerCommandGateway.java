@@ -31,7 +31,7 @@ public final class DedicatedServerCommandGateway {
 
         ChatTextAction action = ChatTextAction.global;
         action.ID.set(ChatTextAction.ACTION_ID);
-        action.senderIdAndChannel.set(0);
+        action.firstPayloadDword.set(0);
         action.playerID.set(0);
         action.text.set(submittedText);
         Globals.gameServer.pushMessage(submittedText);

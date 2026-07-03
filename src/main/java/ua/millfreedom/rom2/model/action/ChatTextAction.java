@@ -10,6 +10,7 @@ import ua.millfreedom.rom2.model.enums.MessageCodes;
 import ua.millfreedom.rom2.model.palette.Palette16;
 import ua.millfreedom.rom2.model.palette.Palettes;
 import ua.millfreedom.rom2.model.visobj.MapVisualObject;
+import ua.millfreedom.rom2.model.window.DialogsMaskFlag;
 
 import java.nio.charset.StandardCharsets;
 
@@ -19,11 +20,16 @@ import java.nio.charset.StandardCharsets;
 public class ChatTextAction extends CGameAction {
     public static final int ACTION_ID = GameActionId.CHAT_TEXT_ACTION_91.id;
     public static final ChatTextAction global = new ChatTextAction();
+    public static final int CHAT_DELIVERY_SAY = 0;
+    public static final int CHAT_DELIVERY_ALLIED = 1;
+    public static final int CHAT_DELIVERY_PRIVATE = 2;
+    public static final int CHAT_DELIVERY_SHOUT = 3;
+    public static final int CHAT_DELIVERY_BROADCAST = 4;
     // Native timed chat line lifetime used by MapVisualObject::HandleGameAction @00414A90.
     private static final int CHAT_LINE_LIFETIME_MS = 10000;
 
     //0x0A
-    public final Property<Integer> senderIdAndChannel = i32(BODY_OFFSET);
+    public final Property<Integer> firstPayloadDword = i32(BODY_OFFSET);
     //0x0E
     public final Property<Integer> textLength = u8(BODY_OFFSET + Integer.BYTES);
     //0x0F
@@ -36,7 +42,7 @@ public class ChatTextAction extends CGameAction {
     public ChatTextAction() {
         super();
         ID.set(ACTION_ID);
-        senderIdAndChannel.set(0);
+        firstPayloadDword.set(0);
         text.set("");
     }
 
@@ -48,7 +54,7 @@ public class ChatTextAction extends CGameAction {
         super();
         ID.set(from.ID.get());
         netID.set(from.netID.get());
-        senderIdAndChannel.set(from.senderIdAndChannel.get());
+        firstPayloadDword.set(from.firstPayloadDword.get());
         textLength.set(from.textLength.get());
         int textBytesWithTerminator = textLength.get() + 1;
         PutSlice(
@@ -66,7 +72,7 @@ public class ChatTextAction extends CGameAction {
     public ChatTextAction(CString text) {
         super();
         ID.set(ACTION_ID);
-        senderIdAndChannel.set(0);
+        firstPayloadDword.set(0);
         this.text.set(text.toString());
     }
 
@@ -77,7 +83,7 @@ public class ChatTextAction extends CGameAction {
     public ChatTextAction(String text) {
         super();
         ID.set(ACTION_ID);
-        senderIdAndChannel.set(0);
+        firstPayloadDword.set(0);
         this.text.set(text);
     }
 
@@ -89,7 +95,7 @@ public class ChatTextAction extends CGameAction {
         action.ID.set(ACTION_ID);
         action.text.set(text);
         action.playerID.set(player == null ? 0 : player.playerId);
-        action.senderIdAndChannel.set(0);
+        action.firstPayloadDword.set(0);
         return action;
     }
 
@@ -139,32 +145,50 @@ public class ChatTextAction extends CGameAction {
     @Override
     public void handle(MapVisualObject mapVisualObject) {
         if (ID.get() == ACTION_ID) {
-            int senderPlayerId = senderIdAndChannel.get() & 0xFF;
-            int channel = (senderIdAndChannel.get() >>> 8) & 0xFF;
+            int packedSenderAndDelivery = firstPayloadDword.get();
+            int senderPlayerId = packedSenderAndDelivery & 0xFF;
+            int deliveryType = (packedSenderAndDelivery >>> 8) & 0xFF;
             CPlayer sender = mapVisualObject.findClientPlayerById(senderPlayerId);
             if (sender != null
                     && mapVisualObject.currentPlayer != null
                     && mapVisualObject.currentPlayer.isSilentDiplomacy(senderPlayerId)
-                    && channel != 4) {
+                    && deliveryType != CHAT_DELIVERY_BROADCAST) {
                 Globals.mainWindow.getInputController().onMessage(MessageCodes.MULTIPLAYER_LOBBY_APPEND_CHAT_MESSAGE, senderPlayerId, text.get());
                 return;
             }
 
             String line = sender == null ? text.get() : sender.name + ": " + text.get();
-            mapVisualObject.gameListControl.addTimedLine(line, resolveChatPalette(sender, channel), CHAT_LINE_LIFETIME_MS);
+            mapVisualObject.gameListControl.addTimedLine(line, resolveChatPalette(sender, deliveryType), CHAT_LINE_LIFETIME_MS);
         }
     }
 
     /**
      * Native support extracted from MapVisualObject::HandleGameAction @00414A90.
      */
-    private static Palette16 resolveChatPalette(CPlayer sender, int channel) {
-        if (channel == 4) {
+    private static Palette16 resolveChatPalette(CPlayer sender, int deliveryType) {
+        if (sender != null && usesAlternateGameplayMessageColors()) {
+            return switch (deliveryType) {
+                case CHAT_DELIVERY_SAY, CHAT_DELIVERY_BROADCAST -> Palettes.chatSayOrBroadcast();
+                case CHAT_DELIVERY_ALLIED -> Palettes.chatAllied();
+                case CHAT_DELIVERY_PRIVATE -> Palettes.chatPrivate();
+                case CHAT_DELIVERY_SHOUT -> Palettes.chatShout();
+                default -> Palettes.messagePrimary();
+            };
+        }
+        if (deliveryType == CHAT_DELIVERY_BROADCAST) {
             return Palettes.orangeish;
         }
-        if (sender != null && sender.color >= 0 && sender.color < Palettes.p16.size()) {
-            return Palettes.p16.get(sender.color);
+        if (sender != null && sender.color >= 0 && sender.color < Palettes.unitPaletteComplements.length) {
+            return Palettes.unitOwnerTextPalette(sender.color);
         }
         return Palettes.messagePrimary();
+    }
+
+    /**
+     * Native support extracted from MapVisualObject::HandleGameAction @004136E8 and @004136F1.
+     */
+    private static boolean usesAlternateGameplayMessageColors() {
+        return Globals.gamePreferences.messageColors != 0
+                && DialogsMaskFlag.GAMEPLAY.isSetIn(Globals.mainWindow.dialogsMask);
     }
 }

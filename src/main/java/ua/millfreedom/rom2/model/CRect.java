@@ -1,6 +1,6 @@
 package ua.millfreedom.rom2.model;
 
-import java.awt.*;
+import java.awt.Point;
 
 public class CRect {
     //0x0
@@ -45,7 +45,7 @@ public class CRect {
      * Native: CRect::CRect @004281B0.
      * Fully ported.
      */
-    public CRect(Point point, Dimension size) {
+    public CRect(Point point, CSize size) {
         set(point.x, point.y, point.x + size.width, point.y + size.height);
     }
 

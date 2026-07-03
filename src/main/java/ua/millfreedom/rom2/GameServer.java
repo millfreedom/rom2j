@@ -1964,7 +1964,7 @@ public class GameServer implements MfcSerializable {
     private void sendMapChecksumToPlayer(Player player) {
         MapChecksumAction action = new MapChecksumAction();
         action.playerID.set(player.playerId);
-        action.senderIdAndChannel.set(gMapChecksum);
+        action.firstPayloadDword.set(gMapChecksum);
         action.text.set(mapFileName);
         CServerApp.sendGameAction(action);
     }
@@ -2930,33 +2930,33 @@ public class GameServer implements MfcSerializable {
             return;
         }
 
-        int packedTargetAndChannel = action.senderIdAndChannel.get();
-        int targetPlayerId = packedTargetAndChannel & 0xFF;
-        int channel = (packedTargetAndChannel >>> 8) & 0xFF;
-        switch (channel) {
-            case 0 -> sendSayChatText(sender, text);
-            case 1 -> sendAlliedChatText(sender, text);
-            case 2 -> sendPrivateChatText(sender, text, targetPlayerId);
-            case 3 -> sendShoutChatText(sender, text);
-            case 4 -> sendRoutedChatText(sender, text, channel, 0);
+        int packedTargetAndDelivery = action.firstPayloadDword.get();
+        int targetPlayerId = packedTargetAndDelivery & 0xFF;
+        int deliveryType = (packedTargetAndDelivery >>> 8) & 0xFF;
+        switch (deliveryType) {
+            case ChatTextAction.CHAT_DELIVERY_SAY -> sendSayChatText(sender, text);
+            case ChatTextAction.CHAT_DELIVERY_ALLIED -> sendAlliedChatText(sender, text);
+            case ChatTextAction.CHAT_DELIVERY_PRIVATE -> sendPrivateChatText(sender, text, targetPlayerId);
+            case ChatTextAction.CHAT_DELIVERY_SHOUT -> sendShoutChatText(sender, text);
+            case ChatTextAction.CHAT_DELIVERY_BROADCAST -> sendRoutedChatText(sender, text, deliveryType, 0);
             default -> {
             }
         }
     }
 
     /**
-     * Native support extracted from GameServer::handleServerGameAction @004F515D case `0x91`, chat channel `0`.
+     * Native support extracted from GameServer::handleServerGameAction @004F515D case `0x91`, chat delivery `0`.
      */
     private void sendSayChatText(Player sender, String text) {
         for (Player recipient : playerList.players) {
             if (recipient.isActive == 0 && canReceiveSayChat(sender, recipient)) {
-                sendRoutedChatText(sender, text, 0, recipient.playerId);
+                sendRoutedChatText(sender, text, ChatTextAction.CHAT_DELIVERY_SAY, recipient.playerId);
             }
         }
     }
 
     /**
-     * Native support extracted from GameServer::handleServerGameAction @004F515D case `0x91`, chat channel `0`.
+     * Native support extracted from GameServer::handleServerGameAction @004F515D case `0x91`, chat delivery `0`.
      */
     private static boolean canReceiveSayChat(Player sender, Player recipient) {
         Unit senderUnit = (Unit) sender.controlledUnit;
@@ -2966,31 +2966,31 @@ public class GameServer implements MfcSerializable {
     }
 
     /**
-     * Native support extracted from GameServer::handleServerGameAction @004F515D case `0x91`, chat channel `1`.
+     * Native support extracted from GameServer::handleServerGameAction @004F515D case `0x91`, chat delivery `1`.
      */
     private void sendAlliedChatText(Player sender, String text) {
         for (Player recipient : playerList.players) {
             if (recipient.isActive == 0
                     && (missionScriptRuntime.getRelationFlags(sender, recipient) & CPlayer.ALLIED_MASK) != 0) {
-                sendRoutedChatText(sender, text, 1, recipient.playerId);
+                sendRoutedChatText(sender, text, ChatTextAction.CHAT_DELIVERY_ALLIED, recipient.playerId);
             }
         }
     }
 
     /**
-     * Native support extracted from GameServer::handleServerGameAction @004F515D case `0x91`, chat channel `2`.
+     * Native support extracted from GameServer::handleServerGameAction @004F515D case `0x91`, chat delivery `2`.
      */
     private void sendPrivateChatText(Player sender, String text, int targetPlayerId) {
-        sendRoutedChatText(sender, text, 2, sender.playerId);
-        sendRoutedChatText(sender, text, 2, targetPlayerId);
+        sendRoutedChatText(sender, text, ChatTextAction.CHAT_DELIVERY_PRIVATE, sender.playerId);
+        sendRoutedChatText(sender, text, ChatTextAction.CHAT_DELIVERY_PRIVATE, targetPlayerId);
     }
 
     /**
-     * Native support extracted from GameServer::handleServerGameAction @004F515D case `0x91`, chat channel `3`.
+     * Native support extracted from GameServer::handleServerGameAction @004F515D case `0x91`, chat delivery `3`.
      */
     private void sendShoutChatText(Player sender, String text) {
         if (sender.shoutDelayTicksRemaining == 0) {
-            sendRoutedChatText(sender, text, 3, 0);
+            sendRoutedChatText(sender, text, ChatTextAction.CHAT_DELIVERY_SHOUT, 0);
             sender.shoutDelayTicksRemaining = Globals.serverConfig.shoutdelay;
             return;
         }
@@ -3000,13 +3000,13 @@ public class GameServer implements MfcSerializable {
     /**
      * Native support extracted from GameServer::handleServerGameAction @004F515D case `0x91`.
      */
-    private static void sendRoutedChatText(Player sender, String text, int channel, int recipientPlayerId) {
+    private static void sendRoutedChatText(Player sender, String text, int deliveryType, int recipientPlayerId) {
         ChatTextAction response = new ChatTextAction(text);
-        if (channel >= 2) {
+        if (deliveryType >= ChatTextAction.CHAT_DELIVERY_PRIVATE) {
             response.netID.set(sender.playerId);
         }
         response.playerID.set(recipientPlayerId);
-        response.senderIdAndChannel.set((sender.playerId & 0xFF) | ((channel & 0xFF) << 8));
+        response.firstPayloadDword.set((sender.playerId & 0xFF) | ((deliveryType & 0xFF) << 8));
         CServerApp.sendGameAction(response);
     }
 
@@ -3747,7 +3747,7 @@ public class GameServer implements MfcSerializable {
             return;
         }
         ChatTextAction spawnAction = (ChatTextAction) action;
-        int humanInfoIndex = spawnAction.senderIdAndChannel.get();
+        int humanInfoIndex = spawnAction.firstPayloadDword.get();
         if (humanInfoIndex <= 0 || humanInfoIndex >= Globals.staticDataMgr.humans.size()) {
             return;
         }
@@ -3804,7 +3804,7 @@ public class GameServer implements MfcSerializable {
 
         LoadScenarioAction loadScenarioAction = LoadScenarioAction.global;
         loadScenarioAction.text.set(mapFileName);
-        loadScenarioAction.senderIdAndChannel.set(mapNumber);
+        loadScenarioAction.firstPayloadDword.set(mapNumber);
         loadScenarioAction.playerID.set(player.playerId);
         CServerApp.sendGameAction(loadScenarioAction);
 

@@ -1,0 +1,6327 @@
+[
+  {
+    "name": "com.sun.jna.Callback"
+  },
+  {
+    "name": "com.sun.jna.CallbackProxy",
+    "methods": [
+      {
+        "name": "callback",
+        "parameterTypes": [
+          "java.lang.Object[]"
+        ]
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "com.sun.jna.CallbackReference",
+    "methods": [
+      {
+        "name": "getCallback",
+        "parameterTypes": [
+          "java.lang.Class",
+          "com.sun.jna.Pointer",
+          "boolean"
+        ]
+      },
+      {
+        "name": "getFunctionPointer",
+        "parameterTypes": [
+          "com.sun.jna.Callback",
+          "boolean"
+        ]
+      },
+      {
+        "name": "getNativeString",
+        "parameterTypes": [
+          "java.lang.Object",
+          "boolean"
+        ]
+      },
+      {
+        "name": "initializeThread",
+        "parameterTypes": [
+          "com.sun.jna.Callback",
+          "com.sun.jna.CallbackReference$AttachOptions"
+        ]
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "com.sun.jna.CallbackReference$AttachOptions"
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "com.sun.jna.FromNativeConverter",
+    "methods": [
+      {
+        "name": "nativeType",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "com.sun.jna.IntegerType",
+    "fields": [
+      {
+        "name": "value"
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "com.sun.jna.JNIEnv"
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "com.sun.jna.Native",
+    "methods": [
+      {
+        "name": "dispose",
+        "parameterTypes": []
+      },
+      {
+        "name": "fromNative",
+        "parameterTypes": [
+          "com.sun.jna.FromNativeConverter",
+          "java.lang.Object",
+          "java.lang.reflect.Method"
+        ]
+      },
+      {
+        "name": "fromNative",
+        "parameterTypes": [
+          "java.lang.Class",
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "fromNative",
+        "parameterTypes": [
+          "java.lang.reflect.Method",
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "nativeType",
+        "parameterTypes": [
+          "java.lang.Class"
+        ]
+      },
+      {
+        "name": "toNative",
+        "parameterTypes": [
+          "com.sun.jna.ToNativeConverter",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "com.sun.jna.Native$ffi_callback",
+    "methods": [
+      {
+        "name": "invoke",
+        "parameterTypes": [
+          "long",
+          "long",
+          "long"
+        ]
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "com.sun.jna.NativeMapped",
+    "methods": [
+      {
+        "name": "toNative",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "com.sun.jna.Pointer",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "long"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "name": "peer"
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "com.sun.jna.PointerType",
+    "fields": [
+      {
+        "name": "pointer"
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "com.sun.jna.Structure",
+    "methods": [
+      {
+        "name": "autoRead",
+        "parameterTypes": []
+      },
+      {
+        "name": "autoWrite",
+        "parameterTypes": []
+      },
+      {
+        "name": "getTypeInfo",
+        "parameterTypes": []
+      },
+      {
+        "name": "newInstance",
+        "parameterTypes": [
+          "java.lang.Class",
+          "long"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "name": "memory"
+      },
+      {
+        "name": "typeInfo"
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "com.sun.jna.Structure$ByValue"
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "com.sun.jna.Structure$FFIType$FFITypes",
+    "fields": [
+      {
+        "name": "ffi_type_double"
+      },
+      {
+        "name": "ffi_type_float"
+      },
+      {
+        "name": "ffi_type_longdouble"
+      },
+      {
+        "name": "ffi_type_pointer"
+      },
+      {
+        "name": "ffi_type_sint16"
+      },
+      {
+        "name": "ffi_type_sint32"
+      },
+      {
+        "name": "ffi_type_sint64"
+      },
+      {
+        "name": "ffi_type_sint8"
+      },
+      {
+        "name": "ffi_type_uint16"
+      },
+      {
+        "name": "ffi_type_uint32"
+      },
+      {
+        "name": "ffi_type_uint64"
+      },
+      {
+        "name": "ffi_type_uint8"
+      },
+      {
+        "name": "ffi_type_void"
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "com.sun.jna.WString",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "java.lang.Boolean",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "boolean"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "name": "TYPE"
+      },
+      {
+        "name": "value"
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "java.lang.Byte",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "byte"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "name": "TYPE"
+      },
+      {
+        "name": "value"
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "java.lang.Character",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "char"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "name": "TYPE"
+      },
+      {
+        "name": "value"
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "java.lang.Class",
+    "methods": [
+      {
+        "name": "getComponentType",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "java.lang.Double",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "double"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "name": "TYPE"
+      },
+      {
+        "name": "value"
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "java.lang.Float",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "float"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "name": "TYPE"
+      },
+      {
+        "name": "value"
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "java.lang.Integer",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "int"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "name": "TYPE"
+      },
+      {
+        "name": "value"
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "java.lang.Long",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "long"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "name": "TYPE"
+      },
+      {
+        "name": "value"
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Library$Handler"
+    },
+    "name": "java.lang.Object",
+    "methods": [
+      {
+        "name": "equals",
+        "parameterTypes": [
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "hashCode",
+        "parameterTypes": []
+      },
+      {
+        "name": "toString",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "java.lang.Short",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "short"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "name": "TYPE"
+      },
+      {
+        "name": "value"
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "java.lang.String",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "byte[]"
+        ]
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "byte[]",
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "getBytes",
+        "parameterTypes": []
+      },
+      {
+        "name": "getBytes",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "toCharArray",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "java.lang.System",
+    "methods": [
+      {
+        "name": "getProperty",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "java.lang.Throwable",
+    "methods": [
+      {
+        "name": "addSuppressed",
+        "parameterTypes": [
+          "java.lang.Throwable"
+        ]
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "java.lang.Void",
+    "fields": [
+      {
+        "name": "TYPE"
+      }
+    ]
+  },
+  {
+    "name": "java.lang.invoke.MethodHandle",
+    "methods": [
+      {
+        "name": "bindTo",
+        "parameterTypes": [
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "invokeWithArguments",
+        "parameterTypes": [
+          "java.lang.Object[]"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "java.lang.invoke.MethodHandles",
+    "methods": [
+      {
+        "name": "lookup",
+        "parameterTypes": []
+      },
+      {
+        "name": "privateLookupIn",
+        "parameterTypes": [
+          "java.lang.Class",
+          "java.lang.invoke.MethodHandles$Lookup"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "java.lang.invoke.MethodHandles$Lookup",
+    "methods": [
+      {
+        "name": "findSpecial",
+        "parameterTypes": [
+          "java.lang.Class",
+          "java.lang.String",
+          "java.lang.invoke.MethodType",
+          "java.lang.Class"
+        ]
+      },
+      {
+        "name": "in",
+        "parameterTypes": [
+          "java.lang.Class"
+        ]
+      },
+      {
+        "name": "unreflectSpecial",
+        "parameterTypes": [
+          "java.lang.reflect.Method",
+          "java.lang.Class"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "java.lang.invoke.MethodType",
+    "methods": [
+      {
+        "name": "methodType",
+        "parameterTypes": [
+          "java.lang.Class",
+          "java.lang.Class[]"
+        ]
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "java.lang.reflect.Method",
+    "methods": [
+      {
+        "name": "getParameterTypes",
+        "parameterTypes": []
+      },
+      {
+        "name": "getReturnType",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "java.nio.Buffer",
+    "methods": [
+      {
+        "name": "position",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "java.nio.ByteBuffer",
+    "methods": [
+      {
+        "name": "array",
+        "parameterTypes": []
+      },
+      {
+        "name": "arrayOffset",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "java.nio.CharBuffer",
+    "methods": [
+      {
+        "name": "array",
+        "parameterTypes": []
+      },
+      {
+        "name": "arrayOffset",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "java.nio.DoubleBuffer",
+    "methods": [
+      {
+        "name": "array",
+        "parameterTypes": []
+      },
+      {
+        "name": "arrayOffset",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "java.nio.FloatBuffer",
+    "methods": [
+      {
+        "name": "array",
+        "parameterTypes": []
+      },
+      {
+        "name": "arrayOffset",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "java.nio.IntBuffer",
+    "methods": [
+      {
+        "name": "array",
+        "parameterTypes": []
+      },
+      {
+        "name": "arrayOffset",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "java.nio.LongBuffer",
+    "methods": [
+      {
+        "name": "array",
+        "parameterTypes": []
+      },
+      {
+        "name": "arrayOffset",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "java.nio.ShortBuffer",
+    "methods": [
+      {
+        "name": "array",
+        "parameterTypes": []
+      },
+      {
+        "name": "arrayOffset",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "com.sun.jna.Native"
+    },
+    "name": "java.security.SecureRandomParameters"
+  },
+  {
+    "name": "sun.security.provider.NativePRNG",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.security.SecureRandomParameters"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.provider.SHA",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "ua.millfreedom.rom2.ApplicationPreferences",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CArchive.CArchive",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CArchive.CArchive$BasicSerializationStrategy",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CArchive.CArchive$MFCSerializationStrategy",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CArchive.CArchive$ReadClassResult",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CArchive.CArchive$RuntimeClassInfo",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CArchive.CArchive$SerializationStrategy",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CArchive.CArchive$StringSerializationStrategy",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CArchive.MfcSerializable",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CFile.BEReader",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CFile.BEWriter",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CFile.CFile",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CFile.CFile$SeekType",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CFile.CFileException",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CFile.CFileException$Cause",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CFile.EndianReader",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CFile.EndianWriter",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CFile.LEReader",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CFile.LEWriter",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CGameFileManager",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CGameFileManager$PathType",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CMainApp",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CStaticDataMgr",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CStaticDataMgr$Tables",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CString",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.CTextFile",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.ClassNameIndex",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.DpLatencyTracker",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.GUI",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.GameServer",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.GameServer$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.GameServer$DecodedSave",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.GameServer$MissionOrderContext",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.GameServerObjectLists",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.Globals",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.NetBuffer",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.NetBufferInfo",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.ServerConfigurationLoader",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.Utils",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.Utils$Counter",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.console.AnsiStringBuilder",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.console.AnsiStringBuilder$BackgroundColor",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.console.AnsiStringBuilder$ColorReset",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.console.AnsiStringBuilder$ForegroundColor",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.console.Utils",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.data.ByteBufferAdaptor",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.data.ByteBufferAdaptor$AccessMode",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.data.Ordered",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.data.Positioned",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.data.RWAdaptor",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.data.ReadAdaptor",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.data.WithCharset",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.data.WriteAdaptor",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.dserver.DedicatedServerCommandGateway",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.dserver.DedicatedServerConsoleSink",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.dserver.DedicatedServerPlayerStatus",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.dserver.DedicatedServerStatusSnapshot",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.dserver.DedicatedServerSwingConsole",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.dserver.DedicatedServerSwingConsole$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.dserver.DedicatedServerSwingConsole$2",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.gameserver.Cheats",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.gameserver.GameServerDebugState",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.gameserver.MissionRuntimeBase",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.gameserver.MissionScriptRuntime",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.gameserver.MissionScriptRuntime$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.gameserver.RandomRelated",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.gameserver.ScenarioMapLoader",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.gameserver.missionruntime.EventDTO",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.gameserver.missionruntime.InstantType",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.gameserver.missionruntime.MissionDiplomacyState",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.gameserver.missionruntime.MissionTurnTimingStats",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.gameserver.missionruntime.PerfMonitorState",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.gameserver.missionruntime.PrivateProfileReader",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.gameserver.missionruntime.ScratchByteState",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.gameserver.missionruntime.ScriptCheck",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.gameserver.missionruntime.ScriptCheckType",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.gameserver.missionruntime.ScriptCondition",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.gameserver.missionruntime.ScriptInstant",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.gameserver.missionruntime.ScriptPattern",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.gameserver.missionruntime.SelectorSlot",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.hatserver.HatHttpServer",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.hatserver.HatHttpServer$Options",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.hatserver.HatHttpServer$ServerEntry",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Armor",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Building",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.BuildingInfo",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.BuildingInfo$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.BuildingList",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CA16",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CA16Font",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CBaseFont",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CBitmapFont",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CBmp256",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CBmp64k",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CBmp64kFrameSequence",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CCursor",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CFameHall",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CGameBitmap",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CGameLighting",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CGameSession",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CImageList",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CMenu",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CMousePointer",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CMultiShopInstance",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CMultiShopShelf",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CMultiShopTemplate",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CPlayer",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CProjectileInfo",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CRect",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CServerApp",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CServerApp$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CServerApp$Endpoint",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CSize",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CSprite16",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CSprite256",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.CUnitInfo",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.ClientTrafficStats",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.ComPortSettings",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Diplomacy",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.DiplomacyWrapper",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.DirectPlayRuntime",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Effect",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Effect$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.EffectType",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Effect_DirectDamage",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.GameBitmapFrame",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.GameBitmapSurface",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.GameFonts",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.GamePreferences",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.GraphicsObjectsFile",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.GraphicsUnitsFile",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Hat",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.HighScoreEntry",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.ImageContainer",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Inn",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Inn$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.IntPointer",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Inventory",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Item",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.ItemAssortmentGenerator",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.ItemNames",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.ItemPayloadTemplate",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.KnowledgeTableCompression",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.LlDriverConnectionOption",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.LlDriverProtocolOption",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.LlDriverSessionEntry",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.MagicInfo",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.MagicItem",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.MagicalItemInfo",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.MainWindowConnectionScratchState",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Material",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.MaterialAttributes",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.MaterialRuntimeData",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.MissionGroupRuntimeState",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Modifiers",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.MultiplayerSessionDialogContext",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Outpost",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.PasswordManager",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.PhoneBook",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Player",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.PlayerBattlePreferences",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.PlayerList",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.PlayerSlot",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Pointer",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.PolyValue",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Projectiles",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.QuestsStorage",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.RadialDistortionOffset",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.RadialScreenDistortion",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Sack",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.SackList",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.SaveFile",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.SavedGameFiles",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Screen",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.ScriptDataSupport",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.SelectedUnitsSnapshot",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.SequentialArrayWalker",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.ServerConfig",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.ShelfFlagValues",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.ShelfFlags",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Shield",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Shop",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.ShopAssortmentEntry",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.SkillData",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.SkillProgression",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.StatData",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.StructureDef",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Structures",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.TableLine",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.TargetHandle",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Token",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.TokenEntry",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.TokenEntry$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.TooltipColor",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.TooltipText",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.TooltipText$ColoredRun",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.UnitGroup",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.UnitGroupList",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.UnitList",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.UnitRenderState",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.UnitTypes",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.VObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.VObjects",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.VirtualCaster",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.VirtualCasterList",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.Weapon",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.WorldItem",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.WorldItem$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.AdjustPlayerGoldAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.AltDebugCommandAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.AreaEffectAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.AttackCellOrderAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.AttackTargetOrderAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.BinaryBlobAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.BuildingHealthAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.CGameAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.CGameAction$CountedCStringMarshaller",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.CancelPointSpellEffectAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.CancelUnitSpellEffectAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.CastSpellAtPointAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.CastSpellAtUnitAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.ChatTextAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.ClientShutdownRequestAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.CloseShopDialogAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.CreatureKnowledgeAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.DefendTargetOrderAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.DeletePlayerAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.DiplomacyAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.DropGoldAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.EffectAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.EffectFromAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.EffectGoneAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.EffectHangAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.EffectMultiFromAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.EffectMultiTargetAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.EnemyEquipmentAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.EnterInnAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.EnterTownOrderAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.Fixed3ByteAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.FixedDwordAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.FixedDwordAction0E",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.GameActionHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.GameEventNotificationAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.GuardOrderAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.IncomingGameActionFactory",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.IncomingGameActionFactory$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.InnQuestsAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.InventoryTransferAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.ItemListAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.LatencySettingAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.LeaveInnAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.LoadGameRequestAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.LoadScenarioAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.LoginRequestAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.MapChecksumAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.MapChunkAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.MapChunkTransferCompleteAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.MapLightOverrideAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.MapLoadCompleteAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.Marshaller",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.MissionCompleteAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.MissionFailedAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.MissionStartedAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.MoneyAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.MoveOrderAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.MultiplayerBootstrapStatusAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.NamedCharacterSpawnRequestAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.NewPlayerAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.NewSegmentAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.NoPayloadAction03",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.OpenShopDialogAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.Packet",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.PatrolOrderAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.PickupAllSacksAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.PickupOrderAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.PlayerJoinAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.PlayerKickedAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.PlayerKillAnnouncementAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.PlayerKnowledgeProgressAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.PlayerQuestsAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.Property",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.QuestObjectivesQueryOpenAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.RangedAttackAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.RefreshShopShelvesAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.RequestMapChunkAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.RequestMapLoadAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.RequestPlayerStateResyncAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.RetreatOrderAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.ReturnAfterDeathAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.ReturnToLobbyAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.ReviveStuckHeroAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.SackAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.SackRemovedAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.SaveGameRequestAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.SelectMultiplayerMapAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.ServerClosedAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.SetCameraPositionAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.ShopBuyAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.ShopSellAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.ShortArrayBlobAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.ShowInnDialogAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.ShowShopDialogAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.StandGroundOrderAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.StandStillOrderAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.StandardMarshaller",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.StandardMarshaller$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.StandardMarshaller$2",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.StandardMarshaller$3",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.StandardMarshaller$4",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.StandardMarshaller$5",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.SubmitCharacterSetupAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.TileVisibilityMaskAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.ToggleUnitAutocastSpellAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.TripleShortArrayAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.TwoDwordAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.UndoShopAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.UnitAttackAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.UnitChangeAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.UnitChangeAction_6C",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.UnitChangeAction_6E",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.UnitChangeAction_6F",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.UnitChangeAction_70",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.UnitCommandStartAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.UnitCommandStartAction$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.UnitDamagedAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.UnitEquipmentStateAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.UnitHiddenAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.UnitInventoryStateAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.UnitMoveAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.UnitShownAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.UnitTokenAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.UnitTokenListAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.UnitTurnAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.UpdateBattlePreferenceAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.UpdateDiplomacyRelationsAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.action.UploadCharacterFileAction",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.actiondata.ActionPayloads",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.actiondata.ItemInfoPacketHeader",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.actiondata.UnitChangePayloads",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.actiondata.UnitChangePayloads$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.color.Consts",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.color.RGB16",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.color.RGB32",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.color.RGBA",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.color.Utils",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.column.BuildingColumn",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.column.HumanColumn",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.column.MagicColumn",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.column.MagicItemColumn",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.column.SpellColumn",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.column.UnitColumn",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.column.WorldItemColumn",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.compression.ByteHuffmanNode",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.compression.ByteHuffmanPacker",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.compression.WeightedByteSymbol",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.container.CustomList",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.control.CGameListControl",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.control.CListBox",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.control.CListBoxState",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.control.CListBoxState$State",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.control.CStatic",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.control.CStatusBar",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.control.GameEdit",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.control.GameEditState",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.control.GameEditState$State",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.control.GameListBox",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.enums.ArmorId",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.enums.BuildingId",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.enums.EffectId",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.enums.GameActionId",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.enums.HumanId",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.enums.MagicItemId",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.enums.MaterialId",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.enums.MessageCodes",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.enums.MissionActionCode",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.enums.ProtocolId",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.enums.SfxSounds",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.enums.ShapeId",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.enums.ShieldId",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.enums.SpellId",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.enums.TextAlign",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.enums.UnitActionState",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.enums.UnitId",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.enums.WeaponId",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.gameobj.CAirUnit",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.gameobj.CBackPack",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.gameobj.CBridge",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.gameobj.CGameObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.gameobj.CHorisontalWoodenBridge",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.gameobj.CProjectile",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.gameobj.CStructure",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.gameobj.CUnit",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.gameobj.CVerticalWoodenBridge",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.gameobj.EquipmentPortraitCache",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.gameobj.EquipmentPortraitCache$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.gameobj.EquipmentPortraitCache$Entry",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.net.CBufferManager",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.net.CLlDriver",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.net.CLlDriver$ClientLatencyBoundaryState",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.net.CLlDriver$TcpConnection",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.palette.CGamePalette",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.palette.Palette",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.palette.Palette16",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.palette.Palette256",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.palette.Palette32",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.palette.Palettes",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.quest.InnQuestIndexBucket",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.quest.InnQuestIndexBucket$RaisedUnitCount",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.quest.Quest",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.quest.QuestIndexBucket",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.quest.QuestRelated",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.quest.Quest_1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.quest.Quest_10",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.quest.Quest_11",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.quest.Quest_12",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.quest.Quest_13",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.quest.Quest_2",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.quest.Quest_3",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.quest.Quest_4",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.quest.Quest_5",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.quest.Quest_6",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.quest.Quest_8",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.quest.Quest_9",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.render.A16RunWriter",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.render.A16SpriteDecoder",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.render.AspectFitLayout",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.render.FpsCounter",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.render.GLCursor",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.render.GLRenderer",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.render.GLRenderer$RenderTargetState",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.render.GLRenderer$TerrainSlopeMaskMode",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.render.PresentationMode",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.render.PresentationSupport",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.render.PresentationTransform",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.render.Renderer",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.render.Rle8RunWriter",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.render.Rle8SpriteDecoder",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.sound.GameplayMusicSupport",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.sound.MsAdpcmDecoder",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.sound.MusicPlayer",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.sound.Sound",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.sound.SoundAttenuation",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.sound.SoundChannel",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.sound.SoundManager",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.sound.SoundPack",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.sound.SoundPlacement",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.sound.SoundPosition",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.sound.SoundPreferences",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.sound.SoundSystem",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.sound.SoundSystem$ChannelPlaybackState",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.sound.SoundSystem$MapSoundAccumulator",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.sound.WaveFormat",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.AreaEffect",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.AreaEffect$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.AreaEffect$MovingAreaOffsetPattern",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.EffectVisualBuilder",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.MaxStatsFromEffects",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.MinStatsFromEffects",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.PointEffect",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.Spell",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.Spell$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.SpellEffect",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.SpellEffectList",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.SpellIndex",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.SpellInfo",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.SpellTokenKind",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.SpellTransport",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.Spellbook",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.Spheres",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.StatModifiers",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.StatsFromEffects",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.SumStatsFromEffects",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.TransientSpellCastSpec",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.UMaxStatsFromEffects",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.spell.VisualElem",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.unit.Unit",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.unit.Unit$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.unit.UnitDirtyFlags",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.unit.UnitInfo",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.unit.UnitInfo$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.unit.UnitMissionRuntimeState",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.unit.UnitMovementState",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.unit.humanoid.Humanoid",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.unit.humanoid.SkillBonus",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.unit.humanoid.human.Human",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.unit.humanoid.human.HumanInfo",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.video.Fading",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.video.Panaraming",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.video.SMKPlayer",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.video.Smacker",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.video.Smacker$AudioState",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.video.Smacker$BitStream",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.video.Smacker$Huff16Tree",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.video.Smacker$Huff8Tree",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.video.Smacker$SMKAudioInfo",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.video.Smacker$SMKFileInfo",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.video.Smacker$SMKVideoInfo",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.video.Smacker$VideoState",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.ActionButtonsPanelVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.AvailableMapsTextListVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.BasicInnDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.BasicInnSceneGridVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.BasicTownDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.CVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.CVisualObject$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.CenteredDialogContextArrayVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.CenteredDialogContextArrayVisualObject$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.CenteredDialogVariantVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.CenteredDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.CharacterGeneratorDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.CharacterLoaderActionButtonsPanelVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.CharacterLoaderDetailsPanelVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.CharacterLoaderDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.CharacterLoaderRosterListPanelVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.CommandButtonRuntimeVariantVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.CommandButtonVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.CreditsDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.DedicatedServerConsoleVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.DialogResultCarrier",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.DialogWindowVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.DiplomacySettingsDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.DiplomacySettingsTextListVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.DropGoldPromptVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.DruidInnDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.DruidInnSceneGridVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.DruidShopCatalogGridVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.DruidShopCompassVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.DruidShopDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.DruidTownDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.EnterYourNameDialogContext",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.EnterYourNameHeaderDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.EscMenu421VisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.FameHallDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.FameHallDocumentDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.FloatingUnitText",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.FullStatsPanelVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.GlobalMapDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.GlobalMapDialogVisualObject$LocationGraph",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.GlobalMapLocationMetadata",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.GridOverlayVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.HandlerFrameRenderer",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.HandlerVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.HatServerBrowserDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.HatServerBrowserDialogVisualObject$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.HatServerEntriesTextListVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.HatServerListDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.HeaderDialogVariantVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.HeaderDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.HeroInventoryControlVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.InnLeftPanelVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.InnRightPanelVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.KaargInnDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.KaargInnSceneGridVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.KaargShopCatalogGridVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.KaargShopCompassVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.KaargShopDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.KaargTownDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.LinkedPaletteVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.LoadDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.LoadDialogVisualObject$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.MainMenuVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.MapVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.MapVisualObject$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.MapVisualObject$GridMetrics",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.MapVisualObject$TerrainVisualSprite",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.MenuListCommandButtonVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.MenuListDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.MessageTarget",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.MinimapVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.MinimapVisualObject$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.MissionFailedHeaderDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.ModemSettingsDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.ModemSettingsDialogVisualObject$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.MpConnectionDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.MultiplayerMapSelectionDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.MultiplayerMapSelectionDialogVisualObject$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.MultiplayerMapSelectionEntry",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.MultiplayerMessagesTextListVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.MultiplayerPlayersTextListVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.OrderToolbarVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.OrderToolbarVisualObject$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.PauseMenuVariantAVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.PauseMenuVariantBVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.PostSetupVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.QuestObjectivesHeaderDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.QuestStatusDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.RecentPhoneNumbersTextListVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.RightPanelContainerVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.RightPanelLayout",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.RoleDialogSupport",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.RoleKeyDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.SaveDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.SaveDialogVisualObject$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.SavedGamesTextListVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.ScrollablePanelHeaderStaticTextVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.ScrollablePanelVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.SelectionInfoPanelVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.SelectionInfoPanelVisualObject$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.SerialSettingsDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.SerialSettingsDialogVisualObject$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.SetupLabel464VisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.ShopCatalogGridVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.ShopCompassVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.ShopDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.ShopDialogVisualObject$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.ShopItemGridVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.ShopRingButtonsVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.ShopSelectionGridVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.ShopTransferGridVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.SideStatusVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.SideStatusVisualObject$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.SkillSelectionPanelVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.SoundConfigRootVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.SoundPreferencesDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.SpellPanelVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.SpriteCommandButtonVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.StartGameSetupDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.StartupLogoDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.StartupLogoDialogVisualObject$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.StaticTextCenteredDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.StaticTextVariantVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.StaticTextVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.StatsAllocationPanelVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.ChatVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.StringListVariantAVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.StringListVariantBVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.StringListVariantCVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.StringListVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.TcpIpSettingsHeaderDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.TextListSelectionMirror",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.TextListVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.TextListVisualObject$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.TipsPromptDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.TownMenuListDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.TwoActionMenuListDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.ViewCutscenesHeaderDialogVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.VirtualKeyCodes",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.WrappedTextListVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.visobj.WrappedTextSourceListVisualObject",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.CCmdTarget",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.CFrameWnd",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.CMainWindow",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.CMainWindow$1",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.CWnd",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.CWndState",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.CWndState$CreatedWindowState",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.CWndState$ModeledWindowHandle",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.DedicatedServerControlDialog",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.DialogsMaskFlag",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.MessageSystem",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.MessageSystem$MessageEnvelope",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.AppendDedicatedServerLogLineMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.CMainWindowWindowProcSupport",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.CharacterLoaderDialogMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ClearTipPromptMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ClientReturnToMapSelectionMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.CloseAfterMissionFailureMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.CommandMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ConnectToServerAddressMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ContinueScenarioLocationEntryMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.CreditsDialogMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.DiplomacyMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.EndQuestMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.EnterModalDialogModeMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.EscMenuMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ExitGameMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ExitMapMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ExitToMenuMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.FameHallDialogMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.GameOptionsMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.GlobalMapTransitionMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.HandleQuestEventDialogMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.InitializeRuntimeGraphicsAndAudioMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.InvalidCdPromptCreateMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.InvalidCdPromptMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.KeyDownMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.KeyUpMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.LeftButtonDownMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.LeftButtonUpMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.LoadGameCreateMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.LoadGameMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.MessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.MouseButtonMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.MouseMoveMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.NotifyDialogClosedMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.PlayLocationCutsceneAndCloseMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.PrepareMultiplayerMapSelectionMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.QuestObjectivesMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ReturnToMultiplayerSetupMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.RunMultiplayerSessionBootstrapMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.RunMultiplayerSessionBootstrapMessageHandler$ClientBootstrapWaitResult",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.RunSessionBootstrapMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.SaveGameMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.SelectModemHostDriverMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.SelectSerialHostDriverMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.SetCursorMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.SetFocusMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ShowCurrentTownDialogMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ShowFameHallDocumentDialogMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ShowHatServerBrowserDialogMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ShowHatServerListDialogMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ShowHelpTextDialogMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ShowInnDialogMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ShowMainMenuMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ShowMissionCompletedDialogMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ShowMissionFailedDialogMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ShowModemSettingsDialogMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ShowMultiplayerConnectionDialogMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ShowMultiplayerSessionDialogMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ShowSerialSettingsDialogMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ShowShopDialogMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ShowStartupLogoDialogMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ShowTcpIpSettingsDialogMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ShowTipByIdMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ShowTownMenuMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.SizeMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.SoundOptionsMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.StartHatDedicatedServerMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.StartNewGameMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.StartupLogoStepCompleteMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.SysKeyDownMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.SysKeyUpMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ToggleQuestStatusDialogMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.UserMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.ViewCutscenesMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.WmCloseMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.window.windowproc.handlers.WriteCurrentMissionResumeSaveMessageHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.CWorldMap",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.MapDescriptor",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.NeighborStepTable",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.Point8",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.Rect16",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.ScenarioDescriptor",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.ScenarioLib",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.ScenarioLocation",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.ScenarioProgressSupport",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.ScenarioState",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.TerrainGraphics",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.VisionAndDistance",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.WorldMapSearchScratchState",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.WorldMapUnitVisibilityState",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.node.WorldMapNode",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.node.WorldMapNodeMap",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.scenario.BuildingDTO",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.scenario.EffectDTO",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.scenario.EffectOrTrapMod",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.scenario.GroupDTO",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.scenario.InnDescriptor",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.scenario.InstArgument",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.scenario.Instant",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.scenario.MusicDTO",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.scenario.PostDescriptor",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.scenario.ScenarioFileHeader",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.scenario.ScenarioRawSection",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.scenario.ScenarioSectionHeader",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.scenario.ScenarioSectionId",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.scenario.ShopDescriptor",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.scenario.Trigger",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.scenario.UnitDTO",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.model.world.scenario.WorldSack",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.platform.glfw.GlfwKeyboardMessageAdapter",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.platform.glfw.GlfwMouseMessageAdapter",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.CGameFile",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.Constants",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.HeapBlob",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.Res",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.Res$PathCursor",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.ResAtom",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.ResBasicFile",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.ResBasicFileInfo",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.ResByteNode",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.ResContainerNode",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.ResDoubleNode",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.ResFS",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.ResFileNode",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.ResHeapNode",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.ResInFile",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.ResInHeap",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.ResIntNode",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.ResNode",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.ResNodeData",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.ResNodeFlags",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.ResShortNode",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.ResValueNode",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.Resources",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.res.Utils",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.starter.DedicatedServerStarter",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.starter.DedicatedServerStarter$Options",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.starter.Rom2StarterLWJGL",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.temp.DumpSfxSounds",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.text.BuildingText",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.text.CutPathsText",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.text.CutSceneText",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.text.DialogsText",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.text.GameTexts",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.text.HeroPictureText",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.text.ItemNameText",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.text.MainText",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.text.NpcNamesText",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.text.PatchText",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.text.SpellText",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.text.SpellsText",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.text.StatsText",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.text.StringTableIndex",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.text.TextTableId",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.text.TextTableLocalEntry",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.text.TunesText",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "ua.millfreedom.rom2.text.UnitNameText",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "[Ljava.awt.event.MouseMotionListener;"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "com.apple.laf.AquaLookAndFeel"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "com.formdev.flatlaf.icons.FlatAscendingSortIcon"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "com.formdev.flatlaf.icons.FlatCheckBoxIcon"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "com.formdev.flatlaf.icons.FlatDescendingSortIcon"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "com.formdev.flatlaf.icons.FlatHelpButtonIcon"
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatArrowButton"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "com.formdev.flatlaf.ui.FlatButtonBorder"
+  },
+  {
+    "methods": [
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      }
+    ],
+    "name": "com.formdev.flatlaf.ui.FlatButtonUI"
+  },
+  {
+    "methods": [
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      }
+    ],
+    "name": "com.formdev.flatlaf.ui.FlatCheckBoxUI"
+  },
+  {
+    "methods": [
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      }
+    ],
+    "name": "com.formdev.flatlaf.ui.FlatLabelUI"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "com.formdev.flatlaf.ui.FlatMarginBorder"
+  },
+  {
+    "methods": [
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      }
+    ],
+    "name": "com.formdev.flatlaf.ui.FlatPanelUI"
+  },
+  {
+    "methods": [
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      }
+    ],
+    "name": "com.formdev.flatlaf.ui.FlatRootPaneUI"
+  },
+  {
+    "methods": [
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      }
+    ],
+    "name": "com.formdev.flatlaf.ui.FlatScrollBarUI"
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatScrollBarUI$FlatScrollBarButton"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "com.formdev.flatlaf.ui.FlatScrollPaneBorder"
+  },
+  {
+    "methods": [
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      }
+    ],
+    "name": "com.formdev.flatlaf.ui.FlatScrollPaneUI"
+  },
+  {
+    "methods": [
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      }
+    ],
+    "name": "com.formdev.flatlaf.ui.FlatSplitPaneUI"
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatSplitPaneUI$1"
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatSplitPaneUI$FlatSplitPaneDivider"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "com.formdev.flatlaf.ui.FlatTableCellBorder$Default"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "com.formdev.flatlaf.ui.FlatTableHeaderBorder"
+  },
+  {
+    "methods": [
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      }
+    ],
+    "name": "com.formdev.flatlaf.ui.FlatTableHeaderUI"
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTableHeaderUI$FlatTableHeaderCellRendererPane"
+  },
+  {
+    "methods": [
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      }
+    ],
+    "name": "com.formdev.flatlaf.ui.FlatTableUI"
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTableUI$FlatBooleanRenderer"
+  },
+  {
+    "methods": [
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      }
+    ],
+    "name": "com.formdev.flatlaf.ui.FlatTextAreaUI"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "com.formdev.flatlaf.ui.FlatTextBorder"
+  },
+  {
+    "methods": [
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      }
+    ],
+    "name": "com.formdev.flatlaf.ui.FlatTextFieldUI"
+  },
+  {
+    "methods": [
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      }
+    ],
+    "name": "com.formdev.flatlaf.ui.FlatViewportUI"
+  },
+  {
+    "fields": [
+      {
+        "name": "OPTIONS"
+      },
+      {
+        "name": "STRING_ENCODING"
+      },
+      {
+        "name": "STRUCTURE_ALIGNMENT"
+      },
+      {
+        "name": "TYPE_MAPPER"
+      }
+    ],
+    "methods": [
+      {
+        "name": "callback",
+        "parameterTypes": []
+      }
+    ],
+    "name": "com.jthemedetecor.MacOSThemeDetector$1"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "com.sun.jna.NativeLong"
+  },
+  {
+    "allPublicFields": true,
+    "name": "com.sun.jna.platform.mac.SystemB"
+  },
+  {
+    "allDeclaredFields": true,
+    "name": "com.sun.jna.platform.mac.SystemB$Timeval"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "com.sun.jna.platform.unix.LibCAPI$size_t"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "com.sun.jna.platform.unix.LibCAPI$size_t$ByReference"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "de.jangassen.jfa.foundation.ID"
+  },
+  {
+    "name": "java.awt.SequencedEvent"
+  },
+  {
+    "fields": [
+      {
+        "name": "eventListener"
+      }
+    ],
+    "name": "java.awt.Toolkit"
+  },
+  {
+    "fields": [
+      {
+        "name": "VK_A"
+      },
+      {
+        "name": "VK_B"
+      },
+      {
+        "name": "VK_BACK_SLASH"
+      },
+      {
+        "name": "VK_BACK_SPACE"
+      },
+      {
+        "name": "VK_C"
+      },
+      {
+        "name": "VK_CONTEXT_MENU"
+      },
+      {
+        "name": "VK_COPY"
+      },
+      {
+        "name": "VK_CUT"
+      },
+      {
+        "name": "VK_D"
+      },
+      {
+        "name": "VK_DELETE"
+      },
+      {
+        "name": "VK_DOWN"
+      },
+      {
+        "name": "VK_E"
+      },
+      {
+        "name": "VK_END"
+      },
+      {
+        "name": "VK_ENTER"
+      },
+      {
+        "name": "VK_ESCAPE"
+      },
+      {
+        "name": "VK_F"
+      },
+      {
+        "name": "VK_F10"
+      },
+      {
+        "name": "VK_F2"
+      },
+      {
+        "name": "VK_F6"
+      },
+      {
+        "name": "VK_F8"
+      },
+      {
+        "name": "VK_H"
+      },
+      {
+        "name": "VK_HOME"
+      },
+      {
+        "name": "VK_INSERT"
+      },
+      {
+        "name": "VK_KP_DOWN"
+      },
+      {
+        "name": "VK_KP_LEFT"
+      },
+      {
+        "name": "VK_KP_RIGHT"
+      },
+      {
+        "name": "VK_KP_UP"
+      },
+      {
+        "name": "VK_LEFT"
+      },
+      {
+        "name": "VK_N"
+      },
+      {
+        "name": "VK_O"
+      },
+      {
+        "name": "VK_P"
+      },
+      {
+        "name": "VK_PAGE_DOWN"
+      },
+      {
+        "name": "VK_PAGE_UP"
+      },
+      {
+        "name": "VK_PASTE"
+      },
+      {
+        "name": "VK_RIGHT"
+      },
+      {
+        "name": "VK_SLASH"
+      },
+      {
+        "name": "VK_SPACE"
+      },
+      {
+        "name": "VK_T"
+      },
+      {
+        "name": "VK_TAB"
+      },
+      {
+        "name": "VK_UP"
+      },
+      {
+        "name": "VK_V"
+      },
+      {
+        "name": "VK_W"
+      },
+      {
+        "name": "VK_X"
+      }
+    ],
+    "name": "java.awt.event.KeyEvent"
+  },
+  {
+    "methods": [
+      {
+        "name": "getUI",
+        "parameterTypes": []
+      }
+    ],
+    "name": "javax.swing.JComponent"
+  },
+  {
+    "methods": [
+      {
+        "name": "createLookAndFeel",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ],
+    "name": "javax.swing.UIManager"
+  },
+  {
+    "methods": [
+      {
+        "name": "drawStringUnderlineCharAt",
+        "parameterTypes": [
+          "javax.swing.JComponent",
+          "java.awt.Graphics2D",
+          "java.lang.String",
+          "int",
+          "float",
+          "float"
+        ]
+      }
+    ],
+    "name": "javax.swing.plaf.basic.BasicGraphicsUtils"
+  },
+  {
+    "methods": [
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "name": "javax.swing.plaf.basic.BasicTableUI"
+  },
+  {
+    "name": "net.miginfocom.swing.MigLayout"
+  },
+  {
+    "name": "org.slf4j.simple.SimpleServiceProvider"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "sun.java2d.loops.SetDrawLineANY"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "sun.java2d.loops.SetDrawPathANY"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "sun.java2d.loops.SetDrawPolygonsANY"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "sun.java2d.loops.SetDrawRectANY"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "sun.java2d.loops.SetFillPathANY"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "sun.java2d.loops.SetFillRectANY"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "sun.java2d.loops.SetFillSpansANY"
+  },
+  {
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ],
+    "name": "sun.java2d.marlin.DMarlinRenderingEngine"
+  },
+  {
+    "methods": [
+      {
+        "name": "invoke",
+        "parameterTypes": [
+          "java.lang.reflect.Method",
+          "java.lang.Object",
+          "java.lang.Object[]"
+        ]
+      }
+    ],
+    "name": "sun.reflect.misc.Trampoline"
+  }
+]

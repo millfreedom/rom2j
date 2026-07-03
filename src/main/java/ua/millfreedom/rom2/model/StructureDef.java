@@ -14,6 +14,7 @@ import static ua.millfreedom.rom2.res.Constants.GRAPHICS;
  */
 public final class StructureDef implements MfcSerializable {
     private static final String STRUCTURES = "structures";
+    private static final int SHADOW_Y_SENTINEL_MIN = 10000;
 
     //0x04
     public CSprite256 spriteMain;
@@ -121,6 +122,14 @@ public final class StructureDef implements MfcSerializable {
             loadSprites();
         }
         return spriteSecondary;
+    }
+
+    /**
+     * Native data support for StructureDef::shadowY loaded by LoadStructures @0047D8AF.
+     * The registry uses sentinel-scale values for structures whose projected object shadow must not be visible.
+     */
+    public boolean hasSentinelShadowY() {
+        return shadowY >= SHADOW_Y_SENTINEL_MIN;
     }
 
     /**
