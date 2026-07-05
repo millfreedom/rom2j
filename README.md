@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="LICENSE">AGPL-3.0-or-later</a> | Java 25 | LWJGL/OpenGL client | Dedicated server
+  <a href="LICENSE">AGPL-3.0-or-later</a> | Java 25 | LWJGL/OpenGL client | Dedicated server | MapEditor
 </p>
 
 ## What this is
@@ -28,6 +28,7 @@ That makes the repository part game runtime, part reverse-engineering notebook, 
 | Data formats | MFC archives, text tables, `.res`, `.reg`, `.alm`, palette, image, sound, save, and scenario structures are modeled in Java.                       |
 | Multiplayer/server | Raw TCP/IP and dedicated-server paths exist, including a no-GL Swing operator surface.                                                  |
 | HAT helper | A simple HAT-compatible HTTP server supports local server-list and discovery testing on port 6666. |
+| MapEditor | Work-in-progress editor for ROM2 maps |
 | Parity state | Work in progress. Some flows are playable or inspectable; other paths are WIP until native behavior is fully matched.                              |
 
 ## Why it is interesting
@@ -43,6 +44,7 @@ The result is a codebase that can be used to study the game, debug old content, 
 | Game client | `ua.millfreedom.rom2.starter.Rom2StarterLWJGL` |
 | Dedicated server | `ua.millfreedom.rom2.starter.DedicatedServerStarter` |
 | Simple HAT server | `ua.millfreedom.rom2.hatserver.HatHttpServer` |
+| MapEditor | `ua.millfreedom.rom2.starter.MapEditorStarter` |
 
 Use the project root as the working directory because the runtime expects the original resource layout beside the code.
 
