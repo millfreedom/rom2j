@@ -211,15 +211,10 @@ public class CharacterLoaderActionButtonsPanelVisualObject extends CVisualObject
     void loadCharacterLoaderButtonArt() {
         releaseCharacterLoaderButtonArt();
         pressedButtonGraphics[0] = new CBmp64k(SHOP_BUTTON_1_BMP);
-        Globals.mousePointer.update();
         pressedButtonGraphics[1] = new CBmp64k(SHOP_BUTTON_2_BMP);
-        Globals.mousePointer.update();
         pressedButtonGraphics[2] = new CBmp64k(SHOP_BUTTON_3_BMP);
-        Globals.mousePointer.update();
         pressedButtonGraphics[3] = new CBmp64k(SHOP_BUTTON_4_BMP);
-        Globals.mousePointer.update();
         backgroundGraphic = new CBmp64k(BUTTONS_AREA_BMP);
-        Globals.mousePointer.update();
     }
 
     /**

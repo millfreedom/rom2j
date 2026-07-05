@@ -5,6 +5,7 @@ import ua.millfreedom.rom2.Globals;
 import ua.millfreedom.rom2.Utils;
 import ua.millfreedom.rom2.model.*;
 import ua.millfreedom.rom2.model.enums.TextAlign;
+import ua.millfreedom.rom2.model.gameobj.CGameObject;
 import ua.millfreedom.rom2.model.gameobj.CUnit;
 import ua.millfreedom.rom2.model.palette.Palettes;
 import ua.millfreedom.rom2.model.sound.Sound;
@@ -103,7 +104,8 @@ public class ShopItemGridVisualObject extends GridOverlayVisualObject {
 
     /**
      * vtbl +0x14: ShopItemGridVisualObject::GetText @004B14D4.
-     * Full port.
+     * Java port status: native shop item tooltip selection ported; Java additionally routes item tooltips through the
+     * ALT equipped-item comparison helper.
      */
     @Override
     public String getText() {
@@ -403,6 +405,39 @@ public class ShopItemGridVisualObject extends GridOverlayVisualObject {
     @Override
     public int getGridModeCode() {
         return -1;
+    }
+
+    /**
+     * Java shop-context override for the native primary-selected object reads in
+     * GridOverlayVisualObject::BeginUiDrag @004A235D and CompleteUiDrag @004A24E8.
+     * not ported as a standalone native method.
+     */
+    @Override
+    protected CGameObject resolveGridOverlayBindingContext(@SuppressWarnings("unused") CMainWindow mainWindow) {
+        return ownerDialog.getSelectedShopUnit();
+    }
+
+    /**
+     * Java shop-context override for the native drop-commit branch in
+     * GridOverlayVisualObject::CompleteUiDrag @004A24E8.
+     * not ported as a standalone native method.
+     */
+    @Override
+    protected void notifyGridOverlayDropCommitted(
+            @SuppressWarnings("unused") CMainWindow mainWindow,
+            int sourcePackedModeCode,
+            int sourceIndex,
+            int targetPackedModeCode,
+            int targetIndex,
+            int quantity
+    ) {
+        ownerDialog.sendSelectedShopUnitInventoryTransferAction(
+                sourcePackedModeCode,
+                sourceIndex,
+                targetPackedModeCode,
+                targetIndex,
+                quantity
+        );
     }
 
     /**
@@ -795,10 +830,29 @@ public class ShopItemGridVisualObject extends GridOverlayVisualObject {
 
     /**
      * Native support boundary for shop-entry tooltip helper `TokenEntry::resolveTooltipText` in ShopItemGridVisualObject::GetText @004B14D4.
-     * Full port.
+     * Java support adds ALT equipped-item comparison composition.
      */
-    private static String resolveCatalogEntryTooltip(Object entry) {
-        return entry instanceof TokenEntry tokenEntry ? tokenEntry.resolveTooltipText() : null;
+    private String resolveCatalogEntryTooltip(Object entry) {
+        if (!(entry instanceof TokenEntry tokenEntry)) {
+            return null;
+        }
+        return ItemTooltipText.withAltEquippedComparison(
+                tokenEntry,
+                tokenEntry.resolveTooltipText(),
+                resolveSelectedUnitForTooltipComparison()
+        );
+    }
+
+    /**
+     * Java-only helper for using the shop dialog's selected unit as the ALT tooltip comparison unit.
+     * not ported.
+     */
+    private CUnit resolveSelectedUnitForTooltipComparison() {
+        int selectedIndex = ownerDialog.selectedUnitIndex & 0xFFFF;
+        if (selectedIndex < 0 || selectedIndex >= ownerDialog.selectedPrimaryUnits.size()) {
+            return null;
+        }
+        return ownerDialog.selectedPrimaryUnits.get(selectedIndex);
     }
 
     /**

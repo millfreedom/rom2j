@@ -920,7 +920,6 @@ public final class CMainApp {
             if (GAMEPLAY.isUnsetIn(mainWindow.dialogsMask)) {
                 pumpNonWorldIdle(mainWindow);
                 mainWindow.renderFrameIfFocused();
-                Globals.mousePointer.update();
             } else {
                 pumpGameplayIdle(mainWindow);
             }
@@ -982,7 +981,6 @@ public final class CMainApp {
      */
     private static void renderSuppressedGameplayModal(CMainWindow mainWindow) {
         mainWindow.renderFrameIfFocused();
-        Globals.mousePointer.update();
     }
 
     /**
@@ -1080,7 +1078,7 @@ public final class CMainApp {
         Globals.mainWindowRect.set(0, 0, 0, 0);
         if (Globals.mousePointer instanceof GLCursor glCursor) {
             glCursor.destroy();
-            Globals.mousePointer = new CMousePointer();
+            Globals.mousePointer = null;
         }
         mouseMessageAdapter = null;
         keyboardMessageAdapter = null;

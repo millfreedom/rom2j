@@ -705,18 +705,12 @@ public class StartGameSetupDialogVisualObject extends HandlerVisualObject {
     private void loadStartGameSetupGraphics() {
         releaseStartGameSetupGraphics();
         hotspotMaskBitmap = loadBmp256(PRECREATE_MASK_BMP);
-        refreshMousePointerAfterResourceLoad();
         mainAreaBitmap = loadBmp64k(PRECREATE_MAINAREA_BMP);
-        refreshMousePointerAfterResourceLoad();
         returnToGameButtonBitmap = loadBmp64k(PRECREATE_RETURN_BMP);
-        refreshMousePointerAfterResourceLoad();
         acceptButtonBitmap = loadBmp64k(PRECREATE_ACCEPT_BMP);
-        refreshMousePointerAfterResourceLoad();
         tableauBitmap = loadBmp64k(PRECREATE_TABLEAU_BMP);
-        refreshMousePointerAfterResourceLoad();
         blindAnimation = loadSprite(PRECREATE_BLIND_SPRITES_16A);
         blindAnimation.initPalette(0x10, 4, 0);
-        refreshMousePointerAfterResourceLoad();
         loadBitmapArray(portraitHoverBitmaps, PORTRAIT_HOVER_BITMAPS, PORTRAIT_BITMAP_LOAD_ORDER);
         loadBitmapArray(portraitSelectedBitmaps, PORTRAIT_ON_BITMAPS, PORTRAIT_BITMAP_LOAD_ORDER);
         loadBitmapArray(portraitSelectedHoverBitmaps, PORTRAIT_SELECTED_HOVER_BITMAPS, PORTRAIT_BITMAP_LOAD_ORDER);
@@ -1532,13 +1526,6 @@ public class StartGameSetupDialogVisualObject extends HandlerVisualObject {
     }
 
     /**
-     * Native support extracted from CMousePointer::Update calls in StartGameSetupDialogVisualObject::LoadStartGameSetupGraphics @00433A3D.
-     */
-    private static void refreshMousePointerAfterResourceLoad() {
-        Globals.mousePointer.update();
-    }
-
-    /**
      * Native support extracted from the repeated portrait/difficulty bitmap-array loads in StartGameSetupDialogVisualObject::LoadStartGameSetupGraphics @00433A3D.
      */
     private static void loadBitmapArray(CBmp64k[] target, String[] resourcePaths) {
@@ -1561,7 +1548,6 @@ public class StartGameSetupDialogVisualObject extends HandlerVisualObject {
      */
     private static void loadBitmapArrayElement(CBmp64k[] target, String[] resourcePaths, int index) {
         target[index] = loadBmp64k(resourcePaths[index]);
-        refreshMousePointerAfterResourceLoad();
     }
 
     /**

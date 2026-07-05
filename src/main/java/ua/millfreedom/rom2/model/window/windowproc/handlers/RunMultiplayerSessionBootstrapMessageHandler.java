@@ -102,7 +102,6 @@ public final class RunMultiplayerSessionBootstrapMessageHandler {
                 return ClientBootstrapWaitResult.FAILED;
             }
             MessageSystem.pumpPostedMessage();
-            Globals.mousePointer.update();
             if (Globals.escapeKeyDown) {
                 Globals.multiplayerBootstrapStatusWord = ESCAPE_BOOTSTRAP_ABORT_STATUS_WORD;
                 mainWindow.postMessage(MessageCodes.RETURN_TO_MULTIPLAYER_SETUP, 0, 0);

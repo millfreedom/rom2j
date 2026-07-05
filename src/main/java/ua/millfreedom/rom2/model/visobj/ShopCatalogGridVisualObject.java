@@ -280,12 +280,13 @@ public class ShopCatalogGridVisualObject extends ShopItemGridVisualObject {
         int result = mergeOrInsertEntryAt(payload, insertIndex);
         int destinationSlot = requireCatalogGridSourceEntries().get(result).sourceSlotDescriptor;
         if (getGridModeCode() == 2) {
-            bindGridSourceFromContext(mainWindow.getGridOverlayBindingContext());
+            bindGridSourceFromContext(resolveGridOverlayBindingContext(mainWindow));
         } else {
             setGridSource(gridSource);
         }
         if (sourceModeCode != destinationModeCode) {
-            mainWindow.onGridOverlayDropCommitted(
+            notifyGridOverlayDropCommitted(
+                    mainWindow,
                     sourceModeCode,
                     mainWindow.getUiLockSourceIndex(),
                     getGridModeCode(),

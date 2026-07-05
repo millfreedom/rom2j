@@ -607,12 +607,9 @@ public class DruidTownDialogVisualObject extends BasicTownDialogVisualObject {
     public void loadTownAssets() {
         releaseTownAssets();
         hoverMaskBitmap = loadBmp256(DRUID_TOWN_MASK_BMP);
-        Globals.mousePointer.update();
         mainBackgroundBitmap = loadBmp64k(DRUID_TOWN_MAIN_BMP);
-        Globals.mousePointer.update();
         tavernHighlightBitmap = loadBmp64k(DRUID_TAVERN_HIGHLIGHT_BMP);
         shopHighlightBitmap = loadBmp64k(DRUID_SHOP_HIGHLIGHT_BMP);
-        Globals.mousePointer.update();
         loadBitmapGroups(shopkeeperAnimationFrameGroups, DRUID_WOMAN_FRAME_PATH_FORMAT);
         loadBitmapGroups(tavernkeeperAnimationFrameGroups, DRUID_MAN_FRAME_PATH_FORMAT);
         bugSprite = loadSprite(DRUID_BUG_SPRITES_16A);
@@ -849,7 +846,6 @@ public class DruidTownDialogVisualObject extends BasicTownDialogVisualObject {
                     break;
                 }
                 group.add(loadBmp64k(resourcePath));
-                Globals.mousePointer.update();
             }
         }
     }

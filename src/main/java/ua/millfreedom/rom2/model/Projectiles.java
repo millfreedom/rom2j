@@ -1,6 +1,6 @@
 package ua.millfreedom.rom2.model;
 
-import ua.millfreedom.rom2.Globals;
+import lombok.SneakyThrows;
 import ua.millfreedom.rom2.model.palette.CGamePalette;
 import ua.millfreedom.rom2.model.palette.Palette256;
 import ua.millfreedom.rom2.model.container.CustomList;
@@ -50,13 +50,13 @@ public final class Projectiles {
      * Full port of registry-visible loader behavior. Native reloads entries by projectile ID without clearing the
      * existing CArray; cleanupProjectiles owns projectile registry clearing.
      */
-    public static void loadProjectiles() throws Exception {
+    @SneakyThrows
+    public static void loadProjectiles()  {
         ResInHeap projectilesReg = ResInHeap.load(GRAPHICS, PROJECTILES, PROJECTILES_REG);
 
         int count = projectilesReg.getInt(GLOBAL, COUNT, 0);
 
         for (int i = 0; i < count; i++) {
-            Globals.mousePointer.update();
             String section = String.format(PROJECTILE_N, i);
 
             StringBuilder fileBuf = new StringBuilder(0x100);

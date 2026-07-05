@@ -705,7 +705,6 @@ public class CGameSession implements MfcSerializable {
                     Globals.multiplayerBootstrapStatusWord = CHARACTER_SETUP_TIMEOUT_STATUS_WORD;
                     return false;
                 }
-                Globals.mousePointer.update();
                 CServerApp.processRemoteNetworkEvents();
             }
             if (!mapVisualObject.handleGameAction(null, 100)) {

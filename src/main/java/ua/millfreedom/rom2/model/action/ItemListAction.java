@@ -422,10 +422,10 @@ public class ItemListAction extends CGameAction {
         if (attachMoneyEntry) {
             inventoryEntries.add(createHeroInventoryMoneyEntry(mapVisualObject));
         }
-        mapVisualObject.notifySelectionUi();
-        if (routeShopItemListAction(2, null)) {
+        if (routeShopUnitInventoryAction(unit)) {
             return;
         }
+        mapVisualObject.notifySelectionUi();
         mapVisualObject.refreshHeroInventoryBindingForInventoryUnit(unit);
     }
 
@@ -602,6 +602,26 @@ public class ItemListAction extends CGameAction {
             return false;
         }
         shopDialog.onMessage(MessageCodes.SHOP_ITEM_GRID_TRANSFER, subtype, entries);
+        return true;
+    }
+
+    /**
+     * Java shop-context support for MapVisualObject::HandleGameAction @0040D9B2 subtype-2 inventory updates.
+     * Native routes a null payload through ShopDialogVisualObject::OnMessage @004B7102; Java passes the updated unit
+     * before generic selection UI refresh can rebind the shared visible-start pointer, preserving the displayed
+     * selected-unit inventory binding after drag/drop and buy/sell updates.
+     * not ported as a standalone native method.
+     */
+    private static boolean routeShopUnitInventoryAction(CUnit unit) {
+        CVisualObject inputController = Globals.mainWindow.getInputController();
+        if (inputController == null) {
+            return false;
+        }
+        CVisualObject root = inputController.getChildById(1000);
+        if (!(root instanceof ShopDialogVisualObject shopDialog)) {
+            return false;
+        }
+        shopDialog.handleShopUnitInventoryUpdated(unit);
         return true;
     }
 }

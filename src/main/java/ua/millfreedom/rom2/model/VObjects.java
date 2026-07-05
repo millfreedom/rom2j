@@ -2,7 +2,6 @@ package ua.millfreedom.rom2.model;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import ua.millfreedom.rom2.Globals;
 import ua.millfreedom.rom2.model.container.CustomList;
 import ua.millfreedom.rom2.res.ResInHeap;
 
@@ -76,7 +75,6 @@ public final class VObjects {
         V_OBJECTS.clear();
         int objectCount = objectsReg.getInt(GLOBAL, OBJECT_COUNT, 0);
         for (int objectIndex = 0; objectIndex < objectCount; objectIndex++) {
-            Globals.mousePointer.update();
             String section = OBJECT_KEY.formatted(objectIndex);
             VObject object = new VObject();
             object.id = objectsReg.getInt(section, ID, -1);

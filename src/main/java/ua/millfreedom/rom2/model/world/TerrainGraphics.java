@@ -1,6 +1,5 @@
 package ua.millfreedom.rom2.model.world;
 
-import ua.millfreedom.rom2.Globals;
 import ua.millfreedom.rom2.model.CBmp256;
 import ua.millfreedom.rom2.model.palette.CGamePalette;
 import ua.millfreedom.rom2.res.Resources;
@@ -65,7 +64,7 @@ public final class TerrainGraphics {
     }
 
     /**
-     * Native support extracted from ReloadTerrainTileGraphics @00476429.
+     * Native support extracted from ReloadTerrainTileGraphics @00476429 and shared with the editor preview reload.
      */
     private static void reloadTerrainTilePass(int terrainTileMask, boolean use3dTiles) {
         if (terrainTileMask != 0) {
@@ -83,7 +82,6 @@ public final class TerrainGraphics {
                 int variantNumber = variant + ((tileIndex & 3) << 2);
                 String fileName = String.format(Locale.ROOT, "tile%d-%02d.bmp", tileGroup, variantNumber);
                 terrainTileSet[tileIndex][variant] = loadBitmap(use3dTiles ? "3d/" + fileName : fileName);
-                Globals.mousePointer.update();
             }
         }
     }

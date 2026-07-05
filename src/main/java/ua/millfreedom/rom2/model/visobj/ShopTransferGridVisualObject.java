@@ -296,7 +296,8 @@ public class ShopTransferGridVisualObject extends ShopItemGridVisualObject {
         int sourceIndex = resolveInventoryTransferSourceIndex(mainWindow, payload);
         int result = mergeOrInsertEntryAt(payload, insertIndex);
         setGridSource(gridSource);
-        mainWindow.onGridOverlayDropCommitted(
+        notifyGridOverlayDropCommitted(
+                mainWindow,
                 mainWindow.getUiLockPackedModeCode(),
                 sourceIndex,
                 getGridModeCode(),

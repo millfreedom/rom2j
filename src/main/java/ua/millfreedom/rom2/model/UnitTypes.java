@@ -86,10 +86,6 @@ public final class UnitTypes {
      */
     public static final CustomList<CUnitInfo> UNIT_TYPES_BY_ID = new CustomList<>(CUnitInfo.class);
 
-    static {
-        loadUnitTypes();
-    }
-
     // not ported.
     private UnitTypes() {
     }
@@ -99,7 +95,7 @@ public final class UnitTypes {
      * Recovered Java/Ghidra grouping owner for the global `LoadUnitRegistry` routine.
      * Java port status: fully ported.
      * Full port of registry-visible loader behavior. Java keeps resource/file allocation inside managed helpers, while
-     * preserving native file-list loading, per-unit mouse updates, parent inheritance, fixed string buffers, geometry,
+     * preserving native file-list loading, parent inheritance, fixed string buffers, geometry,
      * local palettes, animation expansion tables, delays, and the trailing shared `human.pal` bootstrap.
      */
     @SneakyThrows
@@ -116,7 +112,6 @@ public final class UnitTypes {
         UNIT_TYPES_BY_ID.clear();
         int unitCount = unitsReg.getInt(GLOBAL, UNIT_COUNT, 0);
         for (int unitSectionIndex = 0; unitSectionIndex < unitCount; unitSectionIndex++) {
-            Globals.mousePointer.update();
             String section = UNIT_KEY.formatted(unitSectionIndex);
             CUnitInfo info = new CUnitInfo();
             info.m_ID = unitsReg.getInt(section, ID, -1);

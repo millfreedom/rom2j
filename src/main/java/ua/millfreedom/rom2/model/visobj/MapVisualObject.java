@@ -1415,7 +1415,6 @@ public final class MapVisualObject extends CVisualObject {
                 Globals.multiplayerBootstrapStatusWord = PLAYER_JOIN_TIMEOUT_STATUS_WORD;
                 return false;
             }
-            Globals.mousePointer.update();
             CServerApp.processRemoteNetworkEvents();
         }
     }
@@ -1483,7 +1482,6 @@ public final class MapVisualObject extends CVisualObject {
                 return false;
             }
             CServerApp.processRemoteNetworkEvents();
-            Globals.mousePointer.update();
         }
     }
 
@@ -2615,10 +2613,8 @@ public final class MapVisualObject extends CVisualObject {
             dirtyRenderRect.set(screenRect);
         }
 
-        Globals.mousePointer.update();
         updateRenderRingOriginForNativeState();
         drawModeledMapFrame(screenRect);
-        Globals.mousePointer.update();
         drawRightPanelLeftChrome(screenRect);
         if (!Globals.mainWindow.pChatVisualObject.suppressesGameListDraw()) {
             if (Globals.mainWindow.sessionMode != CMainWindow.SESSION_MODE_DEDICATED_SERVER) {
@@ -2630,7 +2626,6 @@ public final class MapVisualObject extends CVisualObject {
         drawRenderStatsOverlay(screenRect);
         drawNetworkStatsOverlay(screenRect);
         super.update();
-        Globals.mousePointer.update();
         selectCursor();
 
         updateRenderRegions(panelLayoutSignature, panelDirtyRect, screenRect);
@@ -5149,11 +5144,34 @@ public final class MapVisualObject extends CVisualObject {
             int destinationSlot,
             int quantityOrItemId
     ) {
+        sendInventoryTransferAction(
+                primarySelectedObject,
+                sourceContainerType,
+                sourceSlot,
+                destinationContainerType,
+                destinationSlot,
+                quantityOrItemId
+        );
+    }
+
+    /**
+     * Native support extracted from MapVisualObject::sendInventoryTransferAction @0041A20C packet-body writes.
+     * Java shop dialogs pass the dialog-selected unit explicitly when it differs from the map primary selection.
+     * not ported as a standalone native method.
+     */
+    public void sendInventoryTransferAction(
+            CGameObject selectedObject,
+            int sourceContainerType,
+            int sourceSlot,
+            int destinationContainerType,
+            int destinationSlot,
+            int quantityOrItemId
+    ) {
         InventoryTransferAction action = InventoryTransferAction.global;
         action.ID.set(GameActionId.INVENTORY_TRANSFER_ACTION_22.id);
         action.netID.set(currentPlayer.playerId);
         action.playerID.set(0);
-        action.unitTokenId.set(primarySelectedObject.m_id);
+        action.unitTokenId.set(selectedObject.m_id);
         action.sourceSlot.set(sourceSlot & 0xFFFF);
         action.sourceContainerType.set(sourceContainerType & 0xFF);
         action.destinationSlot.set(destinationSlot & 0xFFFF);
@@ -5185,11 +5203,29 @@ public final class MapVisualObject extends CVisualObject {
     }
 
     /**
+     * Java shop-context support for MapVisualObject::CommitShopBuyAction @0041A387 packet dispatch.
+     * Native uses `primarySelectedObject`; Java shop dialogs pass the displayed selected unit explicitly.
+     * not ported as a standalone native method.
+     */
+    public void commitShopBuyAction(CGameObject selectedObject) {
+        sendShopUnitTokenAction(ShopBuyAction.global, ShopBuyAction.ACTION_ID, selectedObject);
+    }
+
+    /**
      * Native: MapVisualObject::CommitShopSellAction @0041A3E1.
      * Fully ported.
      */
     public void commitShopSellAction() {
         sendShopUnitTokenAction(ShopSellAction.global, ShopSellAction.ACTION_ID);
+    }
+
+    /**
+     * Java shop-context support for MapVisualObject::CommitShopSellAction @0041A3E1 packet dispatch.
+     * Native uses `primarySelectedObject`; Java shop dialogs pass the displayed selected unit explicitly.
+     * not ported as a standalone native method.
+     */
+    public void commitShopSellAction(CGameObject selectedObject) {
+        sendShopUnitTokenAction(ShopSellAction.global, ShopSellAction.ACTION_ID, selectedObject);
     }
 
     /**
@@ -5201,14 +5237,32 @@ public final class MapVisualObject extends CVisualObject {
     }
 
     /**
+     * Java shop-context support for MapVisualObject::CommitShopUndoAction @0041A43B packet dispatch.
+     * Native uses `primarySelectedObject`; Java shop dialogs pass the displayed selected unit explicitly.
+     * not ported as a standalone native method.
+     */
+    public void commitShopUndoAction(CGameObject selectedObject) {
+        sendShopUnitTokenAction(UndoShopAction.global, UndoShopAction.ACTION_ID, selectedObject);
+    }
+
+    /**
      * Native support extracted from MapVisualObject::CommitShopBuyAction @0041A387,
      * MapVisualObject::CommitShopSellAction @0041A3E1, and MapVisualObject::CommitShopUndoAction @0041A43B.
      */
     private void sendShopUnitTokenAction(UnitTokenAction action, int actionId) {
+        sendShopUnitTokenAction(action, actionId, primarySelectedObject);
+    }
+
+    /**
+     * Native support extracted from MapVisualObject::CommitShopBuyAction @0041A387,
+     * MapVisualObject::CommitShopSellAction @0041A3E1, and MapVisualObject::CommitShopUndoAction @0041A43B.
+     * Java shop dialogs can supply the displayed selected unit when it differs from the map primary selection.
+     */
+    private void sendShopUnitTokenAction(UnitTokenAction action, int actionId, CGameObject selectedObject) {
         action.ID.set(actionId);
         action.netID.set(currentPlayer.playerId);
         action.playerID.set(0);
-        action.unitTokenId.set(primarySelectedObject.m_id);
+        action.unitTokenId.set(selectedObject.m_id);
         CServerApp.sendClientGameAction(action);
     }
 
@@ -7551,17 +7605,11 @@ public final class MapVisualObject extends CVisualObject {
      */
     private void refreshGamePalettesAfterLighting() {
         refreshUnitPalettesAfterLighting();
-        Globals.mousePointer.update();
         Palettes.loadUnitOwnerPalettes();
-        Globals.mousePointer.update();
         TerrainGraphics.refreshTerrainTilePalettes();
-        Globals.mousePointer.update();
         refreshVisualObjectPalettesAfterLighting();
-        Globals.mousePointer.update();
         refreshStructurePalettesAfterLighting();
-        Globals.mousePointer.update();
         refreshProjectilePalettesAfterLighting();
-        Globals.mousePointer.update();
         GUI.sprBackpack.initPalette(0x10, 2, 1);
     }
 
@@ -7569,7 +7617,6 @@ public final class MapVisualObject extends CVisualObject {
      * Native support extracted from RefreshGamePalettes @0047E345 unit-type palette invalidation.
      */
     private static void refreshUnitPalettesAfterLighting() {
-        Globals.mousePointer.update();
         for (CUnitInfo unitInfo : UnitTypes.UNIT_TYPES_BY_ID) {
             if (unitInfo == null) {
                 continue;

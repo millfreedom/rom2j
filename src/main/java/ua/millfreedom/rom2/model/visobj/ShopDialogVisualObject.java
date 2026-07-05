@@ -365,7 +365,8 @@ public class ShopDialogVisualObject extends HandlerVisualObject {
 
     /**
      * vtbl +0x80: ShopDialogVisualObject::ShowDialog @004B8B98.
-     * Full port. Child vtable calls are represented by support helpers/classes with their own port-status comments.
+     * Java port status: native setup ported; Java binds the inventory visible-start pointer to the same selected unit
+     * as the grid source so shop inventory refreshes preserve the displayed unit's scroll position.
      */
     @Override
     public void showDialog() {
@@ -387,7 +388,7 @@ public class ShopDialogVisualObject extends HandlerVisualObject {
         tipsPromptTextUpdatedFlag = 0;
         moveSelectionInfoPanelIntoDialog();
         loadSelectedUnits();
-        unitInventoryGrid.visibleStartRef = selectedPrimaryUnits.get(0).shopInventoryVisibleStart;
+        unitInventoryGrid.visibleStartRef = getSelectedShopUnit().shopInventoryVisibleStart;
         resetShopCatalogGridVisibleStart();
         selectedCatalogCategoryIndex = 100;
         prepareCompassSelection();
@@ -396,7 +397,7 @@ public class ShopDialogVisualObject extends HandlerVisualObject {
         shopCatalogGrid.clearCatalogCategoryEntries();
         tradeTransferGrid.clearTransferEntries();
         mapVisual.onMessage(MessageCodes.REFRESH_LAYOUT, 0, 0);
-        CUnit selectedUnit = selectedPrimaryUnits.get(selectedUnitIndex);
+        CUnit selectedUnit = getSelectedShopUnit();
         selectedUnit.setSelected(true);
         mapVisual.updateSelectionState();
         selectedUnit.unitFlags |= 0x08;
@@ -743,10 +744,10 @@ public class ShopDialogVisualObject extends HandlerVisualObject {
      */
     private void handleShopItemGridTransferMessage(int wParam, Object transferredEntriesParam) {
         if (transferredEntriesParam == null) {
-            refreshShopItemGrid(unitInventoryGrid);
+            refreshSelectedShopUnitInventoryGrid();
             refreshShopItemGrid(shopCatalogGrid);
             refreshShopItemGrid(tradeTransferGrid);
-            mapVisual.getSelectedCUnit().unitFlags |= 0x08;
+            getSelectedShopUnit().unitFlags |= 0x08;
             dirtyFlags |= 0x28;
             return;
         }
@@ -774,6 +775,24 @@ public class ShopDialogVisualObject extends HandlerVisualObject {
             }
         }
         transferredEntries.clear();
+    }
+
+    /**
+     * Java shop-context support for ItemListAction subtype-2 routing from
+     * MapVisualObject::HandleGameAction @0040D9B2 and ShopDialogVisualObject::OnMessage @004B7102.
+     * Native routes a null payload refresh through the shop dialog; Java carries the updated unit so the open shop
+     * inventory can keep the same selected-unit source/ref binding after buy/sell inventory updates.
+     * not ported as a standalone native method.
+     */
+    public void handleShopUnitInventoryUpdated(CUnit updatedUnit) {
+        if (updatedUnit == getSelectedShopUnit()) {
+            bindSelectedShopUnitInventorySourceAndRef();
+        }
+        refreshShopItemGrid(unitInventoryGrid);
+        refreshShopItemGrid(shopCatalogGrid);
+        refreshShopItemGrid(tradeTransferGrid);
+        updatedUnit.unitFlags |= 0x08;
+        dirtyFlags |= 0x28;
     }
 
     /**
@@ -1060,8 +1079,7 @@ public class ShopDialogVisualObject extends HandlerVisualObject {
      * Full support port.
      */
     private void bindInitialSelectedUnitInventory() {
-        CUnit selectedUnit = selectedPrimaryUnits.get(selectedUnitIndex);
-        unitInventoryGrid.setGridSource(selectedUnit.tokenEntries);
+        bindSelectedShopUnitInventorySourceAndRef();
     }
 
     /**
@@ -1069,7 +1087,7 @@ public class ShopDialogVisualObject extends HandlerVisualObject {
      * Full port.
      */
     private void bindSelectedUnitInventory() {
-        CUnit selectedUnit = selectedPrimaryUnits.get(selectedUnitIndex);
+        CUnit selectedUnit = getSelectedShopUnit();
         selectedUnit.setSelected(true);
         mapVisual.updateSelectionState();
         unitInventoryGrid.setGridSource(selectedUnit.tokenEntries);
@@ -1077,6 +1095,61 @@ public class ShopDialogVisualObject extends HandlerVisualObject {
         refreshShopItemGrid(unitInventoryGrid);
         unitInventoryGrid.clampVisibleStart();
         selectedUnit.unitFlags |= 0x08;
+    }
+
+    /**
+     * Java shop-context support extracted from the selected-unit source/ref binding in
+     * ShopDialogVisualObject::ShowDialog @004B8B98, ShiftSelectionForward @004B8102, and
+     * ShiftSelectionBackward @004B8273.
+     * not ported as a standalone native method.
+     */
+    private void bindSelectedShopUnitInventorySourceAndRef() {
+        CUnit selectedUnit = getSelectedShopUnit();
+        unitInventoryGrid.setGridSource(selectedUnit.tokenEntries);
+        unitInventoryGrid.visibleStartRef = selectedUnit.shopInventoryVisibleStart;
+    }
+
+    /**
+     * Java shop-context support extracted from ShopDialogVisualObject::OnMessage @004B7102 subtype-2/null refresh
+     * and the selected-unit source/ref binding in ShowDialog @004B8B98.
+     * not ported as a standalone native method.
+     */
+    private void refreshSelectedShopUnitInventoryGrid() {
+        bindSelectedShopUnitInventorySourceAndRef();
+        refreshShopItemGrid(unitInventoryGrid);
+    }
+
+    /**
+     * Java shop-context support extracted from ShopDialogVisualObject::ShowDialog @004B8B98 selected-unit source
+     * binding and the selected-unit source/ref binding in ShiftSelectionForward @004B8102 and
+     * ShiftSelectionBackward @004B8273.
+     * not ported as a standalone native method.
+     */
+    CUnit getSelectedShopUnit() {
+        return selectedPrimaryUnits.get(selectedUnitIndex & 0xFFFF);
+    }
+
+    /**
+     * Java shop-context support for MapVisualObject::sendInventoryTransferAction @0041A20C packet dispatch.
+     * Native GridOverlayVisualObject uses MapVisualObject primary selection; Java shop grids use the dialog-selected
+     * unit that owns the displayed inventory source.
+     * not ported as a standalone native method.
+     */
+    void sendSelectedShopUnitInventoryTransferAction(
+            int sourceContainerType,
+            int sourceSlot,
+            int destinationContainerType,
+            int destinationSlot,
+            int quantityOrItemId
+    ) {
+        mapVisual.sendInventoryTransferAction(
+                getSelectedShopUnit(),
+                sourceContainerType,
+                sourceSlot,
+                destinationContainerType,
+                destinationSlot,
+                quantityOrItemId
+        );
     }
 
     /**
@@ -1106,7 +1179,7 @@ public class ShopDialogVisualObject extends HandlerVisualObject {
      * Full support port.
      */
     private void applyUndoAction() {
-        mapVisual.commitShopUndoAction();
+        mapVisual.commitShopUndoAction(getSelectedShopUnit());
     }
 
     /**
@@ -1128,7 +1201,7 @@ public class ShopDialogVisualObject extends HandlerVisualObject {
     private void applyAcceptedBuyAction() {
         shopCompass.loadCenterForwardFrames();
         shopCompass.stateFlags |= 0x20;
-        mapVisual.commitShopBuyAction();
+        mapVisual.commitShopBuyAction(getSelectedShopUnit());
 
         buySound.playIfNotPlaying(Globals.soundPreferences.sfxVolume, false, Sound.POINTER_SFX_PRIORITY, 0);
 
@@ -1141,7 +1214,7 @@ public class ShopDialogVisualObject extends HandlerVisualObject {
     private void applyAcceptedSellAction() {
         shopCompass.loadCenterForwardFrames();
         shopCompass.stateFlags |= 0x20;
-        mapVisual.commitShopSellAction();
+        mapVisual.commitShopSellAction(getSelectedShopUnit());
 
         sellSound.playIfNotPlaying(Globals.soundPreferences.sfxVolume, false, Sound.POINTER_SFX_PRIORITY, 0);
 

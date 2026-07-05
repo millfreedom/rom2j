@@ -51,7 +51,6 @@ public class FullStatsPanelVisualObject extends CVisualObject {
     void initializeFullStatsPanel() {
         releaseFullStatsBitmap();
         this.fullStatsBitmap = loadFullStatsBitmap();
-        Globals.mousePointer.update();
     }
 
     /**

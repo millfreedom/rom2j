@@ -1331,7 +1331,7 @@ public final class ScenarioMapLoader {
      * Fully ported native support extracted from ScenarioMapLoader::materializeScenarioSacksAndEffects @00564072
      * world-sack item loop.
      */
-    private static Item createScenarioSackItem(WorldSack worldSack, int itemIndex, ScenarioDescriptor scenario) {
+    public static Item createScenarioSackItem(WorldSack worldSack, int itemIndex, ScenarioDescriptor scenario) {
         Item item = Globals.staticDataMgr.createItemFromPackedHash(worldSack.itemPackedHashes.get(itemIndex) & 0xFFFF);
         if (item == null) {
             return null;

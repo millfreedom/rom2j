@@ -431,7 +431,7 @@ public class GridOverlayVisualObject extends CVisualObject {
         if (source.size() <= sourceIndex) {
             return null;
         }
-        CGameObject selectedObject = mainWindow.getGridOverlayBindingContext();
+        CGameObject selectedObject = resolveGridOverlayBindingContext(mainWindow);
         if (selectedObject.cPlayer != mainWindow.pMapVisualObject.currentPlayer) {
             return null;
         }
@@ -473,14 +473,16 @@ public class GridOverlayVisualObject extends CVisualObject {
         int packedModeCode = getGridModeCode();
         boolean notifyDropCommit = shouldNotifyGridDropCommit(mainWindow, packedModeCode);
         int result = mergeOrInsertEntryAt(payload, insertIndex);
+        CGameObject selectedObject = resolveGridOverlayBindingContext(mainWindow);
         int targetModeCode = getGridModeCode();
         if (targetModeCode == 2) {
-            bindGridSourceFromContext(mainWindow.getGridOverlayBindingContext());
+            bindGridSourceFromContext(selectedObject);
         } else {
             setGridSource(gridSource);
         }
         if (notifyDropCommit) {
-            mainWindow.onGridOverlayDropCommitted(
+            notifyGridOverlayDropCommitted(
+                    mainWindow,
                     mainWindow.getUiLockPackedModeCode(),
                     mainWindow.getUiLockSourceIndex(),
                     getGridModeCode(),
@@ -615,6 +617,35 @@ public class GridOverlayVisualObject extends CVisualObject {
      */
     private void notifyInputControllerSelectionChanged(CMainWindow mainWindow) {
         mainWindow.getInputController().onMessage(MessageCodes.TEXT_LIST_SELECTION_CHANGED, id, 0);
+    }
+
+    /**
+     * Native support extracted from the primary-selected object reads in GridOverlayVisualObject::BeginUiDrag @004A235D
+     * and CompleteUiDrag @004A24E8. Default path matches native map-inventory context.
+     */
+    protected CGameObject resolveGridOverlayBindingContext(CMainWindow mainWindow) {
+        return mainWindow.getGridOverlayBindingContext();
+    }
+
+    /**
+     * Native support extracted from the drop-commit branch in GridOverlayVisualObject::CompleteUiDrag @004A24E8.
+     * Default path sends the native map-selected unit transfer action.
+     */
+    protected void notifyGridOverlayDropCommitted(
+            CMainWindow mainWindow,
+            int sourcePackedModeCode,
+            int sourceIndex,
+            int targetPackedModeCode,
+            int targetIndex,
+            int quantity
+    ) {
+        mainWindow.onGridOverlayDropCommitted(
+                sourcePackedModeCode,
+                sourceIndex,
+                targetPackedModeCode,
+                targetIndex,
+                quantity
+        );
     }
 
     /**

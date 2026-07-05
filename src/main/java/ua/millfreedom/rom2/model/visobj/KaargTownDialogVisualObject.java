@@ -575,12 +575,9 @@ public class KaargTownDialogVisualObject extends BasicTownDialogVisualObject {
     public void loadTownAssets() {
         releaseTownAssets();
         hoverMaskBitmap = loadBmp256(KAARG_TOWN_MASK_BMP);
-        Globals.mousePointer.update();
         mainBackgroundBitmap = loadBmp64k(KAARG_TOWN_MAIN_BMP);
-        Globals.mousePointer.update();
         tavernHighlightBitmap = loadBmp64k(KAARG_TAVERN_HIGHLIGHT_BMP);
         shopHighlightBitmap = loadBmp64k(KAARG_SHOP_HIGHLIGHT_BMP);
-        Globals.mousePointer.update();
         loadBitmapFrames(dervishFrameBitmaps, DERVISH_FRAME_PATH_FORMAT, DERVISH_FRAME_MAX_COUNT);
         loadBitmapFrames(guardFrameBitmaps, GUARD_FRAME_PATH_FORMAT, GUARD_FRAME_MAX_COUNT);
         loadGroupedBitmapFrames(girl1FrameGroups, GIRL1_FRAME_PATH_FORMAT, GIRL_FRAME_MAX_COUNT);
@@ -831,7 +828,6 @@ public class KaargTownDialogVisualObject extends BasicTownDialogVisualObject {
                 break;
             }
             targetFrames.add(loadBmp64k(resourcePath));
-            Globals.mousePointer.update();
         }
     }
 
@@ -848,7 +844,6 @@ public class KaargTownDialogVisualObject extends BasicTownDialogVisualObject {
                     break;
                 }
                 group.add(loadBmp64k(resourcePath));
-                Globals.mousePointer.update();
             }
         }
     }

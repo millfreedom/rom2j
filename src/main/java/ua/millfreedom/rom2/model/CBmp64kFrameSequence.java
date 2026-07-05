@@ -43,13 +43,14 @@ public final class CBmp64kFrameSequence {
 
     /**
      * Native: CBmp64kFrameSequence::LoadFrames @004010EE.
-     * Fully ported. Java routes bitmap allocation through the modeled resource manager and mirrors the native per-frame mouse/music update hook.
+     * Fully ported. Java routes bitmap allocation through the modeled resource manager and keeps streaming music alive
+     * during long frame loads.
      */
     public void loadFrames(List<String> frameNames) {
         frames.clear();
         for (int frameIndex = 0; frameIndex < frameNames.size(); frameIndex++) {
             frames.add(new CBmp64k(Resources.path(frameNames.get(frameIndex))));
-            updateLoadProgress();
+            updateStreamingMusicDuringLoad();
         }
         currentFrameIndex = 0;
         currentFrame = frames.get(currentFrameIndex);
@@ -211,11 +212,10 @@ public final class CBmp64kFrameSequence {
     /**
      * Native support extracted from CBmp64kFrameSequence::LoadFrames @004010EE.
      */
-    private static void updateLoadProgress() {
+    private static void updateStreamingMusicDuringLoad() {
         MusicPlayer musicPlayer = Globals.mainWindow.musicPlayer;
         if (musicPlayer != null) {
             musicPlayer.updateStreamingPlayback((int) System.currentTimeMillis());
         }
-        Globals.mousePointer.update();
     }
 }

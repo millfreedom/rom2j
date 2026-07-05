@@ -307,7 +307,6 @@ public class ActionButtonsPanelVisualObject extends CVisualObject {
      */
     private static CBmp64k loadButtonGraphic(String resourcePath) {
         CBmp64k graphic = new CBmp64k(resourcePath);
-        Globals.mousePointer.update();
         return graphic;
     }
 

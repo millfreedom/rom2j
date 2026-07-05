@@ -703,42 +703,26 @@ public class GlobalMapDialogVisualObject extends HandlerVisualObject {
 
     /**
      * Native: GlobalMapDialogVisualObject::LoadMapAssets @0046EEB0.
-     * Fully ported. Java managed allocation replaces native bitmap/sprite AfxAllocMemory branches while preserving
-     * native mouse-pointer refreshes between loads.
+     * Fully ported. Java managed allocation replaces native bitmap/sprite AfxAllocMemory branches.
      */
     private void loadMapAssets() {
         releaseMapAssets();
         mapBackgroundBitmap = loadBmp64k(umoirMapMode == 0 ? GLOBAL_MAP_BMP : UMOIR_BMP);
-        Globals.mousePointer.update();
         travelStartFlagSprite = loadA16Sprite(FLAG1_SPRITES);
-        Globals.mousePointer.update();
         currentLocationFlagSprite = loadA16Sprite(FLAG_SPRITES);
-        Globals.mousePointer.update();
         targetCrossSprite = loadA16Sprite(CROSS_SPRITES);
-        Globals.mousePointer.update();
         routeDotBitmap = loadBmp64k(BALL_MAP_BMP);
-        Globals.mousePointer.update();
         heroBitmap = loadBmp64k(HERO_BMP);
-        Globals.mousePointer.update();
         heroBitmapSize.setSize(heroBitmap.xSizeOf(0), heroBitmap.ySizeOf(0));
         availableLocationFlagSprite = loadA16Sprite(FLAG_ON_MAP_SPRITES);
-        Globals.mousePointer.update();
         missionLocationFlagSprite = loadA16Sprite(MISSION_FLAG_SPRITES);
-        Globals.mousePointer.update();
         partyLocationFlagSprite = loadA16Sprite(YOUR_FLAG_SPRITES);
-        Globals.mousePointer.update();
         scrollTopBitmap = loadBmp64k(SCROLL_01_BMP);
-        Globals.mousePointer.update();
         scrollMiddleBitmap = loadBmp64k(SCROLL_02_BMP);
-        Globals.mousePointer.update();
         scrollBottomBitmap = loadBmp64k(SCROLL_03_BMP);
-        Globals.mousePointer.update();
         scrollPanelTopBitmap = loadBmp64k(SCROLL_P1_BMP);
-        Globals.mousePointer.update();
         scrollPanelBottomBitmap = loadBmp64k(SCROLL_P3_BMP);
-        Globals.mousePointer.update();
         scrollPanelMiddleBitmap = loadBmp64k(SCROLL_P2_BMP);
-        Globals.mousePointer.update();
     }
 
     /**

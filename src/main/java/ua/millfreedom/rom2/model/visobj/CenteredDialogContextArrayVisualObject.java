@@ -537,7 +537,6 @@ public class CenteredDialogContextArrayVisualObject extends CenteredDialogVisual
      */
     private static boolean pumpSessionEnumerationMessages() {
         MessageSystem.pumpPostedMessage();
-        Globals.mousePointer.update();
         return true;
     }
 

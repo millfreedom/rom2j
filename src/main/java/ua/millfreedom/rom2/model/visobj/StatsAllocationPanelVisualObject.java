@@ -608,7 +608,6 @@ public class StatsAllocationPanelVisualObject extends CVisualObject {
      */
     private static CBmp64k loadStatsGraphic(String resourcePath) {
         CBmp64k graphic = new CBmp64k(resourcePath);
-        Globals.mousePointer.update();
         return graphic;
     }
 

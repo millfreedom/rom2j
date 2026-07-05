@@ -342,10 +342,9 @@ public class SelectionInfoPanelVisualObject extends CVisualObject {
             return 0;
         }
 
-        var frame = pictureHitMap0x78.frames.get(0);
-        int pixel = Byte.toUnsignedInt(frame.data()[(y - panelScreenRect.top - 2) * 0xa0 + (x - panelScreenRect.left)]);
-        if (pixel != 0) {
-            TokenEntry token = beginCarrySelectionSlotToken(pixel - 1);
+        int slotIndex = getPictureHitSlotIndex(panelScreenRect, x, y);
+        if (slotIndex >= 0) {
+            TokenEntry token = beginCarrySelectionSlotToken(slotIndex);
             if (token != null) {
                 beginSelectionSlotDragVisual(token);
                 unit.unitFlags |= UNIT_FLAG_EQUIPMENT_PORTRAIT_DIRTY;
@@ -472,8 +471,8 @@ public class SelectionInfoPanelVisualObject extends CVisualObject {
     public int onLButtonDblClk(int nFlags, int x, int y) {
         CRect panelScreenRect = new CRect();
         clientToScreen(panelScreenRect, cRect);
-        int hitMapValue = getPictureInteractionHitMapValue(panelScreenRect, x, y);
-        if (hitMapValue == 0) {
+        int slotIndex = getPictureHitSlotIndex(panelScreenRect, x, y);
+        if (slotIndex < 0) {
             return 1;
         }
 
@@ -487,7 +486,7 @@ public class SelectionInfoPanelVisualObject extends CVisualObject {
             return 0;
         }
 
-        showSelectionSlotInventoryOverlay(hitMapValue - 1);
+        showSelectionSlotInventoryOverlay(slotIndex);
         return 1;
     }
 
@@ -990,20 +989,12 @@ public class SelectionInfoPanelVisualObject extends CVisualObject {
             ensureDynamicInfoPictureLoaded(unit);
         }
 
-        int hitMapValue = getPictureTooltipHitMapValue(panelScreenRect, mouseX, mouseY);
-        if (hitMapValue == 0) {
+        int slotIndex = getPictureHitSlotIndex(panelScreenRect, mouseX, mouseY);
+        if (slotIndex < 0) {
             return null;
         }
-        TokenEntry token = unit.equipmentTokenEntries[hitMapValue - 1];
+        TokenEntry token = unit.equipmentTokenEntries[slotIndex];
         return token == null ? null : resolveEquipmentTokenTooltip(token, unit);
-    }
-
-    /**
-     * Native support extracted from SelectionInfoPanelVisualObject::GetText @004AE232 direct CBmp256 hit-map read.
-     */
-    private int getPictureTooltipHitMapValue(CRect panelScreenRect, int x, int y) {
-        var frame = pictureHitMap0x78.frames.get(0);
-        return Byte.toUnsignedInt(frame.data()[(y - panelScreenRect.top - 2) * PICTURE_WIDTH + (x - panelScreenRect.left)]);
     }
 
     /**
@@ -1131,16 +1122,9 @@ public class SelectionInfoPanelVisualObject extends CVisualObject {
     }
 
     /**
-     * Native support extracted from SelectionInfoPanelVisualObject::OnLButtonDblClk @004AEABB direct CBmp256 hit-map read.
-     */
-    private int getPictureInteractionHitMapValue(CRect panelScreenRect, int x, int y) {
-        var frame = pictureHitMap0x78.frames.get(0);
-        return Byte.toUnsignedInt(frame.data()[(y - panelScreenRect.top - 2) * PICTURE_WIDTH + (x - panelScreenRect.left)]);
-    }
-
-    /**
-     * Native owner: CBmp256 hit-map lookup used by SelectionInfoPanelVisualObject::GetText / OnMouseMove / OnLButtonUp / OnLButtonDblClk.
-     * not ported.
+     * Native support extracted from SelectionInfoPanelVisualObject::GetText @004AE232,
+     * OnMouseMove @004AF120, and OnLButtonDblClk @004AEABB direct CBmp256 hit-map reads.
+     * Java guards off-buffer screen coordinates before indexing the fixed-size hit-map array.
      */
     private int getPictureHitSlotIndex(CRect panelScreenRect, int x, int y) {
         if (pictureHitMap0x78 == null || pictureHitMap0x78.frames == null || pictureHitMap0x78.frames.isEmpty()) {
@@ -1159,7 +1143,8 @@ public class SelectionInfoPanelVisualObject extends CVisualObject {
         }
 
         int pixel = Byte.toUnsignedInt(frame.data()[localY * frame.xSize() + localX]);
-        return pixel == 0 ? -1 : pixel - 1;
+        int slotIndex = pixel - 1;
+        return slotIndex >= 0 && slotIndex < EQUIPMENT_SLOT_COUNT ? slotIndex : -1;
     }
 
     /**

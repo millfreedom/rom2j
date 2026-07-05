@@ -111,7 +111,8 @@ public class HeroInventoryControlVisualObject extends GridOverlayVisualObject {
 
     /**
      * vtbl +0x14: HeroInventoryControlVisualObject::GetText @004A3F0B.
-     * Fully ported for TokenEntry-backed hero inventory entries.
+     * Java port status: native TokenEntry-backed hero inventory tooltip selection ported; Java additionally routes
+     * item tooltips through the ALT equipped-item comparison helper.
      */
     @Override
     public String getText() {
@@ -145,7 +146,9 @@ public class HeroInventoryControlVisualObject extends GridOverlayVisualObject {
             return get(MAIN_MONEY_74);
         }
         String tooltip = resolveSelectionEntryTooltip(entry);
-        return appendAltEquippedSlotTooltip(entry, tooltip);
+        return entry instanceof TokenEntry tokenEntry
+                ? ItemTooltipText.withAltEquippedComparison(tokenEntry, tooltip, resolveCurrentSelectedUnit())
+                : tooltip;
     }
 
     /**
@@ -1050,52 +1053,6 @@ public class HeroInventoryControlVisualObject extends GridOverlayVisualObject {
      */
     private static String resolveSelectionEntryTooltip(Object entry) {
         return entry instanceof TokenEntry tokenEntry ? tokenEntry.resolveTooltipText() : null;
-    }
-
-    /**
-     * Java-only ALT tooltip extension for comparing hovered inventory items with the selected unit's equipped slot.
-     * not ported.
-     */
-    private static String appendAltEquippedSlotTooltip(Object entry, String tooltip) {
-        if (!Globals.altKeyDown || !(entry instanceof TokenEntry tokenEntry) || tooltip == null) {
-            return tooltip;
-        }
-
-        TokenEntry equippedToken = resolveSelectedUnitEquipmentToken(tokenEntry);
-        if (equippedToken == null) {
-            return tooltip;
-        }
-        return TooltipText.sideBySide(tooltip, equippedToken.resolveTooltipText());
-    }
-
-    /**
-     * Java-only helper mapping a highlighted token's resolved Item slot onto the selected unit equipment snapshot.
-     * not ported.
-     */
-    private static TokenEntry resolveSelectedUnitEquipmentToken(TokenEntry tokenEntry) {
-        Item highlightedItem = resolveTokenEntryItem(tokenEntry);
-        if (highlightedItem == null) {
-            return null;
-        }
-
-        CUnit selectedUnit = resolveCurrentSelectedUnit();
-        if (selectedUnit == null) {
-            return null;
-        }
-
-        int slotIndex = highlightedItem.getSlot() - 1;
-        if (slotIndex < 0 || slotIndex >= selectedUnit.equipmentTokenEntries.length) {
-            return null;
-        }
-        return selectedUnit.equipmentTokenEntries[slotIndex];
-    }
-
-    /**
-     * Java-only helper resolving a highlighted TokenEntry through the same static item factory used by item tooltips.
-     * not ported.
-     */
-    private static Item resolveTokenEntryItem(TokenEntry tokenEntry) {
-        return Globals.staticDataMgr.createItemFromPackedHash(tokenEntry.packedTokenHash & 0xFFFF);
     }
 
     /**

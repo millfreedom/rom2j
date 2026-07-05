@@ -440,7 +440,6 @@ public class SkillSelectionPanelVisualObject extends CVisualObject {
      */
     private static CBmp64k loadBmp64k(String path) {
         CBmp64k bitmap = new CBmp64k(path);
-        Globals.mousePointer.update();
         return bitmap;
     }
 
@@ -449,7 +448,6 @@ public class SkillSelectionPanelVisualObject extends CVisualObject {
      */
     private static CBmp256 loadBmp256(String path) {
         CBmp256 bitmap = new CBmp256(path);
-        Globals.mousePointer.update();
         return bitmap;
     }
 

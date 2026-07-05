@@ -1,7 +1,6 @@
 package ua.millfreedom.rom2.model;
 
 import lombok.SneakyThrows;
-import ua.millfreedom.rom2.Globals;
 import ua.millfreedom.rom2.model.container.CustomList;
 import ua.millfreedom.rom2.res.ResInHeap;
 
@@ -65,7 +64,6 @@ public final class Structures {
 
         int count = structuresReg.getInt(GLOBAL, COUNT, 0);
         for (int index = 0; index < count; index++) {
-            Globals.mousePointer.update();
             String section = STRUCTURE_KEY.formatted(index);
             StructureDef structure = new StructureDef(getStringValue(structuresReg, section, FILE));
             structure.id = structuresReg.getInt(section, ID, -1);

@@ -354,7 +354,8 @@ public class CMousePointer extends CGameBitmap {
 
     /**
      * Native: CMousePointer::Update @004268C4.
-     * Fully ported at the Java platform-cursor and final-overlay tooltip boundary.
+     * Fully ported at the Java platform-cursor and final-overlay tooltip boundary. Java additionally refreshes visible
+     * tooltip text in-place and lets ALT bypass the initial tooltip delay for Java-only alternate tooltip views.
      * skipped: native GetDirectDrawSurfaceLockCount @00452251 has no Java DirectDraw lock counter equivalent.
      */
     public void update() {
@@ -426,10 +427,12 @@ public class CMousePointer extends CGameBitmap {
             return;
         }
         if (tooltipVisible()) {
+            showOrRefreshTooltipFromTarget(mainWindow);
             return;
         }
-        if (previousMoveTime >= FIRST_TOOLTIP_DELAY_MS
-                || totalMoveTime < FIRST_TOOLTIP_DELAY_MS
+        boolean forceTooltip = Globals.altKeyDown;
+        if ((!forceTooltip && previousMoveTime >= FIRST_TOOLTIP_DELAY_MS)
+                || (!forceTooltip && totalMoveTime < FIRST_TOOLTIP_DELAY_MS)
                 || totalMoveTime >= TOOLTIP_AUTO_HIDE_MS
                 || selecting != 0
                 || backgroundCaptureEnabled == 0
@@ -438,6 +441,14 @@ public class CMousePointer extends CGameBitmap {
             return;
         }
 
+        showOrRefreshTooltipFromTarget(mainWindow);
+    }
+
+    /**
+     * Java final-overlay support for resolving, showing, and refreshing the tooltip under the current cursor.
+     * not ported.
+     */
+    private void showOrRefreshTooltipFromTarget(CMainWindow mainWindow) {
         CVisualObject target = resolveTooltipTarget(mainWindow);
         if (target == null) {
             return;
@@ -448,6 +459,9 @@ public class CMousePointer extends CGameBitmap {
             return;
         }
 
+        if (tooltipVisible() && tooltipText.equals(text)) {
+            return;
+        }
         tooltipText = text;
         tooltipVisibleFlag = 1;
         measureTooltipText();

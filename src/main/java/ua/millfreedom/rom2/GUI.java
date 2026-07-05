@@ -81,8 +81,7 @@ public final class GUI {
     /**
      * Native: GUI::loadInterfaceGraphics @00476A6D.
      * Fully ported at the Java managed-allocation boundary. Native allocates the interface bitmap/sprite globals,
-     * refreshes the mouse pointer between load batches, and conditionally loads the 800px or 1024px side-panel art
-     * based on screen height.
+     * conditionally loads the 800px or 1024px side-panel art based on screen height.
      */
     public static void loadInterfaceGraphics() {
         bmp64k.clear();
@@ -98,7 +97,6 @@ public final class GUI {
         bmp64k.put(HEADS_R_BMP, headsR);
         headsL = new CBmp64k(Resources.path(GRAPHICS, INTERFACE, HEADS_L_BMP));
         bmp64k.put(HEADS_L_BMP, headsL);
-        Globals.mousePointer.update();
 
         commandBarR = new CBmp64k(Resources.path(GRAPHICS, INTERFACE, COMMAND_BAR_R_BMP));
         bmp64k.put(COMMAND_BAR_R_BMP, commandBarR);
@@ -110,7 +108,6 @@ public final class GUI {
         bmp64k.put(COMMAND_EMP_R_BMP, commandEmpR);
         humanBackL = new CBmp64k(Resources.path(GRAPHICS, INTERFACE, HUMAN_BACK_L_BMP));
         bmp64k.put(HUMAN_BACK_L_BMP, humanBackL);
-        Globals.mousePointer.update();
 
         humanBackR = new CBmp64k(Resources.path(GRAPHICS, INTERFACE, HUMAN_BACK_R_BMP));
         bmp64k.put(HUMAN_BACK_R_BMP, humanBackR);
@@ -126,7 +123,6 @@ public final class GUI {
         bmp64k.put(BACKPACK_OPEN_BMP, backPackOpen);
         backPackClosed = new CBmp64k(Resources.path(GRAPHICS, INTERFACE, BACKPACK_CLOSED_BMP));
         bmp64k.put(BACKPACK_CLOSED_BMP, backPackClosed);
-        Globals.mousePointer.update();
 
         humanMode = new CBmp64k(Resources.path(GRAPHICS, INTERFACE, HUMAN_MODE_BMP));
         bmp64k.put(HUMAN_MODE_BMP, humanMode);
@@ -142,7 +138,6 @@ public final class GUI {
         bmp64k.put(ARROW3_BMP, arrow3);
         arrow4 = new CBmp64k(Resources.path(GRAPHICS, INTERFACE, ARROW4_BMP));
         bmp64k.put(ARROW4_BMP, arrow4);
-        Globals.mousePointer.update();
 
         spellBook = new CBmp64k(Resources.path(GRAPHICS, INTERFACE, SPELLBOOK_BMP));
         bmp64k.put(SPELLBOOK_BMP, spellBook);
@@ -151,11 +146,7 @@ public final class GUI {
         ball = new CBmp64k(Resources.path(GRAPHICS, INTERFACE, BALL_BMP));
         bmp64k.put(BALL_BMP, ball);
 
-        sprBackpack = new CSprite256(Resources.path(GRAPHICS, BACKPACK, BACKPACK_SPRITES_256));
-        sprite256.put(BACKPACK_SPRITES_256, sprBackpack);
-        sprBackpackB = new CSprite256(Resources.path(GRAPHICS, BACKPACK, BACKPACK_SPRITES_B_256));
-        sprite256.put(BACKPACK_SPRITES_B_256, sprBackpackB);
-        sprBackpack.initPalette(16, 2, 1);
+        loadBackpackSprites();
 
         invFrame = new CBmp64k(Resources.path(GRAPHICS, INTERFACE, INV_FRAME_BMP));
         bmp64k.put(INV_FRAME_BMP, invFrame);
@@ -169,7 +160,6 @@ public final class GUI {
         bmp64k.put(INV_ARROW4_BMP, invArrow4);
         backInv = new CBmp64k(Resources.path(GRAPHICS, INTERFACE, BACK_INV_BMP));
         bmp64k.put(BACK_INV_BMP, backInv);
-        Globals.mousePointer.update();
 
         RightPanelLayout rightPanelLayout = RightPanelLayout.forScreenHeight(Globals.screenRect.bottom);
         if (rightPanelLayout.usesHighResolutionArt()) {
@@ -206,7 +196,6 @@ public final class GUI {
         uiFrameSprite = new CSprite256(Resources.path(GRAPHICS, INTERFACE, UI_FRAME_256));
         uiFrameSprite.initPalette(1, 1, 0);
         sprite256.put(UI_FRAME_256, uiFrameSprite);
-        Globals.mousePointer.update();
 
         sprScrollBars = new CSprite256(Resources.path(GRAPHICS, INTERFACE, SCROLLBARS_256));
         sprite256.put(SCROLLBARS_256, sprScrollBars);
@@ -219,7 +208,6 @@ public final class GUI {
         sprMoney = new CA16(Resources.path(GRAPHICS, INTERFACE, MONEY, MONEY_16A));
         sprite16a.put(MONEY_16A, sprMoney);
         sprMoney.initPalette(16, 4, 0);
-        Globals.mousePointer.update();
 
         sprTBorder = new CSprite256(Resources.path(GRAPHICS, INTERFACE, T_BORDER_256));
         sprite256.put(T_BORDER_256, sprTBorder);
@@ -235,7 +223,6 @@ public final class GUI {
         sprHeroBackFemale = new CSprite256(Resources.path(GRAPHICS, INTERFACE, HERO_BACK, HERO_BACK_FEMALE_256));
         sprite256.put(HERO_BACK_FEMALE_256, sprHeroBackFemale);
         sprHeroBackFemale.initPalette(1, 1, 0);
-        Globals.mousePointer.update();
 
         server = new CBmp64k(Resources.path(GRAPHICS, INTERFACE, SERVER_BMP));
         bmp64k.put(SERVER_BMP, server);
@@ -245,6 +232,25 @@ public final class GUI {
         testIva = new CBmp256(Resources.path(GRAPHICS, INTERFACE, TEST_IVA_BMP));
         bmp256.put(TEST_IVA_BMP, testIva);
         testIva.initPalette(16, 2, 0);
+    }
+
+    /**
+     * Java support for loading backpack sprites used by the standalone MapEditor preview.
+     * not ported.
+     */
+    public static void loadBackpackSpritesForEditorPreview() {
+        loadBackpackSprites();
+    }
+
+    /**
+     * Native support extracted from GUI::loadInterfaceGraphics @00476A6D backpack sprite load.
+     */
+    private static void loadBackpackSprites() {
+        sprBackpack = new CSprite256(Resources.path(GRAPHICS, BACKPACK, BACKPACK_SPRITES_256));
+        sprite256.put(BACKPACK_SPRITES_256, sprBackpack);
+        sprBackpackB = new CSprite256(Resources.path(GRAPHICS, BACKPACK, BACKPACK_SPRITES_B_256));
+        sprite256.put(BACKPACK_SPRITES_B_256, sprBackpackB);
+        sprBackpack.initPalette(16, 2, 1);
     }
 
     /**

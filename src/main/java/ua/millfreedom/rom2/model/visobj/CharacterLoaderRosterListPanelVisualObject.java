@@ -472,7 +472,6 @@ public class CharacterLoaderRosterListPanelVisualObject extends CVisualObject {
      */
     private static CBmp64k loadBmp64k(String resourcePath) {
         CBmp64k graphic = new CBmp64k(resourcePath);
-        Globals.mousePointer.update();
         return graphic;
     }
 

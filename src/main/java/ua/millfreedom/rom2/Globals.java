@@ -44,7 +44,7 @@ public class Globals {
     // Native global INT_005F17E4, cleared by CMainApp::InitInstance @00481223 when video.res is unavailable.
     public static boolean videoResourcesAvailable = true;
     // Native global g_CGameFileManager, constructed by CGameFileManager::New @004E24F6.
-    public static CGameFileManager gameFileManager = CGameFileManager.Init("~/Documents/ROM2");
+    public static CGameFileManager gameFileManager = CGameFileManager.Init("res");
     public static final MaterialRuntimeData materialRuntimeData = new MaterialRuntimeData();
     public static final CStaticDataMgr staticDataMgr = CStaticDataMgr.getInstance();
     // Native global g_GamePreferences @00622758.
@@ -60,7 +60,7 @@ public class Globals {
     public static final QuestsStorage questStorage = new QuestsStorage();
     public static CWorldMap worldMap;
     public static CGameLighting lighting = new CGameLighting();
-    public static CMousePointer mousePointer = new CMousePointer();
+    public static CMousePointer mousePointer = null;
     // Native support latch for DAT_006227e4, written by CMainWindow::WindowProc @004852D8.
     public static boolean leftButtonPressed;
     // Native global keyCONTROL, consumed by MapVisualObject::SelectMapCursor @0040B2B8.

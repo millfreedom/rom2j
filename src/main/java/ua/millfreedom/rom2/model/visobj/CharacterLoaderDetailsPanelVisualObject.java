@@ -222,12 +222,9 @@ public class CharacterLoaderDetailsPanelVisualObject extends CVisualObject {
     void loadDetailsResources() {
         releaseDetailsResources();
         bottomPanelBitmap = new CBmp64k(FULL_STATSL_BMP);
-        Globals.mousePointer.update();
         topPanelBitmap = new CBmp64k(LOADER_LEFTUP_BMP);
-        Globals.mousePointer.update();
         statCubeSpriteSheet = new CA16(CUBE_SPRITES_16A);
         statCubeSpriteSheet.initPalette(0x10, 4, 0);
-        Globals.mousePointer.update();
     }
 
     /**

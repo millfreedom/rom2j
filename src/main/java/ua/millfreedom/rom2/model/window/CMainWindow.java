@@ -702,7 +702,6 @@ public class CMainWindow extends CFrameWnd {
      * Fully ported.
      */
     public void pumpDedicatedServerIdle() {
-        Globals.mousePointer.update();
         while (Integer.compareUnsigned(
                 Globals.currentTickMillis(),
                 m_LastTickTime + m_TickInterval * (m_FrameCounter + 1)
@@ -712,7 +711,6 @@ public class CMainWindow extends CFrameWnd {
             }
             m_FrameCounter = (m_FrameCounter + 1) & 0xF;
             Globals.gameServer.runServerLoopTick();
-            Globals.mousePointer.update();
             if (Globals.isWindowed != 0 && m_FrameCounter == 1) {
                 refreshWindowedDedicatedServerStatus();
             }
@@ -728,7 +726,6 @@ public class CMainWindow extends CFrameWnd {
                 break;
             }
         }
-        Globals.mousePointer.update();
     }
 
     /**
@@ -1032,7 +1029,6 @@ public class CMainWindow extends CFrameWnd {
      * Fully ported.
      */
     public void pumpTimedGameplayTicks() {
-        Globals.mousePointer.update();
         while (Integer.compareUnsigned(
                 Globals.currentTickMillis(),
                 m_LastTickTime + m_TickInterval * (m_FrameCounter + 1)
@@ -1044,11 +1040,9 @@ public class CMainWindow extends CFrameWnd {
             Globals.gameServer.runServerLoopTick();
             pMapVisualObject.handleGameAction(null, 100);
             inputController.onMessage(MessageCodes.INITIALIZE_UI, 0, 0);
-            Globals.mousePointer.update();
         }
         scrollMapAtScreenEdges();
         renderFrameIfFocused();
-        Globals.mousePointer.update();
     }
 
     /**
@@ -1063,7 +1057,6 @@ public class CMainWindow extends CFrameWnd {
             return;
         }
 
-        Globals.mousePointer.update();
         if (CServerApp.getPendingSegmentMarkerCount() == 0) {
             int currentTick = Globals.currentTickMillis();
             if (Math.abs(currentTick - Globals.lastRemoteServerLoopCounterBroadcastTick) > 1000) {
@@ -1077,7 +1070,6 @@ public class CMainWindow extends CFrameWnd {
 
         scrollMapAtScreenEdgesWithoutMapContextNotify();
         renderFrameIfFocused();
-        Globals.mousePointer.update();
     }
 
     /**
@@ -1118,7 +1110,6 @@ public class CMainWindow extends CFrameWnd {
             }
             pMapVisualObject.handleGameAction(null, 100);
             getInputController().onMessage(INITIALIZE_UI, 0, 0);
-            Globals.mousePointer.update();
         } while (CServerApp.getPendingSegmentMarkerCount() != 0);
     }
 
@@ -1127,18 +1118,15 @@ public class CMainWindow extends CFrameWnd {
      * Fully ported.
      */
     public void pumpSingleGameplayTick() {
-        Globals.mousePointer.update();
         Globals.gameServer.runServerLoopTick();
         pMapVisualObject.handleGameAction(null, 100);
         inputController.onMessage(MessageCodes.INITIALIZE_UI, 0, 0);
         m_FrameCounter++;
-        Globals.mousePointer.update();
         scrollMapAtScreenEdges();
         if (haveFocus != 0) {
             inputController.onMessage(MessageCodes.RENDER_FRAME, 0, 0);
             captureAllodsDebugBmp();
         }
-        Globals.mousePointer.update();
     }
 
     /**
@@ -1253,13 +1241,13 @@ public class CMainWindow extends CFrameWnd {
 
     /**
      * Native: CMainWindow::OnKeyDown @00484A76.
-     * Fully ported. Native tail calls the stock frame default key handler; Java has no modeled CFrameWnd keydown state.
+     * Java port status: native key dispatch ported; Java intentionally skips the native CMousePointer::EndDrag tail
+     * because key presses must not hide or reset final-overlay tooltips.
      */
     public void onKeyDown(int virtualKey, int repeatCount, int flags) {
         if (fileTransferDownloadPending == 0) {
             handleActiveKeyDown(virtualKey);
         }
-        Globals.mousePointer.endDrag();
     }
 
     /**
@@ -1397,19 +1385,17 @@ public class CMainWindow extends CFrameWnd {
 
     /**
      * Native: CMainWindow::OnSysKeyDown @0048509B.
-     * Fully ported. Native tail calls the stock frame default sys-key handler; Java has no modeled CFrameWnd sys-key
-     * state.
+     * Java port status: native sys-key dispatch ported; Java intentionally skips the native CMousePointer::EndDrag tail
+     * because key presses must not hide or reset final-overlay tooltips.
      */
     public void onSysKeyDown(int virtualKey, int repeatCount, int flags) {
         if (fileTransferDownloadPending == 0) {
             if (virtualKey == VK_F10) {
                 forwardKeyDownToInputController(VK_F10);
-                Globals.mousePointer.endDrag();
                 return;
             }
             handleActiveSysKeyDown(virtualKey, flags);
         }
-        Globals.mousePointer.endDrag();
     }
 
     /**
@@ -1437,7 +1423,8 @@ public class CMainWindow extends CFrameWnd {
 
     /**
      * Native: CMainWindow::OnKeyUp @0048521C.
-     * Fully ported. Native tail calls the stock frame default key handler; Java has no modeled CFrameWnd key-up state.
+     * Java port status: native modifier release dispatch ported; Java intentionally skips the native
+     * CMousePointer::EndDrag tail because key releases must not hide or reset final-overlay tooltips.
      */
     public void onKeyUp(int virtualKey, int repeatCount, int flags) {
         if (fileTransferDownloadPending == 0) {
@@ -1449,20 +1436,18 @@ public class CMainWindow extends CFrameWnd {
                 Globals.altKeyDown = false;
             }
         }
-        Globals.mousePointer.endDrag();
     }
 
     /**
      * Native: CMainWindow::OnSysKeyUp @00485291.
-     * Fully ported. Native tail calls the stock frame default sys-key handler; Java has no modeled CFrameWnd sys-key
-     * state.
+     * Java port status: native sys-key release dispatch ported; Java intentionally skips the native
+     * CMousePointer::EndDrag tail because key releases must not hide or reset final-overlay tooltips.
      */
     public void onSysKeyUp(int virtualKey, int repeatCount, int flags) {
         if (fileTransferDownloadPending == 0
                 && (virtualKey == VK_MENU || virtualKey == VK_LMENU || virtualKey == VK_RMENU)) {
             Globals.altKeyDown = false;
         }
-        Globals.mousePointer.endDrag();
     }
 
     /**
@@ -1847,8 +1832,6 @@ public class CMainWindow extends CFrameWnd {
                 showDirectAddressConnectionError(PatchText.SERVER_IS_NOT_RESPONDING_0);
                 postMessage(MessageCodes.WM_CLOSE, 0, 0);
                 return;
-            } else {
-                Globals.mousePointer.update();
             }
         }
         if (connectionScratchState.directAddressLoginAccepted) {
@@ -2409,7 +2392,6 @@ public class CMainWindow extends CFrameWnd {
                     continue;
                 }
                 if (!mouseHidden) {
-                    Globals.mousePointer.update();
                     Globals.mousePointer.hide();
                     mouseHidden = true;
                     clearTransitionSurface();
@@ -2447,7 +2429,6 @@ public class CMainWindow extends CFrameWnd {
         Globals.blockingPlaybackActive = true;
         Globals.blockingPlaybackAbortRequested = false;
         try {
-            Globals.mousePointer.update();
             Globals.mousePointer.hide();
             clearTransitionSurface();
             Globals.presentCurrentSurface.run();
@@ -2944,7 +2925,6 @@ public class CMainWindow extends CFrameWnd {
                     return false;
                 }
                 CServerApp.processRemoteNetworkEvents();
-                Globals.mousePointer.update();
             }
             if (!pMapVisualObject.handleGameAction(null, 100)) {
                 return false;
@@ -4048,13 +4028,12 @@ public class CMainWindow extends CFrameWnd {
     }
 
     /**
-     * Native support extracted from the GetMessage/DispatchMessage/mouse-update loop in
+     * Native support extracted from the GetMessage/DispatchMessage loop in
      * CMainWindow::showDialogAndRunModalMessageLoop @00492282-004922D2, with Java presentation polling added so GLFW
      * input reaches the modal dialog while the caller is blocked.
      */
     private void pumpModalDialogFrame() {
         renderFrameIfFocused();
-        Globals.mousePointer.update();
         inputController.onMessage(STATIC_TEXT_CARET_BLINK_TICK, 0, 0);
         Globals.mousePointer.drawSelectionOverlay();
         Globals.mousePointer.drawTooltipOverlay();
