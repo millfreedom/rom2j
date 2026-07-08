@@ -40,7 +40,15 @@ final class MapEditorUnitDisplay {
      * not ported.
      */
     static int nativeUnitId(UnitDTO unit) {
-        return (short) unit.unitID;
+        return nativeUnitIdForStoredId(unit.unitID);
+    }
+
+    /**
+     * Java support native-visible scenario unit id display for raw stored unit ids.
+     * not ported.
+     */
+    static int nativeUnitIdForStoredId(int unitID) {
+        return (short) unitID;
     }
 
     /**

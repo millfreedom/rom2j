@@ -34,9 +34,9 @@ public final class CLlDriver {
     // Native CLlDriver::CLlDriver @005068BF passes 3000 through CLlDriver::SetReliablePacketTimeoutMs @00493AA0.
     private static final int DEFAULT_RELIABLE_PACKET_TIMEOUT_MS = 3000;
     // Native BuildTcpSockAddr @00508F25 writes raw sin_port word 0x1F40, which is network port 0x401F.
-    private static final int TCP_GAME_PORT = 0x401F;
+    public static final int DEFAULT_TCP_GAME_PORT = 0x401F;
     // Native StartTcpListener @0050916D writes raw sin_port word 0x1F41, which is network port 0x411F.
-    private static final int TCP_DISCOVERY_PORT = 0x411F;
+    public static final int DEFAULT_TCP_DISCOVERY_PORT = 0x411F;
     // Native PingThreadTcp @00508E74 writes this magic dword after the active TCP client count.
     private static final int TCP_DISCOVERY_MAGIC = 0x56CE2AB5;
     // Java support for the visible raw TCP/IP replacement session browser; native DPSP_TCPIP uses this timeout.
@@ -65,6 +65,10 @@ public final class CLlDriver {
     private static TcpConnection localTcpConnection;
     // Java support for native clients array allocated by CLlDriver::StartServer @0050791A.
     private static TcpConnection[] serverTcpConnections = new TcpConnection[0];
+    // Java support, not a native field. Current raw TCP game endpoint port for dedicated listeners.
+    private static int tcpGamePort = DEFAULT_TCP_GAME_PORT;
+    // Java support, not a native field. Current raw TCP discovery endpoint port for dedicated listeners.
+    private static int tcpDiscoveryPort = DEFAULT_TCP_DISCOVERY_PORT;
 
     //0x00 Native CLlDriver.serverApp, set by CLlDriver::SetServerApp @00493A60.
     private static Object serverApp;
@@ -159,6 +163,7 @@ public final class CLlDriver {
         connectAddress = "";
         preparedBindAddress = "";
         visibleRawTcpSessionServer = false;
+        resetTcpEndpointPortsBoundary();
     }
 
     /**
@@ -358,6 +363,38 @@ public final class CLlDriver {
     }
 
     /**
+     * Java support for dedicated-server raw TCP ports loaded from server.cfg or dedicated command-line endpoint.
+     * not ported.
+     */
+    public static void configureTcpEndpointPortsBoundary(int gamePort, int discoveryPort) {
+        if (!ServerConfig.isValidTcpPort(gamePort) || !ServerConfig.isValidTcpPort(discoveryPort)) {
+            throw new IllegalArgumentException(
+                    "Invalid raw TCP ports: game=" + gamePort + ", discovery=" + discoveryPort
+            );
+        }
+        tcpGamePort = gamePort;
+        tcpDiscoveryPort = discoveryPort;
+    }
+
+    /**
+     * Java support default discovery-port convention for configured dedicated game ports.
+     * not ported.
+     */
+    public static int defaultDiscoveryPortForGamePort(int gamePort) {
+        int discoveryPort = gamePort + (DEFAULT_TCP_DISCOVERY_PORT - DEFAULT_TCP_GAME_PORT);
+        return ServerConfig.isValidTcpPort(discoveryPort) ? discoveryPort : DEFAULT_TCP_DISCOVERY_PORT;
+    }
+
+    /**
+     * Java support reset for raw TCP port overrides when the driver protocol state resets.
+     * not ported.
+     */
+    private static void resetTcpEndpointPortsBoundary() {
+        tcpGamePort = DEFAULT_TCP_GAME_PORT;
+        tcpDiscoveryPort = DEFAULT_TCP_DISCOVERY_PORT;
+    }
+
+    /**
      * Native: CLlDriver::SetServerApp @00493A60.
      * Fully ported.
      */
@@ -385,7 +422,8 @@ public final class CLlDriver {
      * Native support boundary for CLlDriver::StartServer @0050791A in
      * CMainWindow::startDedicatedMultiplayerSession @0048F156 and
      * CMainWindow::startHatDedicatedServer @0048EF1F.
-     * Fully ported for TCP/IP listener setup; DirectPlay server setup remains modeled by the existing boundary state.
+     * Native TCP/IP listener setup is ported; Java dedicated startup can override raw TCP ports from server config.
+     * DirectPlay server setup remains modeled by the existing boundary state.
      */
     public static boolean startMultiplayerServerBoundary(
             int maxPlayers,
@@ -581,10 +619,10 @@ public final class CLlDriver {
             listener = new ServerSocket();
             listener.setReuseAddress(true);
             String tcpBindAddress = bindAddress.isBlank() ? "0.0.0.0" : bindAddress;
-            listener.bind(new InetSocketAddress(tcpBindAddress, TCP_GAME_PORT), maxPlayers);
+            listener.bind(new InetSocketAddress(tcpBindAddress, tcpGamePort), maxPlayers);
             discoveryListener = new ServerSocket();
             discoveryListener.setReuseAddress(true);
-            discoveryListener.bind(new InetSocketAddress(tcpBindAddress, TCP_DISCOVERY_PORT), 5);
+            discoveryListener.bind(new InetSocketAddress(tcpBindAddress, tcpDiscoveryPort), 5);
             ServerSocket activeListener = listener;
             ServerSocket activeDiscoveryListener = discoveryListener;
             synchronized (tcpLifecycleLock) {
@@ -664,11 +702,12 @@ public final class CLlDriver {
         int effectiveTimeoutMillis = timeoutMillis > 0 ? timeoutMillis : TCP_SESSION_DISCOVERY_TIMEOUT_MS;
         Socket socket = new Socket();
         try {
+            TcpEndpoint endpoint = parseTcpDiscoveryEndpoint(connectAddress);
             socket.setTcpNoDelay(true);
             if (!preparedBindAddress.isBlank()) {
                 socket.bind(new InetSocketAddress(preparedBindAddress, 0));
             }
-            socket.connect(new InetSocketAddress(connectAddress, TCP_DISCOVERY_PORT), effectiveTimeoutMillis);
+            socket.connect(new InetSocketAddress(endpoint.host, endpoint.port), effectiveTimeoutMillis);
             socket.setSoTimeout(effectiveTimeoutMillis);
             byte[] responseBytes = socket.getInputStream().readNBytes(Long.BYTES);
             if (responseBytes.length != Long.BYTES) {
@@ -680,7 +719,7 @@ public final class CLlDriver {
                 return;
             }
             context.sessionEntries.add(new LlDriverSessionEntry(tcpSessionName()));
-        } catch (IOException ignored) {
+        } catch (IOException | IllegalArgumentException ignored) {
             // Native raw GetActiveSessions has no browser row; failed Java discovery leaves the list empty.
         } finally {
             closeSocketOnly(socket);
@@ -748,11 +787,12 @@ public final class CLlDriver {
         clientCount = 0;
         Socket socket = new Socket();
         try {
+            TcpEndpoint endpoint = parseTcpGameEndpoint(address);
             socket.setTcpNoDelay(true);
             if (!preparedBindAddress.isBlank()) {
                 socket.bind(new InetSocketAddress(preparedBindAddress, 0));
             }
-            socket.connect(new InetSocketAddress(address, TCP_GAME_PORT), tcpConnectTimeoutMillis());
+            socket.connect(new InetSocketAddress(endpoint.host, endpoint.port), tcpConnectTimeoutMillis());
             int socketId = nextSocketIdBase;
             CBufferManager bufferManager = CServerApp.newNetworkClient(serverApp, socketId);
             TcpConnection connection = new TcpConnection(socketId, socket, bufferManager, -1);
@@ -764,11 +804,36 @@ public final class CLlDriver {
                 startTcpReceiveThread(connection);
             }
             return true;
-        } catch (IOException e) {
+        } catch (IOException | IllegalArgumentException e) {
             closeSocketOnly(socket);
             closeTcpTransport();
             return false;
         }
+    }
+
+    /**
+     * Java support endpoint parser for TCP game connections with optional `host:port` addresses.
+     * not ported.
+     */
+    private static TcpEndpoint parseTcpGameEndpoint(String address) {
+        return new TcpEndpoint(
+                ServerConfig.tcpEndpointHostOrDefault(address, ""),
+                ServerConfig.tcpEndpointPortOrDefault(address, DEFAULT_TCP_GAME_PORT)
+        );
+    }
+
+    /**
+     * Java support endpoint parser for raw TCP session discovery when HAT/direct rows include a game port.
+     * not ported.
+     */
+    private static TcpEndpoint parseTcpDiscoveryEndpoint(String address) {
+        String host = ServerConfig.tcpEndpointHostOrDefault(address, "");
+        int gamePort = ServerConfig.tcpEndpointPortOrDefault(address, DEFAULT_TCP_GAME_PORT);
+        int discoveryPort = DEFAULT_TCP_DISCOVERY_PORT;
+        if (ServerConfig.hasTcpEndpointPort(address)) {
+            discoveryPort = defaultDiscoveryPortForGamePort(gamePort);
+        }
+        return new TcpEndpoint(host, discoveryPort);
     }
 
     /**
@@ -1026,6 +1091,26 @@ public final class CLlDriver {
         private int sequenceOut;
         // Native CLocalClient::retransmitCount, read by CLlDriver::GetClientRetransmitRate @005087F8.
         private int retransmitCount;
+    }
+
+    /**
+     * Java support holder for optional `host:port` TCP endpoint parsing.
+     * not ported.
+     */
+    private static final class TcpEndpoint {
+        // Java support, not a native field.
+        private final String host;
+        // Java support, not a native field.
+        private final int port;
+
+        /**
+         * Java support constructor for parsed TCP endpoints.
+         * not ported.
+         */
+        private TcpEndpoint(String host, int port) {
+            this.host = host;
+            this.port = port;
+        }
     }
 
     /**

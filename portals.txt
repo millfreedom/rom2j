@@ -1,0 +1,9 @@
+# This system is dynamically adding links between maps, without the need to edit maps or exit to "map selection"
+# There are 2 types of portals:
+# 1) portal is on an empty cell - displayed as "teleport" spell. Moving to the cell is triggering the teleport
+# 2) portal is landing on a building - converting the building into "portal" - clicking on it (while standing nearby) is triggering the teleport.
+# (any building should work, but prefer non-usable, e.g. "Cave", "Tower", etc.)
+#fromMapName;fromX:fromY->toMapName;toX:toY
+#kids3;     54:31     ->  monsters;     130:105
+kids3;      54:31     ->  cave;         16:12
+cave;       16:11     ->  kids3;        41:36

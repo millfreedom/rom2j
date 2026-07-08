@@ -296,6 +296,18 @@ public class PlayerList implements MfcSerializable {
     }
 
     /**
+     * Java support for immediately expiring a disconnected player that is already queued for delayed TCP removal.
+     * not ported.
+     */
+    public boolean removeQueuedDisconnectedPlayerImmediately(Player player) {
+        if (player == null || player.clientConnected != 0 || player.pendingRemovalServerTick == 0) {
+            return false;
+        }
+        removeExpiredPlayer(player);
+        return true;
+    }
+
+    /**
      * Native support extracted from PlayerList::updatePeriodicPlayerState @005162F6.
      * Fully ported.
      */

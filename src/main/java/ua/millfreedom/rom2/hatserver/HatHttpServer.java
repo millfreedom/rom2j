@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import ua.millfreedom.rom2.ServerConfigurationLoader;
 import ua.millfreedom.rom2.model.ServerConfig;
+import ua.millfreedom.rom2.model.net.CLlDriver;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,6 +27,7 @@ public final class HatHttpServer {
     private static final String LOOPBACK_CONNECT_ADDRESS = "127.0.0.1";
     private static final String RESPONSE_CONTENT_TYPE = "text/plain; charset=ISO-8859-1";
     private static final String NO_MAP_NAME = "no map";
+    public static final String MAP_EXTENSION = ".alm";
     private static final String NO_MAP_SIZE = "0x0";
     private static final String NO_MAP_DIFFICULTY_LEVEL = "9";
     private static final String NO_MAP_PLAYER_COUNT = "16";
@@ -34,10 +36,12 @@ public final class HatHttpServer {
     private static final String CONFIGURED_MAP_PLAYER_COUNT = "0";
     private static final int HTTP_OK = 200;
     private static final int HTTP_BAD_REQUEST = 400;
+    private static final int HTTP_NOT_FOUND = 404;
     private static final int HTTP_METHOD_NOT_ALLOWED = 405;
+    private static final long TRANSFER_TICKET_TTL_MILLIS = 60_000L;
 
     private final Map<String, ServerEntry> reportedServers = new ConcurrentHashMap<>();
-
+    private final Map<String, TransferTicket> transferTickets = new ConcurrentHashMap<>();
 
     /**
      * not ported.
@@ -111,6 +115,12 @@ public final class HatHttpServer {
             }
 
             Map<String, String> parameters = parseQuery(exchange.getRequestURI().getRawQuery());
+            String path = exchange.getRequestURI().getPath();
+            if (path.startsWith("/map-transfer")) {
+                handleMapTransferRequest(exchange, path, parameters);
+                return;
+            }
+
             if (isServerStatusReport(parameters)) {
                 ServerEntry serverEntry = ServerEntry.fromStatusReport(parameters, remoteHost(exchange));
                 reportedServers.put(serverEntry.key(), serverEntry);
@@ -123,6 +133,225 @@ public final class HatHttpServer {
         } catch (IllegalArgumentException exception) {
             sendText(exchange, HTTP_BAD_REQUEST, exception.getMessage() + "\n");
         }
+    }
+
+    /**
+     * Java support dispatcher for dedicated map-transfer HAT endpoints.
+     * not ported.
+     */
+    private void handleMapTransferRequest(
+            HttpExchange exchange,
+            String path,
+            Map<String, String> parameters
+    ) throws IOException {
+        purgeExpiredTransferTickets();
+        switch (path) {
+            case "/map-transfer", "/map-transfer/servers" -> handleTransferServersRequest(exchange, parameters);
+            case "/map-transfer/prepare" -> handlePrepareTransferRequest(exchange, parameters);
+            case "/map-transfer/redirected" -> handleMarkTransferRedirectedRequest(exchange, parameters);
+            case "/map-transfer/claim" -> handleClaimTransferTicketRequest(exchange, parameters);
+            case "/map-transfer/commit" -> handleCommitTransferTicketRequest(exchange, parameters);
+            case "/map-transfer/cancel" -> handleCancelTransferTicketRequest(exchange, parameters);
+            case "/map-transfer/ticket" -> handleTransferTicketStatusRequest(exchange, parameters);
+            default -> sendText(exchange, HTTP_NOT_FOUND, "Unknown map-transfer endpoint.\n");
+        }
+    }
+
+    /**
+     * Java support response for the current dedicated map-server registry.
+     * not ported.
+     */
+    private void handleTransferServersRequest(
+            HttpExchange exchange,
+            Map<String, String> parameters
+    ) throws IOException {
+        String mapName = parameters.get("mapname");
+        List<ServerEntry> rows = transferRegistryRows(mapName);
+        StringBuilder response = new StringBuilder(96 + rows.size() * 96);
+        response.append("OK|COUNT|").append(rows.size()).append('\n');
+        response.append("SERVER|NAME|MAP|HOST|GAMEPORT|DISCOVERYPORT|PLAYERS|ADDRESS\n");
+        for (ServerEntry row : rows) {
+            response.append(row.toTransferRegistryRow()).append('\n');
+        }
+        sendText(exchange, HTTP_OK, response.toString());
+    }
+
+    /**
+     * Java support endpoint for creating a short-lived transfer ticket after the source server saved a payload.
+     * not ported.
+     */
+    private void handlePrepareTransferRequest(
+            HttpExchange exchange,
+            Map<String, String> parameters
+    ) throws IOException {
+        String targetMapName = requireParameter(parameters, "tomapname");
+        int destinationX = parseRequiredCell(parameters, "tox");
+        int destinationY = parseRequiredCell(parameters, "toy");
+        ServerEntry targetServer = findTargetServerForMap(targetMapName);
+        if (targetServer == null) {
+            sendText(exchange, HTTP_NOT_FOUND, "NO_TARGET\n");
+            return;
+        }
+
+        long nowMillis = System.currentTimeMillis();
+        TransferTicket ticket = TransferTicket.prepare(
+                UUID.randomUUID().toString(),
+                requireParameter(parameters, "sourceserver"),
+                requireParameter(parameters, "sourceplayer"),
+                parameters.getOrDefault("sourcemap", ""),
+                targetServer,
+                destinationX,
+                destinationY,
+                requireParameter(parameters, "payloadref"),
+                nowMillis,
+                nowMillis + TRANSFER_TICKET_TTL_MILLIS
+        );
+        transferTickets.put(ticket.token(), ticket);
+        sendText(exchange, HTTP_OK, ticket.prepareResponse());
+    }
+
+    /**
+     * Java support endpoint marking that the source server sent the client redirect packet.
+     * not ported.
+     */
+    private void handleMarkTransferRedirectedRequest(
+            HttpExchange exchange,
+            Map<String, String> parameters
+    ) throws IOException {
+        TransferTicket ticket = requireTicket(parameters);
+        ticket.markRedirected();
+        sendText(exchange, HTTP_OK, ticket.statusResponse());
+    }
+
+    /**
+     * Java support endpoint for target-side single-use ticket claim before loading a saved transfer payload.
+     * not ported.
+     */
+    private void handleClaimTransferTicketRequest(
+            HttpExchange exchange,
+            Map<String, String> parameters
+    ) throws IOException {
+        TransferTicket ticket = requireTicket(parameters);
+        ticket.verifyOptionalTargetAddress(parameters.get("targetaddress"));
+        ticket.claim();
+        sendText(exchange, HTTP_OK, ticket.claimResponse());
+    }
+
+    /**
+     * Java support endpoint for target-side ticket commit after player load/spawn/bootstrap succeeds.
+     * not ported.
+     */
+    private void handleCommitTransferTicketRequest(
+            HttpExchange exchange,
+            Map<String, String> parameters
+    ) throws IOException {
+        TransferTicket ticket = requireTicket(parameters);
+        ticket.commit();
+        sendText(exchange, HTTP_OK, ticket.statusResponse());
+    }
+
+    /**
+     * Java support endpoint for source/target rollback or timeout cancellation.
+     * not ported.
+     */
+    private void handleCancelTransferTicketRequest(
+            HttpExchange exchange,
+            Map<String, String> parameters
+    ) throws IOException {
+        TransferTicket ticket = requireTicket(parameters);
+        ticket.cancel();
+        sendText(exchange, HTTP_OK, ticket.statusResponse());
+    }
+
+    /**
+     * Java support endpoint for manual probes and later source rollback checks.
+     * not ported.
+     */
+    private void handleTransferTicketStatusRequest(
+            HttpExchange exchange,
+            Map<String, String> parameters
+    ) throws IOException {
+        TransferTicket ticket = requireTicket(parameters);
+        sendText(exchange, HTTP_OK, ticket.detailResponse());
+    }
+
+    /**
+     * Java support ticket lookup with consistent missing/expired semantics.
+     * not ported.
+     */
+    private TransferTicket requireTicket(Map<String, String> parameters) {
+        String token = requireParameter(parameters, "token");
+        TransferTicket ticket = transferTickets.get(token);
+        if (ticket == null) {
+            throw new IllegalArgumentException("Unknown transfer token.");
+        }
+        ticket.failIfExpired(System.currentTimeMillis());
+        return ticket;
+    }
+
+    /**
+     * Java support current dedicated map-server row selection for transfer lookup.
+     * not ported.
+     */
+    private List<ServerEntry> transferRegistryRows(String mapName) {
+        List<ServerEntry> rows = new ArrayList<>();
+        for (ServerEntry serverEntry : reportedServers.values()) {
+            if (serverEntry.isTransferRegistryCandidate(mapName)) {
+                rows.add(serverEntry);
+            }
+        }
+        rows.sort(Comparator.comparing(ServerEntry::transferMapName)
+                .thenComparing(ServerEntry::serverName)
+                .thenComparing(ServerEntry::connectAddress));
+        return rows;
+    }
+
+    /**
+     * Java support target server lookup for `prepare` requests.
+     * not ported.
+     */
+    private ServerEntry findTargetServerForMap(String mapName) {
+        List<ServerEntry> candidates = transferRegistryRows(mapName);
+        return candidates.isEmpty() ? null : candidates.getFirst();
+    }
+
+    /**
+     * Java support periodic ticket expiry cleanup piggybacked on transfer HTTP requests.
+     * not ported.
+     */
+    private void purgeExpiredTransferTickets() {
+        long nowMillis = System.currentTimeMillis();
+        transferTickets.values().removeIf(ticket -> ticket.expireIfTimedOut(nowMillis));
+    }
+
+    /**
+     * Java support required query parameter reader.
+     * not ported.
+     */
+    private static String requireParameter(Map<String, String> parameters, String name) {
+        String value = parameters.get(name);
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException("Missing required parameter: " + name);
+        }
+        return value.strip();
+    }
+
+    /**
+     * Java support non-negative map-cell parser for transfer ticket destination coordinates.
+     * not ported.
+     */
+    private static int parseRequiredCell(Map<String, String> parameters, String name) {
+        String value = requireParameter(parameters, name);
+        int parsed;
+        try {
+            parsed = Integer.parseInt(value);
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException("Invalid map cell parameter: " + name);
+        }
+        if (parsed < 0) {
+            throw new IllegalArgumentException("Invalid map cell parameter: " + name);
+        }
+        return parsed;
     }
 
     /**
@@ -170,7 +399,12 @@ public final class HatHttpServer {
         if (reportedServers.isEmpty()) {
             return List.of();
         }
-        List<ServerEntry> rows = new ArrayList<>(reportedServers.values());
+        List<ServerEntry> rows = new ArrayList<>();
+        for (ServerEntry serverEntry : reportedServers.values()) {
+            if (serverEntry.isPublicServerListCandidate()) {
+                rows.add(serverEntry);
+            }
+        }
         rows.sort(Comparator.comparing(ServerEntry::serverName).thenComparing(ServerEntry::connectAddress));
         return rows;
     }
@@ -236,10 +470,14 @@ public final class HatHttpServer {
         private final String serverName;
         private final String version;
         private final String mapName;
+        private final String transferMapName;
         private final String mapSize;
         private final String difficultyLevel;
         private final String players;
         private final String connectAddress;
+        private final int discoveryPort;
+        private final boolean dedicatedMapTransferEnabled;
+        private final boolean notPublic;
 
         /**
          * not ported.
@@ -248,18 +486,26 @@ public final class HatHttpServer {
                 String serverName,
                 String version,
                 String mapName,
+                String transferMapName,
                 String mapSize,
                 String difficultyLevel,
                 String players,
-                String connectAddress
+                String connectAddress,
+                int discoveryPort,
+                boolean dedicatedMapTransferEnabled,
+                boolean notPublic
         ) {
             this.serverName = sanitizeField(serverName);
             this.version = sanitizeField(version);
             this.mapName = sanitizeField(mapName);
+            this.transferMapName = sanitizeField(defaultIfBlank(transferMapName, mapName));
             this.mapSize = sanitizeField(mapSize);
             this.difficultyLevel = sanitizeField(difficultyLevel);
             this.players = sanitizeField(players);
             this.connectAddress = sanitizeConnectAddress(connectAddress);
+            this.discoveryPort = ServerConfig.isValidTcpPort(discoveryPort) ? discoveryPort : 0;
+            this.dedicatedMapTransferEnabled = dedicatedMapTransferEnabled;
+            this.notPublic = notPublic;
         }
 
 
@@ -275,17 +521,21 @@ public final class HatHttpServer {
             String rawPlayers = parameters.get("players");
             String rowPlayers = isUnavailableMap(rawMapName, rawPlayers) ? NO_MAP_PLAYER_COUNT : rawPlayers;
             String reportedAddress = parameters.get("ip");
-            if (reportedAddress.isBlank()) {
+            if (reportedAddress == null || reportedAddress.isBlank()) {
                 reportedAddress = remoteHost;
             }
             return new ServerEntry(
                     parameters.get("servername"),
                     parameters.get("version"),
                     rawMapName,
+                    parameters.get("mapfile"),
                     parameters.get("mapsize"),
                     parameters.get("difficultylevel"),
                     rowPlayers,
-                    reportedAddress
+                    reportedAddress,
+                    parseLeadingInt(parameters.get("discoveryport")),
+                    isDedicatedMapTransferReport(parameters),
+                    isAffirmative(parameters.get("notpublic"))
             );
         }
 
@@ -306,8 +556,44 @@ public final class HatHttpServer {
         /**
          * not ported.
          */
+        private String mapName() {
+            return mapName;
+        }
+
+        /**
+         * not ported.
+         */
+        private String transferMapName() {
+            return transferMapName;
+        }
+
+        /**
+         * not ported.
+         */
         private String connectAddress() {
             return connectAddress;
+        }
+
+        /**
+         * Java support transfer-registry predicate for dedicated server rows running a current map.
+         * not ported.
+         */
+        private boolean isTransferRegistryCandidate(String requestedMapName) {
+            if (!dedicatedMapTransferEnabled || isUnavailableMap(mapName, players) || gamePort() <= 0) {
+                return false;
+            }
+            return requestedMapName == null || requestedMapName.isBlank()
+                    || transferMapName.equalsIgnoreCase(requestedMapName.strip())
+                    || transferMapName.equalsIgnoreCase(requestedMapName.strip() + MAP_EXTENSION)
+                    ;
+        }
+
+        /**
+         * Java support predicate for the public HAT CURRENTCOUNT response.
+         * not ported.
+         */
+        private boolean isPublicServerListCandidate() {
+            return !notPublic;
         }
 
         /**
@@ -330,6 +616,57 @@ public final class HatHttpServer {
         }
 
         /**
+         * Java support pipe-row formatter for dedicated map-transfer registry probes.
+         * not ported.
+         */
+        private String toTransferRegistryRow() {
+            return String.join(
+                    "|",
+                    "SERVER",
+                    serverName,
+                    transferMapName,
+                    host(),
+                    Integer.toString(gamePort()),
+                    Integer.toString(discoveryPort()),
+                    players,
+                    connectAddress
+            );
+        }
+
+        /**
+         * Java support endpoint-host accessor for transfer redirect targets.
+         * not ported.
+         */
+        private String host() {
+            return ServerConfig.tcpEndpointHostOrDefault(connectAddress, "");
+        }
+
+        /**
+         * Java support endpoint-port accessor for transfer redirect targets.
+         * not ported.
+         */
+        private int gamePort() {
+            try {
+                return ServerConfig.tcpEndpointPortOrDefault(connectAddress, 0);
+            } catch (IllegalArgumentException exception) {
+                return 0;
+            }
+        }
+
+        /**
+         * Java support discovery-port accessor for transfer registry diagnostics. New dedicated reports include the
+         * configured discovery port; legacy rows fall back to the native default relation from the advertised game port.
+         * not ported.
+         */
+        private int discoveryPort() {
+            if (discoveryPort > 0) {
+                return discoveryPort;
+            }
+            int gamePort = gamePort();
+            return gamePort == 0 ? 0 : CLlDriver.defaultDiscoveryPortForGamePort(gamePort);
+        }
+
+        /**
          * Java support read of the configured map selected by g_ServerConfig.field15_0x8c.
          * not ported.
          */
@@ -349,7 +686,26 @@ public final class HatHttpServer {
          * not ported.
          */
         private static boolean isUnavailableMap(String mapName, String players) {
-            return NO_MAP_NAME.equalsIgnoreCase(mapName.strip()) || parseLeadingInt(players) < 0;
+            return NO_MAP_NAME.equalsIgnoreCase(Objects.requireNonNullElse(mapName, "").strip())
+                    || parseLeadingInt(players) < 0;
+        }
+
+        /**
+         * Java support predicate for status reports eligible for map transfer.
+         * not ported.
+         */
+        private static boolean isDedicatedMapTransferReport(Map<String, String> parameters) {
+            return isAffirmative(parameters.get("dedicated")) || isAffirmative(parameters.get("maptransfer"));
+        }
+
+        /**
+         * Java support boolean query parser for HAT transfer flags.
+         * not ported.
+         */
+        private static boolean isAffirmative(String value) {
+            return "1".equals(value)
+                    || "true".equalsIgnoreCase(Objects.requireNonNullElse(value, ""))
+                    || "yes".equalsIgnoreCase(Objects.requireNonNullElse(value, ""));
         }
 
         /**
@@ -357,7 +713,7 @@ public final class HatHttpServer {
          * not ported.
          */
         private static int parseLeadingInt(String value) {
-            String trimmed = value.stripLeading();
+            String trimmed = Objects.requireNonNullElse(value, "").stripLeading();
             if (trimmed.isEmpty()) {
                 return 0;
             }
@@ -393,13 +749,9 @@ public final class HatHttpServer {
         private static String sanitizeConnectAddress(String value) {
             String sanitized = sanitizeField(value);
             if (sanitized.startsWith("[") && sanitized.contains("]")) {
-                return sanitized.substring(1, sanitized.indexOf(']'));
-            }
-            int colonIndex = sanitized.indexOf(':');
-            if (colonIndex > 0 && colonIndex == sanitized.lastIndexOf(':')) {
-                String portSuffix = sanitized.substring(colonIndex + 1);
-                if (isUnsignedDecimal(portSuffix)) {
-                    return sanitized.substring(0, colonIndex);
+                int bracketEnd = sanitized.indexOf(']');
+                if (bracketEnd == sanitized.length() - 1) {
+                    return sanitized.substring(1, bracketEnd);
                 }
             }
             return sanitized;
@@ -408,23 +760,266 @@ public final class HatHttpServer {
         /**
          * not ported.
          */
-        private static boolean isUnsignedDecimal(String value) {
-            if (value.isEmpty()) {
-                return false;
-            }
-            for (int index = 0; index < value.length(); index++) {
-                if (!Character.isDigit(value.charAt(index))) {
-                    return false;
-                }
-            }
-            return true;
+        private static String defaultIfBlank(String value, String fallback) {
+            return value == null || value.isBlank() ? fallback : value;
+        }
+    }
+
+    /**
+     * Java support transfer-ticket state values owned by HAT.
+     * not ported.
+     */
+    private enum TransferTicketStatus {
+        PREPARED,
+        REDIRECTED,
+        CLAIMED,
+        COMMITTED,
+        CANCELLED,
+        EXPIRED
+    }
+
+    /**
+     * Java support short-lived HAT-owned transfer ticket metadata.
+     * not ported.
+     */
+    private static final class TransferTicket {
+        private final String token;
+        private final String sourceServer;
+        private final String sourcePlayer;
+        private final String sourceMapName;
+        private final String targetServer;
+        private final String targetMapName;
+        private final String targetAddress;
+        private final String targetHost;
+        private final int targetGamePort;
+        private final int targetDiscoveryPort;
+        private final int destinationX;
+        private final int destinationY;
+        private final String payloadRef;
+        private final long createdAtMillis;
+        private final long expiresAtMillis;
+        private TransferTicketStatus status;
+
+        /**
+         * Java support constructor for prepared HAT transfer-ticket metadata.
+         * not ported.
+         */
+        private TransferTicket(
+                String token,
+                String sourceServer,
+                String sourcePlayer,
+                String sourceMapName,
+                ServerEntry targetServer,
+                int destinationX,
+                int destinationY,
+                String payloadRef,
+                long createdAtMillis,
+                long expiresAtMillis
+        ) {
+            this.token = token;
+            this.sourceServer = ServerEntry.sanitizeField(sourceServer);
+            this.sourcePlayer = ServerEntry.sanitizeField(sourcePlayer);
+            this.sourceMapName = ServerEntry.sanitizeField(sourceMapName);
+            this.targetServer = targetServer.serverName();
+            this.targetMapName = targetServer.transferMapName();
+            this.targetAddress = targetServer.connectAddress();
+            this.targetHost = targetServer.host();
+            this.targetGamePort = targetServer.gamePort();
+            this.targetDiscoveryPort = targetServer.discoveryPort();
+            this.destinationX = destinationX;
+            this.destinationY = destinationY;
+            this.payloadRef = ServerEntry.sanitizeField(payloadRef);
+            this.createdAtMillis = createdAtMillis;
+            this.expiresAtMillis = expiresAtMillis;
+            this.status = TransferTicketStatus.PREPARED;
         }
 
         /**
+         * Java support factory for a prepared transfer ticket.
          * not ported.
          */
-        private static String defaultIfBlank(String value, String fallback) {
-            return value == null || value.isBlank() ? fallback : value;
+        private static TransferTicket prepare(
+                String token,
+                String sourceServer,
+                String sourcePlayer,
+                String sourceMapName,
+                ServerEntry targetServer,
+                int destinationX,
+                int destinationY,
+                String payloadRef,
+                long createdAtMillis,
+                long expiresAtMillis
+        ) {
+            return new TransferTicket(
+                    token,
+                    sourceServer,
+                    sourcePlayer,
+                    sourceMapName,
+                    targetServer,
+                    destinationX,
+                    destinationY,
+                    payloadRef,
+                    createdAtMillis,
+                    expiresAtMillis
+            );
+        }
+
+        /**
+         * Java support accessor for the opaque ticket token.
+         * not ported.
+         */
+        private String token() {
+            return token;
+        }
+
+        /**
+         * Java support transition after the source server sends the redirect packet.
+         * not ported.
+         */
+        private synchronized void markRedirected() {
+            requireStatus(TransferTicketStatus.PREPARED, "redirect");
+            status = TransferTicketStatus.REDIRECTED;
+        }
+
+        /**
+         * Java support transition when the destination server claims the ticket.
+         * not ported.
+         */
+        private synchronized void claim() {
+            requireStatus(TransferTicketStatus.REDIRECTED, "claim");
+            status = TransferTicketStatus.CLAIMED;
+        }
+
+        /**
+         * Java support transition after destination-side player load/spawn/bootstrap succeeds.
+         * not ported.
+         */
+        private synchronized void commit() {
+            requireStatus(TransferTicketStatus.CLAIMED, "commit");
+            status = TransferTicketStatus.COMMITTED;
+        }
+
+        /**
+         * Java support cancellation transition for source/target rollback.
+         * not ported.
+         */
+        private synchronized void cancel() {
+            if (status == TransferTicketStatus.COMMITTED || status == TransferTicketStatus.EXPIRED) {
+                throw new IllegalArgumentException("Cannot cancel transfer ticket in status " + status + ".");
+            }
+            status = TransferTicketStatus.CANCELLED;
+        }
+
+        /**
+         * Java support target-address guard for optional target-side claim validation.
+         * not ported.
+         */
+        private void verifyOptionalTargetAddress(String requestedTargetAddress) {
+            if (requestedTargetAddress != null
+                    && !requestedTargetAddress.isBlank()
+                    && !targetAddress.equalsIgnoreCase(requestedTargetAddress.strip())) {
+                throw new IllegalArgumentException("Transfer token is not assigned to target " + requestedTargetAddress);
+            }
+        }
+
+        /**
+         * Java support expiry check for a requested ticket.
+         * not ported.
+         */
+        private synchronized void failIfExpired(long nowMillis) {
+            if (!isTerminalStatus() && nowMillis >= expiresAtMillis) {
+                status = TransferTicketStatus.EXPIRED;
+                throw new IllegalArgumentException("Transfer ticket expired.");
+            }
+        }
+
+        /**
+         * Java support expiry check used by request-time cleanup.
+         * not ported.
+         */
+        private synchronized boolean expireIfTimedOut(long nowMillis) {
+            if (!isTerminalStatus() && nowMillis >= expiresAtMillis) {
+                status = TransferTicketStatus.EXPIRED;
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         * Java support status transition guard.
+         * not ported.
+         */
+        private void requireStatus(TransferTicketStatus expectedStatus, String action) {
+            if (status != expectedStatus) {
+                throw new IllegalArgumentException("Cannot " + action + " transfer ticket in status " + status + ".");
+            }
+        }
+
+        /**
+         * Java support terminal-state predicate for cleanup and cancellation.
+         * not ported.
+         */
+        private boolean isTerminalStatus() {
+            return status == TransferTicketStatus.COMMITTED
+                    || status == TransferTicketStatus.CANCELLED
+                    || status == TransferTicketStatus.EXPIRED;
+        }
+
+        /**
+         * Java support response for a successful prepare request.
+         * not ported.
+         */
+        private String prepareResponse() {
+            return "OK|TOKEN|" + token
+                    + "|TARGET|" + targetAddress
+                    + "|HOST|" + targetHost
+                    + "|GAMEPORT|" + targetGamePort
+                    + "|DISCOVERYPORT|" + targetDiscoveryPort
+                    + "|EXPIRES|" + expiresAtMillis
+                    + "\n";
+        }
+
+        /**
+         * Java support response for a successful claim request.
+         * not ported.
+         */
+        private synchronized String claimResponse() {
+            return "OK|TOKEN|" + token
+                    + "|STATUS|" + status
+                    + "|PAYLOADREF|" + payloadRef
+                    + "|TOMAP|" + targetMapName
+                    + "|TOX|" + destinationX
+                    + "|TOY|" + destinationY
+                    + "\n";
+        }
+
+        /**
+         * Java support compact status response for state-changing endpoints.
+         * not ported.
+         */
+        private synchronized String statusResponse() {
+            return "OK|TOKEN|" + token + "|STATUS|" + status + "\n";
+        }
+
+        /**
+         * Java support detailed ticket response for probes and rollback polling.
+         * not ported.
+         */
+        private synchronized String detailResponse() {
+            return "OK|TOKEN|" + token
+                    + "|STATUS|" + status
+                    + "|SOURCESERVER|" + sourceServer
+                    + "|SOURCEPLAYER|" + sourcePlayer
+                    + "|SOURCEMAP|" + sourceMapName
+                    + "|TARGETSERVER|" + targetServer
+                    + "|TARGET|" + targetAddress
+                    + "|TOMAP|" + targetMapName
+                    + "|TOX|" + destinationX
+                    + "|TOY|" + destinationY
+                    + "|PAYLOADREF|" + payloadRef
+                    + "|CREATED|" + createdAtMillis
+                    + "|EXPIRES|" + expiresAtMillis
+                    + "\n";
         }
     }
 

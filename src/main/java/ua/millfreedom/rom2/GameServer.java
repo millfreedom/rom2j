@@ -8,6 +8,8 @@ import ua.millfreedom.rom2.gameserver.GameServerDebugState;
 import ua.millfreedom.rom2.gameserver.Cheats;
 import ua.millfreedom.rom2.gameserver.MissionScriptRuntime;
 import ua.millfreedom.rom2.gameserver.ScenarioMapLoader;
+import ua.millfreedom.rom2.maptransfer.DedicatedTransferSpotEffect;
+import ua.millfreedom.rom2.maptransfer.TransferZone;
 import ua.millfreedom.rom2.model.*;
 import ua.millfreedom.rom2.model.action.*;
 import ua.millfreedom.rom2.model.actiondata.ActionPayloads;
@@ -28,6 +30,7 @@ import ua.millfreedom.rom2.model.world.ScenarioDescriptor;
 import ua.millfreedom.rom2.res.Resources;
 
 import java.io.*;
+import java.net.URLEncoder;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -39,6 +42,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -92,7 +96,7 @@ public class GameServer implements MfcSerializable {
             3, 3, 4, 4,
             4, 4, 4, 4
     };
-    private static final String MAP_EXTENSION = ".alm";
+    public static final String MAP_EXTENSION = ".alm";
     private static final String DEFAULT_SAVE_RESTORE_FILE = "game0000.sav";
     private static final int SERVER_GRID_SIZE = 0x20;
     private static final int SCENARIO_OBJECT_ID_BASE = 0x6000;
@@ -126,6 +130,13 @@ public class GameServer implements MfcSerializable {
     private static final int SERVER_STATUS_REPORT_INTERVAL_MS = 300_000;
     private static final int HUMANOID_PUBLIC_TYPE_FIRST = 0x21;
     private static final int HUMANOID_PUBLIC_TYPE_LAST = 0x3F;
+    private static final String MAP_TRANSFER_ARTIFACT_DIRECTORY = "map-transfer";
+    private static final String MAP_TRANSFER_ARTIFACT_EXTENSION = ".a2c";
+    private static final Duration MAP_TRANSFER_HAT_REQUEST_TIMEOUT = Duration.ofSeconds(3);
+    private static final long MAP_TRANSFER_SOURCE_STATUS_POLL_INTERVAL_MS = 1000;
+    private static final int MAP_TRANSFER_SOURCE_TRIGGER_RADIUS = 0;
+    private static final int MAP_TRANSFER_BUILDING_INTERACTION_TRIGGER_RADIUS = 1;
+    private static final int MAP_TRANSFER_LANDING_RADIUS = 2;
     private static final int BATTLE_PREFERENCE_WIMPY_MODE = 1;
     private static final int BATTLE_PREFERENCE_FORMATION_MODE = 2;
     private static final int BATTLE_PREFERENCE_AUTO_CASTING_MODE = 3;
@@ -280,6 +291,12 @@ public class GameServer implements MfcSerializable {
     public final Shop globalCampaignShop = new Shop();
     //0x170
     public final GameServerDebugState debugState = new GameServerDebugState();
+    // Java support, not a native field. Dedicated-only transfer zones installed for the current map.
+    public final List<TransferZone> transferZones = new ArrayList<>();
+    // Java support, not a native field. Transfer zones triggered by interacting with a source building token.
+    public final Map<Integer, TransferZone> buildingTransferZones = new HashMap<>();
+    // Java support, not a native field. Source-side transfer tickets prepared by this dedicated server.
+    public final Map<Integer, PendingDedicatedMapTransfer> pendingDedicatedMapTransfers = new HashMap<>();
 
     /**
      * Native support extracted from GameServer::New @004E957B.
@@ -306,6 +323,7 @@ public class GameServer implements MfcSerializable {
         playerList.counter = 0;
         activeUnits.clear();
         deferredDeathUnits.clear();
+        removeDedicatedTransferSpotEffects();
         objectLists.clearOwnedObjectLists();
         missionEntryDropCells.clear();
         scenarioDescriptor = null;
@@ -338,7 +356,176 @@ public class GameServer implements MfcSerializable {
         difficultyLevel = -1;
         Arrays.fill(runtimeSpells, null);
         debugState.clear();
+        transferZones.clear();
+        buildingTransferZones.clear();
+        pendingDedicatedMapTransfers.clear();
         randomizeOnTimer();
+    }
+
+    /**
+     * Java support for clearing dedicated map-transfer zones during server lifecycle/map changes.
+     * not ported.
+     */
+    public void clearDedicatedTransferZones() {
+        removeDedicatedTransferSpotEffects();
+        transferZones.clear();
+        buildingTransferZones.clear();
+        pendingDedicatedMapTransfers.clear();
+    }
+
+    /**
+     * Java support for replacing dedicated map-transfer zones after a dedicated map load.
+     * not ported.
+     */
+    public void installDedicatedTransferZones(List<TransferZone> zones) {
+        removeDedicatedTransferSpotEffects();
+        transferZones.clear();
+        buildingTransferZones.clear();
+        pendingDedicatedMapTransfers.clear();
+        transferZones.addAll(zones);
+        installDedicatedTransferSpotEffects();
+        pushMessage("Loaded transfer zones: " + transferZones.size());
+    }
+
+    /**
+     * Java support for installing permanent visual markers at dedicated map-transfer source cells. If a source cell is
+     * inside a building footprint, the building becomes the interaction trigger and no ground marker is created.
+     * not ported.
+     */
+    private void installDedicatedTransferSpotEffects() {
+        if (Globals.worldMap == null) {
+            return;
+        }
+        Map<TransferZone, Building> buildingZones = resolveDedicatedTransferBuildingZones();
+        for (TransferZone transferZone : transferZones) {
+            Building transferBuilding = buildingZones.get(transferZone);
+            if (transferBuilding != null) {
+                sendDedicatedTransferBuildingInteraction(transferBuilding, null);
+                continue;
+            }
+            if (objectLists.spellEffects == null) {
+                continue;
+            }
+            DedicatedTransferSpotEffect effect = new DedicatedTransferSpotEffect(transferZone, true);
+            effect.idFull = allocateNextFreeVisibleSpellEffectId();
+            objectLists.spellEffects.add(effect);
+            Globals.worldMap.attachAreaEffectAtPoint(effect, transferZone.sourceX(), transferZone.sourceY());
+            effect.publishTransferSpotVisual();
+        }
+    }
+
+    /**
+     * Java support mapping of building-footprint transfer sources to their interaction building token.
+     * not ported.
+     */
+    private Map<TransferZone, Building> resolveDedicatedTransferBuildingZones() {
+        Map<TransferZone, Building> buildingZones = new IdentityHashMap<>();
+        for (TransferZone transferZone : transferZones) {
+            Building building = findDedicatedTransferBuildingAtSource(transferZone);
+            if (building == null) {
+                continue;
+            }
+            int tokenId = building.idFull & 0xFFFF;
+            TransferZone previous = buildingTransferZones.putIfAbsent(tokenId, transferZone);
+            if (previous != null) {
+                pushMessage(String.format(
+                        Locale.ROOT,
+                        "Warning - portals.txt:%d transfer source on building #%04x ignored; first building transfer source declared on line %d",
+                        transferZone.sourceLineNumber(),
+                        tokenId,
+                        previous.sourceLineNumber()
+                ));
+                buildingZones.put(transferZone, building);
+                continue;
+            }
+            buildingZones.put(transferZone, building);
+        }
+        return buildingZones;
+    }
+
+    /**
+     * Java support building lookup for transfer source cells that are authored inside a building footprint.
+     * not ported.
+     */
+    private Building findDedicatedTransferBuildingAtSource(TransferZone transferZone) {
+        if (objectLists.buildings == null) {
+            return null;
+        }
+        for (Building building : objectLists.buildings) {
+            if (building != null && building.id != 0 && buildingContainsTransferSourceCell(building, transferZone)) {
+                return building;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Java support predicate matching CWorldMap::attachBuildingFootprint present-cell masking.
+     * not ported.
+     */
+    private static boolean buildingContainsTransferSourceCell(Building building, TransferZone transferZone) {
+        int sourceX = transferZone.sourceX();
+        int sourceY = transferZone.sourceY();
+        int bit = 0;
+        for (int y = 0; y < (building.sizeY & 0xFF); y++) {
+            for (int x = 0; x < (building.sizeX & 0xFF); x++) {
+                if ((building.buildingPresentMask & (1 << (bit & 0x1F))) != 0
+                        && building.m_pTargetHandle.getX() + x == sourceX
+                        && building.m_pTargetHandle.getY() + y == sourceY) {
+                    return true;
+                }
+                bit++;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Java support server-to-client marker for buildings that trigger dedicated map transfer when interacted with.
+     * not ported.
+     */
+    private static void sendDedicatedTransferBuildingInteraction(Building building, Player player) {
+        CServerApp.sendGameAction(MapTransferBuildingAction.createForBuilding(building, player, true));
+    }
+
+    /**
+     * Java support for removing dedicated transfer-zone visual markers during map-transfer zone reload/cleanup.
+     * not ported.
+     */
+    private void removeDedicatedTransferSpotEffects() {
+        if (Globals.worldMap == null || objectLists.spellEffects == null) {
+            return;
+        }
+        List<DedicatedTransferSpotEffect> transferSpotEffects = new ArrayList<>();
+        for (SpellEffect spellEffect : objectLists.spellEffects) {
+            if (spellEffect instanceof DedicatedTransferSpotEffect transferSpotEffect) {
+                transferSpotEffects.add(transferSpotEffect);
+            }
+        }
+        for (DedicatedTransferSpotEffect transferSpotEffect : transferSpotEffects) {
+            Globals.worldMap.detachAreaEffectAtPoint(
+                    transferSpotEffect,
+                    transferSpotEffect.m_pTargetHandle.getX(),
+                    transferSpotEffect.m_pTargetHandle.getY()
+            );
+            if (transferSpotEffect.idFull != 0) {
+                clearBitForId(transferSpotEffect.idFull);
+            }
+            objectLists.spellEffects.remove(transferSpotEffect);
+        }
+    }
+
+    /**
+     * Java support token-id allocator for area-effect markers replayed by GameServer::sendInitialScenarioState.
+     * not ported.
+     */
+    private int allocateNextFreeVisibleSpellEffectId() {
+        int id = allocateNextFreeId() & 0xFFFF;
+        while ((id & 0xFF) == 0) {
+            clearBitForId(id);
+            id = allocateNextFreeId() & 0xFFFF;
+        }
+        return id;
     }
 
     /**
@@ -631,6 +818,7 @@ public class GameServer implements MfcSerializable {
     public void returnToLobby() {
         reportNoMapServerStatusAndDeleteStatusFile();
         field16_0x8c = 1;
+        transferZones.clear();
         prepareInactiveControlledUnitsForReturnToLobby();
         objectLists.clearLoadedWorldObjectLists();
         missionScriptRuntime = null;
@@ -673,6 +861,7 @@ public class GameServer implements MfcSerializable {
         deferredDeathUnits.clear();
         Arrays.fill(runtimeSpells, null);
         debugState.clear();
+        transferZones.clear();
         pushMessage("Server closed.");
     }
 
@@ -921,6 +1110,7 @@ public class GameServer implements MfcSerializable {
         if (colorSlot != 0) {
             player.colorSlot = colorSlot;
         }
+        applyLoadedScenarioJoinRelations(player);
 
         CServerApp.sendGameAction(NewPlayerAction.prepareForPlayerJoinBroadcast(player, newPlayer));
         pushMessage("Player " + playerName + " joined.");
@@ -1258,7 +1448,8 @@ public class GameServer implements MfcSerializable {
      * Full port of the recovered native server-loop tick. Java advances the per-loop server counter, tick-phase object
      * maintenance, mission script runtime turn, local game-action drain, object-list tick, active unit ticks, periodic
      * mission-result publication, quest/status maintenance, CPU usage accounting, and the server-loop-counter broadcast
-     * boundary through GameServer::advanceServerLoopCounterAndObjects.
+     * boundary through GameServer::advanceServerLoopCounterAndObjects. Java also scans dedicated-server transfer zones
+     * after movement/state updates; that extension returns immediately outside dedicated-server mode.
      * Fully ported.
      */
     public void runServerLoopTick() {
@@ -1278,6 +1469,7 @@ public class GameServer implements MfcSerializable {
             processPeriodicWorldMaintenance();
         }
         advanceServerLoopCounterAndObjects();
+        processDedicatedMapTransferZonesAfterTick();
         if (nativeServerLoopPhase() == 0x0F) {
             updatePeriodicMissionResults();
             someValue++;
@@ -1301,6 +1493,739 @@ public class GameServer implements MfcSerializable {
         playerList.updatePeriodicPlayerState();
         CServerApp.sampleLocalClientTrafficStats();
         publishDirtyQuestState();
+    }
+
+    /**
+     * Java support source-side scan for dedicated map-transfer zones after native movement/unit updates.
+     * not ported.
+     */
+    private void processDedicatedMapTransferZonesAfterTick() {
+        if (!isDedicatedMapTransferRuntime()) {
+            return;
+        }
+        purgeExpiredPendingDedicatedMapTransfers();
+        if (transferZones.isEmpty()) {
+            return;
+        }
+        for (Player player : playerList.players) {
+            if (!isDedicatedMapTransferPlayerCandidate(player)
+                    || pendingDedicatedMapTransfers.containsKey(player.playerId)) {
+                continue;
+            }
+            Humanoid humanoid = (Humanoid) player.controlledUnit;
+            TransferZone transferZone = findDedicatedTransferZoneAt(
+                    humanoid.m_pTargetHandle.getX(),
+                    humanoid.m_pTargetHandle.getY()
+            );
+            if (transferZone != null) {
+                prepareDedicatedMapTransfer(player, humanoid, transferZone);
+            }
+        }
+    }
+
+    /**
+     * Java support runtime gate for source-side map transfer. Dedicated map transfer must not run for campaign,
+     * non-dedicated network hosts, local loopback play, or the map editor.
+     * not ported.
+     */
+    private static boolean isDedicatedMapTransferRuntime() {
+        return Globals.mainWindow.sessionMode == CMainWindow.SESSION_MODE_DEDICATED_SERVER;
+    }
+
+    /**
+     * Java support source-player predicate for dedicated map-transfer zone checks.
+     * not ported.
+     */
+    private static boolean isDedicatedMapTransferPlayerCandidate(Player player) {
+        return player.isActive == 0
+                && player.clientConnected != 0
+                && player.controlledUnit instanceof Humanoid humanoid
+                && humanoid.owner == player
+                && (humanoid.status & UNIT_STATUS_INACTIVE) == 0;
+    }
+
+    /**
+     * Java support source-cell trigger lookup for installed dedicated map-transfer zones.
+     * not ported.
+     */
+    private TransferZone findDedicatedTransferZoneAt(int unitX, int unitY) {
+        for (TransferZone transferZone : transferZones) {
+            if (!isBuildingBackedTransferZone(transferZone)
+                    && isInsideDedicatedTransferZoneTrigger(unitX, unitY, transferZone)) {
+                return transferZone;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Java support predicate for transfer zones whose source is an interactable building instead of a ground spot.
+     * not ported.
+     */
+    private boolean isBuildingBackedTransferZone(TransferZone transferZone) {
+        return buildingTransferZones.containsValue(transferZone)
+                || findDedicatedTransferBuildingAtSource(transferZone) != null;
+    }
+
+    /**
+     * Java support order initializer for dedicated map-transfer building interactions.
+     * not ported.
+     */
+    private boolean tryInitializeDedicatedMapTransferBuildingInteractionOrder(Unit unit, Building building) {
+        if (!isDedicatedMapTransferRuntime()) {
+            return false;
+        }
+        TransferZone transferZone = buildingTransferZones.get(building.idFull & 0xFFFF);
+        if (transferZone == null) {
+            return false;
+        }
+        missionScriptRuntime.initializeDedicatedMapTransferBuildingOrderUnit(
+                unit,
+                building,
+                packDedicatedTransferSourceCell(transferZone)
+        );
+        return true;
+    }
+
+    /**
+     * Java support building-interaction trigger for dedicated map transfer.
+     * not ported.
+     */
+    public boolean tryPrepareDedicatedMapTransferFromBuildingInteraction(
+            Player player,
+            Humanoid humanoid,
+            Building building
+    ) {
+        if (!isDedicatedMapTransferRuntime()
+                || player == null
+                || humanoid == null
+                || building == null
+                || player.controlledUnit != humanoid
+                || !isDedicatedMapTransferPlayerCandidate(player)) {
+            return false;
+        }
+        TransferZone transferZone = buildingTransferZones.get(building.idFull & 0xFFFF);
+        if (transferZone == null) {
+            return false;
+        }
+        if (!isInsideDedicatedBuildingTransferInteractionTrigger(humanoid, transferZone)) {
+            return true;
+        }
+        if (!pendingDedicatedMapTransfers.containsKey(player.playerId)) {
+            prepareDedicatedMapTransfer(player, humanoid, transferZone);
+        }
+        return true;
+    }
+
+    /**
+     * Java support source-cell trigger radius for dedicated map-transfer building interactions.
+     * not ported.
+     */
+    private static boolean isInsideDedicatedBuildingTransferInteractionTrigger(Unit unit, TransferZone transferZone) {
+        int deltaX = Math.abs(unit.m_pTargetHandle.getX() - transferZone.sourceX());
+        int deltaY = Math.abs(unit.m_pTargetHandle.getY() - transferZone.sourceY());
+        return Math.max(deltaX, deltaY) <= MAP_TRANSFER_BUILDING_INTERACTION_TRIGGER_RADIUS;
+    }
+
+    /**
+     * Java support source-cell trigger radius for dedicated map-transfer zones.
+     * not ported.
+     */
+    private static boolean isInsideDedicatedTransferZoneTrigger(int unitX, int unitY, TransferZone transferZone) {
+        int deltaX = Math.abs(unitX - transferZone.sourceX());
+        int deltaY = Math.abs(unitY - transferZone.sourceY());
+        return Math.max(deltaX, deltaY) <= MAP_TRANSFER_SOURCE_TRIGGER_RADIUS;
+    }
+
+    /**
+     * Java support cell packing for dedicated map-transfer source cells.
+     * not ported.
+     */
+    private static int packDedicatedTransferSourceCell(TransferZone transferZone) {
+        return ((transferZone.sourceY() & 0xFF) << 8) | (transferZone.sourceX() & 0xFF);
+    }
+
+    /**
+     * Java support source-side preparation for a dedicated map transfer.
+     * not ported.
+     */
+    private void prepareDedicatedMapTransfer(Player player, Humanoid humanoid, TransferZone transferZone) {
+        DedicatedMapTransferArtifact artifact;
+        try {
+            artifact = saveDedicatedMapTransferArtifact(player, humanoid);
+        } catch (IOException exception) {
+            pushMessage("Failed to save map transfer payload for " + player.name + ": " + exception.getMessage());
+            return;
+        }
+
+        HatMapTransferPrepareResult prepareResult = requestHatMapTransferPrepare(player, transferZone, artifact.payloadRef());
+        if (prepareResult == null) {
+            deleteUnusedDedicatedMapTransferArtifact(artifact.path());
+            return;
+        }
+
+        pendingDedicatedMapTransfers.put(player.playerId, new PendingDedicatedMapTransfer(
+                prepareResult.token(),
+                artifact.payloadRef(),
+                transferZone.destinationMapName(),
+                transferZone.destinationX(),
+                transferZone.destinationY(),
+                prepareResult.targetAddress(),
+                prepareResult.targetHost(),
+                prepareResult.targetGamePort(),
+                System.currentTimeMillis() + MAP_TRANSFER_SOURCE_STATUS_POLL_INTERVAL_MS,
+                prepareResult.expiresAtMillis()
+        ));
+        if (!requestHatMapTransferStatusTransition(
+                "/map-transfer/redirected",
+                prepareResult.token(),
+                "redirect"
+        )) {
+            pendingDedicatedMapTransfers.remove(player.playerId);
+            deleteUnusedDedicatedMapTransferArtifact(artifact.path());
+            return;
+        }
+        CServerApp.sendGameAction(MapTransferRedirectAction.createForRedirect(
+                player,
+                prepareResult.targetHost(),
+                prepareResult.targetGamePort(),
+                prepareResult.token()
+        ));
+        player.mapLoadPending = 1;
+        CServerApp.flushActiveClientWriteBuffers();
+        pushMessage(String.format(
+                Locale.ROOT,
+                "Redirected map transfer for %s to %s at %d:%d via %s",
+                player.name,
+                transferZone.destinationMapName(),
+                transferZone.destinationX(),
+                transferZone.destinationY(),
+                prepareResult.targetAddress()
+        ));
+    }
+
+    /**
+     * Java support cleanup for source-side prepared transfers after their HAT ticket timeout.
+     * not ported.
+     */
+    private void purgeExpiredPendingDedicatedMapTransfers() {
+        long nowMillis = System.currentTimeMillis();
+        Iterator<Map.Entry<Integer, PendingDedicatedMapTransfer>> iterator =
+                pendingDedicatedMapTransfers.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Integer, PendingDedicatedMapTransfer> entry = iterator.next();
+            PendingDedicatedMapTransfer pendingTransfer = entry.getValue();
+            Player player = playerList.getPlayerById(entry.getKey());
+            if (pendingTransfer.isExpired(nowMillis)) {
+                String status = requestHatMapTransferTicketStatus(pendingTransfer.token());
+                if ("COMMITTED".equals(status)) {
+                    cleanupCommittedSourceDedicatedMapTransfer(player, pendingTransfer);
+                } else {
+                    rollbackSourceDedicatedMapTransfer(player, pendingTransfer, "expired");
+                }
+                iterator.remove();
+                continue;
+            }
+            if (!pendingTransfer.isStatusPollDue(nowMillis)) {
+                continue;
+            }
+
+            String status = requestHatMapTransferTicketStatus(pendingTransfer.token());
+            if (status == null) {
+                entry.setValue(pendingTransfer.withNextStatusPollMillis(nextMapTransferStatusPollMillis(nowMillis)));
+                continue;
+            }
+            switch (status) {
+                case "COMMITTED" -> {
+                    cleanupCommittedSourceDedicatedMapTransfer(player, pendingTransfer);
+                    iterator.remove();
+                }
+                case "CANCELLED", "EXPIRED" -> {
+                    rollbackSourceDedicatedMapTransfer(player, pendingTransfer, status.toLowerCase(Locale.ROOT));
+                    iterator.remove();
+                }
+                default -> entry.setValue(
+                        pendingTransfer.withNextStatusPollMillis(nextMapTransferStatusPollMillis(nowMillis))
+                );
+            }
+        }
+    }
+
+    /**
+     * Java support next HAT ticket status poll timestamp for source-side transfer cleanup.
+     * not ported.
+     */
+    private static long nextMapTransferStatusPollMillis(long nowMillis) {
+        return nowMillis + MAP_TRANSFER_SOURCE_STATUS_POLL_INTERVAL_MS;
+    }
+
+    /**
+     * Java support source-side cleanup after the target commits a dedicated map transfer.
+     * not ported.
+     */
+    private void cleanupCommittedSourceDedicatedMapTransfer(
+            Player player,
+            PendingDedicatedMapTransfer pendingTransfer
+    ) {
+        if (player != null) {
+            if (player.controlledUnit instanceof Unit controlledUnit) {
+                controlledUnit.hideFromMissionMap();
+            }
+            player.markDisconnectedForRemoval();
+            pushMessage("Cleaned up committed source map transfer for " + player.name + ".");
+        }
+        deleteDedicatedMapTransferArtifactRef(pendingTransfer.payloadRef());
+    }
+
+    /**
+     * Java support source-side rollback after HAT reports cancellation/expiry or local ticket expiry.
+     * not ported.
+     */
+    private void rollbackSourceDedicatedMapTransfer(
+            Player player,
+            PendingDedicatedMapTransfer pendingTransfer,
+            String reason
+    ) {
+        if (player != null) {
+            if (player.clientConnected != 0) {
+                player.mapLoadPending = 0;
+                pushMessage("Restored source map transfer for " + player.name + " after " + reason + ".");
+            } else {
+                player.markDisconnectedForRemoval();
+                pushMessage("Queued disconnected source map transfer player " + player.name
+                        + " for removal after " + reason + ".");
+            }
+        }
+        deleteDedicatedMapTransferArtifactRef(pendingTransfer.payloadRef());
+    }
+
+    /**
+     * Java support save of the outgoing player payload as an encrypted `.a2c` transfer artifact.
+     * not ported.
+     */
+    private DedicatedMapTransferArtifact saveDedicatedMapTransferArtifact(Player player, Humanoid humanoid)
+            throws IOException {
+        Path artifactDirectory = dedicatedMapTransferArtifactDirectory();
+        Files.createDirectories(artifactDirectory);
+        Path artifactPath = artifactDirectory.resolve(String.format(
+                Locale.ROOT,
+                "player-%d-%s%s",
+                player.playerId & 0xFFFF,
+                UUID.randomUUID(),
+                MAP_TRANSFER_ARTIFACT_EXTENSION
+        )).toAbsolutePath().normalize();
+        CGameSession.writeEncryptedSaveSections(
+                artifactPath,
+                packServerSavedCharacterHeader(humanoid, player),
+                packServerSavedCharacterStats(humanoid, player),
+                player.knowledgeTable,
+                ItemListAction.prepareForRuntimeUnitEquipmentSnapshot(humanoid).packSavedCharacterItemListSection(),
+                packServerSavedCharacterInventoryItems(humanoid).packSavedCharacterItemListSection(),
+                null
+        );
+        return new DedicatedMapTransferArtifact(artifactPath, artifactPath.toString());
+    }
+
+    /**
+     * Java support shared transfer-artifact directory selection. A blank `chrbase` uses the current server directory.
+     * not ported.
+     */
+    private static Path dedicatedMapTransferArtifactDirectory() {
+        Path root = Globals.serverConfig.chrbase.isBlank() ? Path.of("") : Path.of(Globals.serverConfig.chrbase);
+        return root.resolve(MAP_TRANSFER_ARTIFACT_DIRECTORY);
+    }
+
+    /**
+     * Java support best-effort cleanup when the source prepared a payload but HAT did not create a ticket.
+     * not ported.
+     */
+    private static void deleteUnusedDedicatedMapTransferArtifact(Path artifactPath) {
+        try {
+            Files.deleteIfExists(artifactPath);
+        } catch (IOException exception) {
+            // The ticket was not created, so the stale file is harmless and must not crash the server tick.
+        }
+    }
+
+    /**
+     * Java support best-effort cleanup for a saved transfer artifact referenced by a HAT ticket.
+     * not ported.
+     */
+    private static void deleteDedicatedMapTransferArtifactRef(String payloadRef) {
+        try {
+            Files.deleteIfExists(Path.of(payloadRef));
+        } catch (IOException exception) {
+            // A stale transfer artifact is safer than crashing the server cleanup path.
+        }
+    }
+
+    /**
+     * Java support for asking HAT to reserve a target map-transfer ticket after the source payload is saved.
+     * not ported.
+     */
+    private HatMapTransferPrepareResult requestHatMapTransferPrepare(
+            Player player,
+            TransferZone transferZone,
+            String payloadRef
+    ) {
+        String prepareEndpoint = configuredHatMapTransferEndpoint("/map-transfer/prepare");
+        if (prepareEndpoint.isBlank()) {
+            pushMessage("Map transfer target unavailable: no HAT report target configured.");
+            return null;
+        }
+        Map<String, String> parameters = new LinkedHashMap<>();
+        parameters.put("sourceserver", Globals.serverConfig.ServerName);
+        parameters.put("sourceplayer", Integer.toString(player.playerId & 0xFFFF));
+        parameters.put("sourcemap", mapFileName);
+        parameters.put("tomapname", transferZone.destinationMapName());
+        parameters.put("tox", Integer.toString(transferZone.destinationX()));
+        parameters.put("toy", Integer.toString(transferZone.destinationY()));
+        parameters.put("payloadref", payloadRef);
+
+        try {
+            HttpResponse<String> response = sendHatMapTransferRequest(prepareEndpoint, parameters);
+            if (response.statusCode() != 200) {
+                pushMessage("Map transfer target unavailable for " + transferZone.destinationMapName()
+                        + ": " + response.body().strip());
+                return null;
+            }
+            return parseHatMapTransferPrepareResponse(response.body());
+        } catch (IOException | IllegalArgumentException exception) {
+            pushMessage("Map transfer prepare failed for " + transferZone.destinationMapName()
+                    + ": " + exception.getMessage());
+            return null;
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            pushMessage("Map transfer prepare interrupted for " + transferZone.destinationMapName());
+            return null;
+        }
+    }
+
+    /**
+     * Java support selection of the configured HAT map-transfer endpoint.
+     * not ported.
+     */
+    private static String configuredHatMapTransferEndpoint(String endpointPath) {
+        for (String reportTarget : Globals.serverConfig.reporttowww) {
+            String normalizedBaseUrl = normalizeHatReportTarget(reportTarget);
+            if (!normalizedBaseUrl.isBlank()) {
+                return normalizedBaseUrl + endpointPath;
+            }
+        }
+        return "";
+    }
+
+    /**
+     * Java support normalization for HAT report targets before appending `/map-transfer/...` endpoints.
+     * not ported.
+     */
+    private static String normalizeHatReportTarget(String reportTarget) {
+        if (reportTarget == null) {
+            return "";
+        }
+        String normalized = reportTarget.strip();
+        int queryIndex = normalized.indexOf('?');
+        if (queryIndex >= 0) {
+            normalized = normalized.substring(0, queryIndex).stripTrailing();
+        }
+        while (normalized.endsWith("/")) {
+            normalized = normalized.substring(0, normalized.length() - 1);
+        }
+        if (normalized.isBlank()) {
+            return "";
+        }
+        if (!normalized.regionMatches(true, 0, "http://", 0, "http://".length())) {
+            normalized = "http://" + normalized;
+        }
+        return normalized;
+    }
+
+    /**
+     * Java support GET request for HAT map-transfer endpoints.
+     * not ported.
+     */
+    private static HttpResponse<String> sendHatMapTransferRequest(
+            String endpoint,
+            Map<String, String> parameters
+    ) throws IOException, InterruptedException {
+        String url = endpoint + "?" + encodeHatQuery(parameters);
+        HttpRequest request = HttpRequest.newBuilder(URI.create(url))
+                .header("User-Agent", "RageOfMages2")
+                .header("Cache-Control", "no-cache")
+                .timeout(MAP_TRANSFER_HAT_REQUEST_TIMEOUT)
+                .GET()
+                .build();
+        return HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+    }
+
+    /**
+     * Java support query-string encoder for HAT map-transfer requests.
+     * not ported.
+     */
+    private static String encodeHatQuery(Map<String, String> parameters) {
+        StringJoiner query = new StringJoiner("&");
+        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+            query.add(encodeHatQueryComponent(entry.getKey()) + "=" + encodeHatQueryComponent(entry.getValue()));
+        }
+        return query.toString();
+    }
+
+    /**
+     * Java support query component encoder for HAT map-transfer requests.
+     * not ported.
+     */
+    private static String encodeHatQueryComponent(String value) {
+        return URLEncoder.encode(Objects.requireNonNullElse(value, ""), StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Java support parser for HAT `/map-transfer/prepare` responses.
+     * not ported.
+     */
+    private static HatMapTransferPrepareResult parseHatMapTransferPrepareResponse(String responseBody) {
+        Map<String, String> fields = parseHatPipeResponse(responseBody);
+        return new HatMapTransferPrepareResult(
+                requireHatResponseField(fields, "TOKEN"),
+                requireHatResponseField(fields, "TARGET"),
+                requireHatResponseField(fields, "HOST"),
+                parseHatIntField(fields, "GAMEPORT"),
+                parseHatIntField(fields, "DISCOVERYPORT"),
+                parseHatLongField(fields, "EXPIRES")
+        );
+    }
+
+    /**
+     * Java support parser for HAT `/map-transfer/claim` responses.
+     * not ported.
+     */
+    private static HatMapTransferClaimResult parseHatMapTransferClaimResponse(String responseBody) {
+        Map<String, String> fields = parseHatPipeResponse(responseBody);
+        return new HatMapTransferClaimResult(
+                requireHatResponseField(fields, "TOKEN"),
+                requireHatResponseField(fields, "PAYLOADREF"),
+                requireHatResponseField(fields, "TOMAP"),
+                parseHatIntField(fields, "TOX"),
+                parseHatIntField(fields, "TOY")
+        );
+    }
+
+    /**
+     * Java support for moving a HAT map-transfer ticket through a simple token-only transition.
+     * not ported.
+     */
+    private boolean requestHatMapTransferStatusTransition(String endpointPath, String token, String transitionName) {
+        String endpoint = configuredHatMapTransferEndpoint(endpointPath);
+        if (endpoint.isBlank()) {
+            pushMessage("Map transfer " + transitionName + " failed: no HAT report target configured.");
+            return false;
+        }
+        Map<String, String> parameters = new LinkedHashMap<>();
+        parameters.put("token", token);
+        try {
+            HttpResponse<String> response = sendHatMapTransferRequest(endpoint, parameters);
+            if (response.statusCode() == 200) {
+                return true;
+            }
+            pushMessage("Map transfer " + transitionName + " failed: " + response.body().strip());
+            return false;
+        } catch (IOException | IllegalArgumentException exception) {
+            pushMessage("Map transfer " + transitionName + " failed: " + exception.getMessage());
+            return false;
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            pushMessage("Map transfer " + transitionName + " interrupted.");
+            return false;
+        }
+    }
+
+    /**
+     * Java support target-side HAT claim for a reconnecting dedicated map-transfer client.
+     * not ported.
+     */
+    private HatMapTransferClaimResult requestHatMapTransferClaim(String token) {
+        String claimEndpoint = configuredHatMapTransferEndpoint("/map-transfer/claim");
+        if (claimEndpoint.isBlank()) {
+            pushMessage("Map transfer claim failed: no HAT report target configured.");
+            return null;
+        }
+        Map<String, String> parameters = new LinkedHashMap<>();
+        parameters.put("token", token);
+        parameters.put("targetaddress", Globals.serverConfig.dedicatedAdvertisedAddress());
+        try {
+            HttpResponse<String> response = sendHatMapTransferRequest(claimEndpoint, parameters);
+            if (response.statusCode() != 200) {
+                pushMessage("Map transfer claim failed: " + response.body().strip());
+                return null;
+            }
+            return parseHatMapTransferClaimResponse(response.body());
+        } catch (IOException | IllegalArgumentException exception) {
+            pushMessage("Map transfer claim failed: " + exception.getMessage());
+            return null;
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            pushMessage("Map transfer claim interrupted.");
+            return null;
+        }
+    }
+
+    /**
+     * Java support source-side poll of HAT ticket status for commit/rollback cleanup.
+     * not ported.
+     */
+    private String requestHatMapTransferTicketStatus(String token) {
+        String ticketEndpoint = configuredHatMapTransferEndpoint("/map-transfer/ticket");
+        if (ticketEndpoint.isBlank()) {
+            pushMessage("Map transfer status poll failed: no HAT report target configured.");
+            return null;
+        }
+        Map<String, String> parameters = new LinkedHashMap<>();
+        parameters.put("token", token);
+        try {
+            HttpResponse<String> response = sendHatMapTransferRequest(ticketEndpoint, parameters);
+            if (response.statusCode() != 200) {
+                pushMessage("Map transfer status poll failed: " + response.body().strip());
+                return null;
+            }
+            return requireHatResponseField(parseHatPipeResponse(response.body()), "STATUS");
+        } catch (IOException | IllegalArgumentException exception) {
+            pushMessage("Map transfer status poll failed: " + exception.getMessage());
+            return null;
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            pushMessage("Map transfer status poll interrupted.");
+            return null;
+        }
+    }
+
+    /**
+     * Java support parser for `OK|KEY|VALUE` HAT map-transfer responses.
+     * not ported.
+     */
+    private static Map<String, String> parseHatPipeResponse(String responseBody) {
+        String strippedBody = Objects.requireNonNullElse(responseBody, "").strip();
+        String[] tokens = strippedBody.split("\\|");
+        if (tokens.length < 3 || !"OK".equals(tokens[0])) {
+            throw new IllegalArgumentException("Unexpected HAT response: " + strippedBody);
+        }
+        Map<String, String> fields = new HashMap<>();
+        for (int index = 1; index + 1 < tokens.length; index += 2) {
+            fields.put(tokens[index], tokens[index + 1]);
+        }
+        return fields;
+    }
+
+    /**
+     * Java support required-field accessor for HAT map-transfer responses.
+     * not ported.
+     */
+    private static String requireHatResponseField(Map<String, String> fields, String key) {
+        String value = fields.get(key);
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException("HAT response missing " + key);
+        }
+        return value;
+    }
+
+    /**
+     * Java support integer field parser for HAT map-transfer responses.
+     * not ported.
+     */
+    private static int parseHatIntField(Map<String, String> fields, String key) {
+        return Integer.parseInt(requireHatResponseField(fields, key));
+    }
+
+    /**
+     * Java support long field parser for HAT map-transfer responses.
+     * not ported.
+     */
+    private static long parseHatLongField(Map<String, String> fields, String key) {
+        return Long.parseLong(requireHatResponseField(fields, key));
+    }
+
+    /**
+     * Java support local file reference for one saved map-transfer artifact.
+     * not ported.
+     */
+    private record DedicatedMapTransferArtifact(Path path, String payloadRef) {
+    }
+
+    /**
+     * Java support parsed response from HAT `/map-transfer/prepare`.
+     * not ported.
+     */
+    private record HatMapTransferPrepareResult(
+            String token,
+            String targetAddress,
+            String targetHost,
+            int targetGamePort,
+            int targetDiscoveryPort,
+            long expiresAtMillis
+    ) {
+    }
+
+    /**
+     * Java support parsed response from HAT `/map-transfer/claim`.
+     * not ported.
+     */
+    private record HatMapTransferClaimResult(
+            String token,
+            String payloadRef,
+            String targetMapName,
+            int destinationX,
+            int destinationY
+    ) {
+    }
+
+    /**
+     * Java support source-side pending transfer state that suppresses repeated zone triggers.
+     * not ported.
+     */
+    private record PendingDedicatedMapTransfer(
+            String token,
+            String payloadRef,
+            String destinationMapName,
+            int destinationX,
+            int destinationY,
+            String targetAddress,
+            String targetHost,
+            int targetGamePort,
+            long nextStatusPollMillis,
+            long expiresAtMillis
+    ) {
+        /**
+         * Java support HAT ticket expiry check for source-side retry control.
+         * not ported.
+         */
+        private boolean isExpired(long nowMillis) {
+            return nowMillis >= expiresAtMillis;
+        }
+
+        /**
+         * Java support status-poll due check for source-side transfer cleanup.
+         * not ported.
+         */
+        private boolean isStatusPollDue(long nowMillis) {
+            return nowMillis >= nextStatusPollMillis;
+        }
+
+        /**
+         * Java support immutable update for the next source-side HAT ticket status poll.
+         * not ported.
+         */
+        private PendingDedicatedMapTransfer withNextStatusPollMillis(long nextStatusPollMillis) {
+            return new PendingDedicatedMapTransfer(
+                    token,
+                    payloadRef,
+                    destinationMapName,
+                    destinationX,
+                    destinationY,
+                    targetAddress,
+                    targetHost,
+                    targetGamePort,
+                    nextStatusPollMillis,
+                    expiresAtMillis
+            );
+        }
     }
 
     /**
@@ -1652,7 +2577,9 @@ public class GameServer implements MfcSerializable {
                 int buildingTokenId = readActionWord(action, CGameAction.BODY_OFFSET + 4);
                 Building building = objectLists.buildings.findByTokenId(buildingTokenId);
                 if (building != null) {
-                    missionScriptRuntime.initializeEnterBuildingOrderUnit(activeUnit, building);
+                    if (!tryInitializeDedicatedMapTransferBuildingInteractionOrder(activeUnit, building)) {
+                        missionScriptRuntime.initializeEnterBuildingOrderUnit(activeUnit, building);
+                    }
                 } else {
                     pushMessage("No building #" + buildingTokenId);
                 }
@@ -1792,6 +2719,10 @@ public class GameServer implements MfcSerializable {
      */
     private void dispatchClientRequestAction(CGameAction action) {
         if (action instanceof PlayerJoinAction playerJoinAction) {
+            if (isNotPublicDedicatedServer()) {
+                rejectNewConnectionOnNotPublicServer(playerJoinAction.getSourceClient());
+                return;
+            }
             if (playerJoinAction.getSourceClient().GetLoginName() != null) {
                 handlePlayerJoinRequest(playerJoinAction);
             }
@@ -1824,6 +2755,10 @@ public class GameServer implements MfcSerializable {
         }
         if (action instanceof LoginRequestAction loginRequestAction) {
             handleLoginRequest(loginRequestAction);
+            return;
+        }
+        if (action instanceof MapTransferTokenAction mapTransferTokenAction) {
+            handleDedicatedMapTransferTokenRequest(mapTransferTokenAction);
             return;
         }
         if (action instanceof InventoryTransferAction inventoryTransferAction) {
@@ -1901,6 +2836,140 @@ public class GameServer implements MfcSerializable {
     }
 
     /**
+     * Java support target-side dedicated map-transfer token admission.
+     * not ported.
+     */
+    private void handleDedicatedMapTransferTokenRequest(MapTransferTokenAction action) {
+        if (!isDedicatedMapTransferRuntime()) {
+            return;
+        }
+        String token = action.transferToken.get().strip();
+        if (token.isEmpty()) {
+            pushMessage("Map transfer claim failed: empty token.");
+            return;
+        }
+
+        HatMapTransferClaimResult claimResult = requestHatMapTransferClaim(token);
+        if (claimResult == null) {
+            return;
+        }
+        if (!claimResult.targetMapName().equalsIgnoreCase(mapFileName)) {
+            pushMessage("Map transfer token targets " + claimResult.targetMapName()
+                    + " but this server runs " + mapFileName + ".");
+            requestHatMapTransferStatusTransition("/map-transfer/cancel", token, "cancel");
+            return;
+        }
+        if (!admitDedicatedMapTransfer(action.getSourceClient(), claimResult)) {
+            requestHatMapTransferStatusTransition("/map-transfer/cancel", token, "cancel");
+        }
+    }
+
+    /**
+     * Java support target-side load/place/bootstrap after HAT validates a dedicated map-transfer token.
+     * not ported.
+     */
+    private boolean admitDedicatedMapTransfer(CBufferManager sourceClient, HatMapTransferClaimResult claimResult) {
+        if (sourceClient == null) {
+            pushMessage("Map transfer claim failed: missing source client.");
+            return false;
+        }
+
+        byte[] payload;
+        try {
+            payload = Files.readAllBytes(Path.of(claimResult.payloadRef()));
+        } catch (IOException exception) {
+            pushMessage("Map transfer payload load failed: " + exception.getMessage());
+            return false;
+        }
+
+        byte[][] sections = CGameSession.readSavedCharacterSections(payload);
+        if (sections == null || sections[CGameSession.SAVE_SECTION_CHARACTER_HEADER_INDEX] == null) {
+            pushMessage("Map transfer payload is not a valid character artifact.");
+            return false;
+        }
+
+        byte[] headerSection = sections[CGameSession.SAVE_SECTION_CHARACTER_HEADER_INDEX];
+        String playerName = CGameSession.readSavedCharacterHeaderPlayerName(headerSection);
+        Player existingPlayer = removeQueuedDedicatedMapTransferDuplicate(playerList.getByName(playerName));
+        if (existingPlayer != null
+                && (existingPlayer.clientConnected != 0
+                || existingPlayer.controlledUnit != null
+                || !existingPlayer.ownedUnits.isEmpty())) {
+            pushMessage("Map transfer rejected duplicate active player " + playerName + ".");
+            return false;
+        }
+
+        Player player = existingPlayer == null ? ensurePlayerForJoinName(playerName) : existingPlayer;
+        player.name = playerName;
+        player.isActive = 0;
+        player.mapLoadPending = 0;
+        writeJoinSessionKeys(
+                player,
+                CGameSession.readSavedCharacterHeaderSessionKeyPart1(headerSection),
+                CGameSession.readSavedCharacterHeaderSessionKeyPart2(headerSection)
+        );
+        player.joinOptions = 1;
+        if (player.colorSlot == 0) {
+            player.colorSlot = firstFreeInactivePlayerColorSlot();
+        }
+
+        BinaryBlobAction transferPayload = BinaryBlobAction.global;
+        transferPayload.payloadSize.set(payload.length);
+        transferPayload.data.set(payload);
+        Human loadedHuman = materializeSavedCharacter(transferPayload, player);
+        if (loadedHuman == null) {
+            player.markDisconnectedForRemoval();
+            pushMessage("Map transfer payload materialization failed for " + playerName + ".");
+            return false;
+        }
+
+        attachDedicatedMapTransferHuman(loadedHuman, player);
+        if (!placeDedicatedMapTransferLanding(
+                loadedHuman,
+                claimResult.destinationX(),
+                claimResult.destinationY()
+        )) {
+            player.markDisconnectedForRemoval();
+            pushMessage("Map transfer landing blocked for " + playerName + ".");
+            return false;
+        }
+
+        sourceClient.SetNetId(player.playerId);
+        player.clientConnected = 1;
+        player.pendingRemovalServerTick = 0;
+        applyLoadedScenarioJoinRelations(player);
+        CServerApp.sendGameAction(NewPlayerAction.prepareForPlayerJoinBroadcast(player, true));
+        CServerApp.sendNoPayloadAction(GameActionId.MISSION_STARTED_ACTION_B7, player);
+        sendInitialScenarioState(player, 0);
+        CServerApp.sendCurrentServerLoopCounter(player);
+        if (!requestHatMapTransferStatusTransition("/map-transfer/commit", claimResult.token(), "commit")) {
+            player.markDisconnectedForRemoval();
+            return false;
+        }
+        deleteDedicatedMapTransferArtifactRef(claimResult.payloadRef());
+        CServerApp.flushActiveClientWriteBuffers();
+        pushMessage(String.format(
+                Locale.ROOT,
+                "Committed map transfer for %s at %d:%d.",
+                player.name,
+                loadedHuman.m_pTargetHandle.getX(),
+                loadedHuman.m_pTargetHandle.getY()
+        ));
+        return true;
+    }
+
+    /**
+     * Java support for target-side map transfer re-admission after a prior TCP client disconnect queued delayed removal.
+     * not ported.
+     */
+    private Player removeQueuedDedicatedMapTransferDuplicate(Player existingPlayer) {
+        if (playerList.removeQueuedDisconnectedPlayerImmediately(existingPlayer)) {
+            return null;
+        }
+        return existingPlayer;
+    }
+
+    /**
      * Native support extracted from GameServer::handleServerGameAction @004F515D case `0x05`.
      */
     private void handleMapLoadCompleteRequest(CGameAction action) {
@@ -1937,6 +3006,10 @@ public class GameServer implements MfcSerializable {
     private void handleLoginRequest(LoginRequestAction action) {
         String credentials = action.text.get();
         CBufferManager sourceClient = action.getSourceClient();
+        if (isNotPublicDedicatedServer()) {
+            rejectNewConnectionOnNotPublicServer(sourceClient);
+            return;
+        }
         if (!Globals.passwordManager.checkPassword(credentials)) {
             rejectClientJoin(sourceClient, 0, "Incorrect password");
             return;
@@ -3460,6 +4533,56 @@ public class GameServer implements MfcSerializable {
     }
 
     /**
+     * Java support target-side owner/group attach for a materialized dedicated map-transfer Human before placement.
+     * not ported.
+     */
+    private void attachDedicatedMapTransferHuman(Human loadedHuman, Player player) {
+        loadedHuman.idFull = allocateNextFreeId() & 0xFFFF;
+        loadedHuman.owner = player;
+        player.controlledUnit = loadedHuman;
+        player.ownedUnits.add(loadedHuman);
+
+        UnitGroup unitGroup = new UnitGroup();
+        player.unitGroups.add(unitGroup);
+        unitGroup.addUnit(loadedHuman);
+    }
+
+    /**
+     * Java support deterministic destination landing for dedicated map transfer.
+     * not ported.
+     */
+    private boolean placeDedicatedMapTransferLanding(Unit unit, int centerX, int centerY) {
+        for (int radius = 0; radius <= MAP_TRANSFER_LANDING_RADIUS; radius++) {
+            for (int candidateY = centerY - radius; candidateY <= centerY + radius; candidateY++) {
+                for (int candidateX = centerX - radius; candidateX <= centerX + radius; candidateX++) {
+                    if (Math.max(Math.abs(candidateX - centerX), Math.abs(candidateY - centerY)) != radius) {
+                        continue;
+                    }
+                    if (tryDedicatedMapTransferLandingCell(unit, candidateX, candidateY)) {
+                        activeUnits.add(unit);
+                        resetMissionEntryUnitScriptData(unit);
+                        unit.unitGroup.initializeScenarioMissionEntryGroup(missionScriptRuntime);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Java support single-cell footprint test and attach for dedicated map-transfer landing.
+     * not ported.
+     */
+    private boolean tryDedicatedMapTransferLandingCell(Unit unit, int x, int y) {
+        if (x < 0 || y < 0 || x > 0xFF || y > 0xFF) {
+            return false;
+        }
+        unit.m_pTargetHandle.initFromBytes(x, y, worldMap);
+        return worldMap.canPlaceUnitFootprint(unit) && worldMap.refreshSteppedUnitCell(unit);
+    }
+
+    /**
      * Native support extracted from GameServer::handleServerGameAction @004F515D case `0xBE` loaded-Human attach branch.
      * Fully ported support helper.
      */
@@ -3836,12 +4959,16 @@ public class GameServer implements MfcSerializable {
         CServerApp.sendGameAction(setCameraPositionAction);
         CServerApp.netUpdate(unit, null, ALL_UNIT_UPDATE_FLAGS, 0x0FFB, 0, 0);
         CServerApp.sendInitialUnitAndBuildingSnapshotsForPlayer(player);
+        sendDedicatedTransferBuildingInteractions(player);
         CServerApp.sendInitialSackSnapshotsForPlayer(player);
         CServerApp.sendPlayerKnowledgeAction(0, player);
         CServerApp.sendUnitVisibilityAction(unit, false, null);
         if (objectLists.spellEffects != null) {
             for (SpellEffect spellEffect : objectLists.spellEffects) {
-                if ((spellEffect.idFull & 0xFF) != 0 && spellEffect instanceof AreaEffect areaEffect) {
+                if ((spellEffect.idFull & 0xFF) != 0
+                        && spellEffect instanceof DedicatedTransferSpotEffect transferSpotEffect) {
+                    transferSpotEffect.publishTransferSpotVisual();
+                } else if ((spellEffect.idFull & 0xFF) != 0 && spellEffect instanceof AreaEffect areaEffect) {
                     CServerApp.sendSpellEffectStateAction(areaEffect, 1);
                 }
             }
@@ -3853,6 +4980,40 @@ public class GameServer implements MfcSerializable {
         player.adjustGoldAndNotify(0, 1);
         CServerApp.sendNoPayloadAction(GameActionId.NO_PAYLOAD_ACTION_03, player);
         reportServerStatusToConfiguredTargets();
+    }
+
+    /**
+     * Java support replay of dedicated map-transfer building interaction markers for a loading client.
+     * not ported.
+     */
+    private void sendDedicatedTransferBuildingInteractions(Player player) {
+        if (objectLists.buildings == null || buildingTransferZones.isEmpty()) {
+            return;
+        }
+        for (Building building : objectLists.buildings) {
+            if (building != null && buildingTransferZones.containsKey(building.idFull & 0xFFFF)) {
+                sendDedicatedTransferBuildingInteraction(building, player);
+            }
+        }
+    }
+
+    /**
+     * Java support for raw TCP dedicated joins after GameServer::LoadMapByName @004EB715 has already loaded a network
+     * scenario. Native GameServer::sendInitialScenarioState @004F1D9C copies scenario Self diplomacy during staged
+     * entry; Java can register or transfer the connected player before that request path, so mirror the same relation
+     * template before the diplomacy snapshot is sent.
+     * not ported.
+     */
+    private void applyLoadedScenarioJoinRelations(Player player) {
+        if (networkSessionActive == 0
+                || worldLoaded == 0
+                || missionScriptRuntime == null
+                || player.isActive != 0
+                || player.playerId == player.scenarioPlayerId
+                || player.scenarioPlayerId != 1) {
+            return;
+        }
+        applyMissionEntryRelationsFromSelf(player);
     }
 
     /**
@@ -4091,37 +5252,72 @@ public class GameServer implements MfcSerializable {
     }
 
     /**
-     * Fully ported native support extracted from GameServer::reportServerStatusToConfiguredTargets @004ED0B1
-     * server-status format.
+     * Java support gate for dedicated servers configured as transfer-only through `[settings] notpublic=1`.
+     * not ported.
+     */
+    private static boolean isNotPublicDedicatedServer() {
+        return Globals.mainWindow.sessionMode == CMainWindow.SESSION_MODE_DEDICATED_SERVER
+                && Globals.serverConfig.notPublic != 0;
+    }
+
+    /**
+     * Java support rejection shared by direct-address login and session-browser join attempts on NotPublic servers.
+     * not ported.
+     */
+    private void rejectNewConnectionOnNotPublicServer(CBufferManager sourceClient) {
+        pushMessage("New player connection rejected (NotPublic server).");
+        rejectClientJoin(sourceClient, JOIN_REJECT_RESTRICTED_NAME, "This server accepts transfers only.");
+    }
+
+    /**
+     * Native support extracted from GameServer::reportServerStatusToConfiguredTargets @004ED0B1 server-status format.
+     * Java raw TCP dedicated reporting uses the configured host:port endpoint.
      */
     private String buildServerStatusParameters() {
         if (!mapName.isEmpty()) {
-            return String.format(
+            return appendDedicatedServerStatusFlags(String.format(
                     Locale.ROOT,
-                    "servername=%s&version=1.01&mapname=%s&mapsize=%dx%d&difficultylevel=%d&players=%d&ip=%s",
+                    "servername=%s&version=1.01&mapname=%s&mapfile=%s&mapsize=%dx%d&difficultylevel=%d&players=%d&ip=%s",
                     Globals.serverConfig.ServerName,
                     mapName,
+                    mapFileName,
                     worldMap.getMapWidth() - 0x10,
                     worldMap.getMapHeight() - 0x10,
                     difficultyLevel,
                     playerList.getPlayersCount(),
-                    Globals.serverConfig.ipaddress
-            );
+                    Globals.serverConfig.dedicatedAdvertisedAddress()
+            ));
         }
         return buildNoMapServerStatusParameters();
     }
 
     /**
-     * Fully ported native support extracted from Global::reportNoMapServerStatusAndDeleteStatusFile @004ED298 and
-     * GameServer::reportServerStatusToConfiguredTargets @004ED0B1 no-map server-status format.
+     * Native support extracted from Global::reportNoMapServerStatusAndDeleteStatusFile @004ED298 and
+     * GameServer::reportServerStatusToConfiguredTargets @004ED0B1 no-map server-status format. Java raw TCP dedicated
+     * reporting uses the configured host:port endpoint.
      */
     private static String buildNoMapServerStatusParameters() {
-        return String.format(
+        return appendDedicatedServerStatusFlags(String.format(
                 Locale.ROOT,
                 "servername=%s&version=1.01&mapname=no map&mapsize=0x0&difficultylevel=9&players=-1&ip=%s",
                 Globals.serverConfig.ServerName,
-                Globals.serverConfig.ipaddress
-        );
+                Globals.serverConfig.dedicatedAdvertisedAddress()
+        ));
+    }
+
+    /**
+     * Java support extension: dedicated status reports carry map-transfer registry flags and NotPublic visibility.
+     * not ported.
+     */
+    private static String appendDedicatedServerStatusFlags(String parameters) {
+        if (Globals.mainWindow.sessionMode == CMainWindow.SESSION_MODE_DEDICATED_SERVER) {
+            String dedicatedParameters = parameters + "&dedicated=1&discoveryport=" + Globals.serverConfig.discoveryPort;
+            if (Globals.serverConfig.notPublic != 0) {
+                return dedicatedParameters + "&notpublic=1";
+            }
+            return dedicatedParameters;
+        }
+        return parameters;
     }
 
     /**

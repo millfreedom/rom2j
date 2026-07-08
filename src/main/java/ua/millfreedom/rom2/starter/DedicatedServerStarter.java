@@ -125,9 +125,11 @@ public final class DedicatedServerStarter {
         CMainWindow mainWindow = createHeadlessMainWindow();
         DedicatedServerSwingConsole operatorConsole = createOperatorConsole(options, mainWindow);
         initializeHeadlessWindowRuntime();
+        String bindAddress = configureDedicatedEndpoint(options);
         String mapName = configureDedicatedMapSchedule(options);
-        System.out.println("Starting dedicated server on " + options.bindAddressOrDefault() + " with map " + mapName);
-        if (!mainWindow.startHeadlessDedicatedServer(mapName, options.bindAddressOrDefault())) {
+        System.out.println("Starting dedicated server on " + Globals.serverConfig.dedicatedAdvertisedAddress()
+                + " (bind " + bindAddress + ") with map " + mapName);
+        if (!mainWindow.startHeadlessDedicatedServer(mapName, bindAddress)) {
             if (operatorConsole != null) {
                 operatorConsole.close();
             }
@@ -273,6 +275,18 @@ public final class DedicatedServerStarter {
     }
 
     /**
+     * Java support for resolving dedicated bind host/game port after server.cfg is loaded.
+     * not ported.
+     */
+    private static String configureDedicatedEndpoint(Options options) {
+        if (options.bindAddress() != null
+                && !Globals.serverConfig.applyConfiguredIpAddress(options.bindAddress())) {
+            throw new IllegalArgumentException("Invalid dedicated bind endpoint: " + options.bindAddress());
+        }
+        return Globals.serverConfig.dedicatedBindAddressOrDefault("0.0.0.0");
+    }
+
+    /**
      * Java support boundary for running the dedicated OnIdle subset without GLFW's message loop.
      * not ported.
      */
@@ -326,7 +340,7 @@ public final class DedicatedServerStarter {
      */
     private static String usage() {
         return "Usage: DedicatedServerStarter [--config " + ServerConfigurationLoader.DEFAULT_CONFIG_PATH
-                + "] [--map kids3.alm] [--bind 0.0.0.0] "
+                + "] [--map kids3.alm] [--bind 0.0.0.0[:port]] "
                 + "[--exit-after-ms 5000] [--no-ui]";
     }
 
@@ -415,11 +429,11 @@ public final class DedicatedServerStarter {
         }
 
         /**
-         * Java support accessor for CLlDriver::StartServer @0050791A bind-address input.
+         * Java support accessor for the explicit dedicated bind endpoint.
          * not ported.
          */
-        public String bindAddressOrDefault() {
-            return bindAddress == null ? "0.0.0.0" : bindAddress;
+        public String bindAddress() {
+            return bindAddress;
         }
 
         /**

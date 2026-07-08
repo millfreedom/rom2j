@@ -1123,10 +1123,19 @@ public class Unit extends Token {
 
     /**
      * Native support extracted from Unit::update @0050F12C.
+     * Java dedicated-map-transfer building interactions run before native building-specific handlers.
      */
     private Object updateInteractState() {
         Building interactive = Globals.gameServer.objectLists.buildings.findInteractiveNearTarget(m_pTargetHandle);
         if (interactive != null) {
+            if (this instanceof Humanoid humanoid
+                    && Globals.gameServer.tryPrepareDedicatedMapTransferFromBuildingInteraction(
+                            owner,
+                            humanoid,
+                            interactive
+                    )) {
+                return interactive;
+            }
             if (interactive instanceof Shop shop) {
                 return CServerApp.openShopDialog(shop, owner);
             }

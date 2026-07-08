@@ -171,6 +171,10 @@ public final class IncomingGameActionFactory {
             case MAP_CHECKSUM_ACTION_BF -> MapChecksumAction::new;
             case MAP_CHUNK_ACTION_C0 -> MapChunkAction::new;
             case LATENCY_SETTING_ACTION_C1 -> LatencySettingAction::new;
+            case MAP_TRANSFER_REDIRECT_ACTION_C2 -> MapTransferRedirectAction::new;
+            case MAP_TRANSFER_TOKEN_ACTION_C3 -> MapTransferTokenAction::new;
+            case MAP_TRANSFER_SPOT_VISUAL_ACTION_C4 -> PointProjectileVisualAction::new;
+            case MAP_TRANSFER_BUILDING_ACTION_C5 -> MapTransferBuildingAction::new;
             default -> null;
         };
     }

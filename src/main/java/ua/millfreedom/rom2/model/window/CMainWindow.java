@@ -5,6 +5,7 @@ import ua.millfreedom.rom2.*;
 import ua.millfreedom.rom2.CFile.LEWriter;
 import ua.millfreedom.rom2.dserver.DedicatedServerPlayerStatus;
 import ua.millfreedom.rom2.dserver.DedicatedServerStatusSnapshot;
+import ua.millfreedom.rom2.maptransfer.TransferPortalLoader;
 import ua.millfreedom.rom2.model.*;
 import ua.millfreedom.rom2.model.action.ChatTextAction;
 import ua.millfreedom.rom2.model.action.LoginRequestAction;
@@ -1972,8 +1973,14 @@ public class CMainWindow extends CFrameWnd {
         CServerApp.setLocalNetworkDriver(CLlDriver.class);
         CLlDriver.bindLocalServerAppBoundary();
         CLlDriver.setProtocolId(ProtocolId.TCP_IP);
-        CLlDriver.enableVisibleRawTcpSessionServerBoundary();
+        if (Globals.serverConfig.notPublic == 0) {
+            CLlDriver.enableVisibleRawTcpSessionServerBoundary();
+        }
         String bindAddress = getHatDedicatedServerBindAddress();
+        CLlDriver.configureTcpEndpointPortsBoundary(
+                Globals.serverConfig.gamePort,
+                Globals.serverConfig.discoveryPort
+        );
         boolean started = CLlDriver.startMultiplayerServerBoundary(
                 Globals.serverConfig.maxplayers,
                 m_GameSession.m_PlayerName,
@@ -2008,7 +2015,13 @@ public class CMainWindow extends CFrameWnd {
         CServerApp.setLocalNetworkDriver(CLlDriver.class);
         CLlDriver.bindLocalServerAppBoundary();
         CLlDriver.setProtocolId(ProtocolId.TCP_IP);
-        CLlDriver.enableVisibleRawTcpSessionServerBoundary();
+        if (Globals.serverConfig.notPublic == 0) {
+            CLlDriver.enableVisibleRawTcpSessionServerBoundary();
+        }
+        CLlDriver.configureTcpEndpointPortsBoundary(
+                Globals.serverConfig.gamePort,
+                Globals.serverConfig.discoveryPort
+        );
         boolean started = CLlDriver.startMultiplayerServerBoundary(
                 Globals.serverConfig.maxplayers,
                 m_GameSession.m_PlayerName,
@@ -2036,21 +2049,26 @@ public class CMainWindow extends CFrameWnd {
 
     /**
      * Native support extracted from the `-ip"` command-line branch in
-     * CMainWindow::startHatDedicatedServer @0048EF1F.
+     * CMainWindow::startHatDedicatedServer @0048EF1F. Java also falls back to server.cfg `ipaddress` for dedicated
+     * runs and accepts a Java-only optional endpoint port.
      */
     private static String getHatDedicatedServerBindAddress() {
         String commandLine = Globals.commandLine;
         String ipOptionMarker = "-ip\"";
         int ipOptionIndex = commandLine.indexOf(ipOptionMarker);
         if (ipOptionIndex == -1) {
-            return "0.0.0.0";
+            return Globals.serverConfig.dedicatedBindAddressOrDefault("0.0.0.0");
         }
         int valueStart = ipOptionIndex + ipOptionMarker.length();
         int valueEnd = commandLine.indexOf('"', valueStart);
         if (valueEnd == -1) {
-            return "0.0.0.0";
+            return Globals.serverConfig.dedicatedBindAddressOrDefault("0.0.0.0");
         }
-        return commandLine.substring(valueStart, Math.min(valueEnd, valueStart + 0xFF));
+        String endpoint = commandLine.substring(valueStart, Math.min(valueEnd, valueStart + 0xFF));
+        if (!Globals.serverConfig.applyConfiguredIpAddress(endpoint)) {
+            return endpoint;
+        }
+        return Globals.serverConfig.dedicatedBindAddressOrDefault("0.0.0.0");
     }
 
     /**
@@ -2068,7 +2086,9 @@ public class CMainWindow extends CFrameWnd {
      */
     private boolean startJavaRawTcpVisibleMultiplayerServer() {
         CLlDriver.bindLocalServerAppBoundary();
-        CLlDriver.enableVisibleRawTcpSessionServerBoundary();
+        if (Globals.serverConfig.notPublic == 0) {
+            CLlDriver.enableVisibleRawTcpSessionServerBoundary();
+        }
         boolean started = CLlDriver.startMultiplayerServerBoundary(
                 Globals.serverConfig.maxplayers,
                 m_GameSession.m_PlayerName,
@@ -2670,10 +2690,25 @@ public class CMainWindow extends CFrameWnd {
     /**
      * Native support extracted from the GameServer::LoadMapByName @004EB715 call site in
      * CMainWindow::runSessionBootstrap @0048C8A3.
+     * Java dedicated-server extension installs configured map-transfer zones after a successful map load.
      */
     private void beginScenarioBootstrap(String mapName) {
         Globals.gameServer.loadSavedGameOnMapLoad = 0;
-        Globals.gameServer.loadMapByName(mapName);
+        if (sessionMode == SESSION_MODE_DEDICATED_SERVER) {
+            Globals.gameServer.clearDedicatedTransferZones();
+        }
+        int loadResult = Globals.gameServer.loadMapByName(mapName);
+        if (loadResult == 0 && sessionMode == SESSION_MODE_DEDICATED_SERVER) {
+            installDedicatedTransferZones(mapName);
+        }
+    }
+
+    /**
+     * Java support for dedicated-only transfer-zone installation after map load.
+     * not ported.
+     */
+    private static void installDedicatedTransferZones(String mapName) {
+        Globals.gameServer.installDedicatedTransferZones(TransferPortalLoader.loadTransferZonesForMap(mapName));
     }
 
     /**

@@ -275,6 +275,7 @@ public final class ScenarioDescriptor {
      * Fully ported.
      */
     private void initDefaults() {
+        clearScenarioLoadSections();
         mapWidth = DEFAULT_MAP_DIMENSION;
         mapHeight = DEFAULT_MAP_DIMENSION;
         sunAngle = 0.0f;
@@ -305,6 +306,27 @@ public final class ScenarioDescriptor {
         sect12MusicCount = 0;
         heightsPayloadSize = 0;
         infoSectionLoaded = false;
+    }
+
+    /**
+     * Native support for ScenarioDescriptor::ScenarioDescriptor @00534AD4 fresh CArray/CList construction before parse.
+     * Java support clears section lists when the loader reuses a blank-map descriptor instance.
+     */
+    private void clearScenarioLoadSections() {
+        sec5Players.clear();
+        sect7Instants.clear();
+        sect7Checks.clear();
+        sect7Triggers.clear();
+        sect8Sacks.clear();
+        sect9Effects.clear();
+        sect10Groups.clear();
+        sect11ShopDescriptors.clear();
+        sect11InnDescriptors.clear();
+        sect11PostDescriptors.clear();
+        sect12Music.clear();
+        sec4Buildings.clear();
+        sec6Units.clear();
+        rawSections.clear();
     }
 
     /**

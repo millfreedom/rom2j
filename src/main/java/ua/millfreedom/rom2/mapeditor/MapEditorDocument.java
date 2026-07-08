@@ -408,7 +408,7 @@ public final class MapEditorDocument {
      */
     public BuildingDTO addBuilding(int x, int y, int typeID, int hp, int playerID, int sizeX, int sizeY) {
         ensureMapCell(x, y);
-        BuildingDTO building = new BuildingDTO(x, y, typeID, hp, playerID, nextBuildingId(), sizeX, sizeY);
+        BuildingDTO building = new BuildingDTO(x, y, typeID, hp, playerID, nextScenarioObjectId(), sizeX, sizeY);
         scenario.sec4Buildings.add(building);
         dirty = true;
         return building;
@@ -431,6 +431,7 @@ public final class MapEditorDocument {
     ) {
         ensureBuildingIndex(buildingIndex);
         ensureMapCell(x, y);
+        ensureScenarioObjectIdAvailableForBuilding(buildingID, buildingIndex);
         BuildingDTO building = scenario.sec4Buildings.get(buildingIndex);
         building.x = x & 0xFFFF;
         building.y = y & 0xFFFF;
@@ -503,7 +504,7 @@ public final class MapEditorDocument {
                 rotation,
                 hp,
                 maxHp,
-                nextUnitId(),
+                nextScenarioObjectId(),
                 unitFlags1,
                 questFlags,
                 groupID
@@ -536,6 +537,7 @@ public final class MapEditorDocument {
     ) {
         ensureUnitIndex(unitIndex);
         ensureMapCell(tileX, tileY);
+        ensureScenarioObjectIdAvailableForUnit(unitID, unitIndex);
         updateUnitFields(
                 scenario.sec6Units.get(unitIndex),
                 tileX,
@@ -1827,33 +1829,72 @@ public final class MapEditorDocument {
     }
 
     /**
-     * Java support scenario-building id allocation for newly added editor records.
+     * Java support shared scenario object-id allocation for newly added editor building/unit records.
+     * Native MapDescriptor::MapDescriptor @004A449C inserts buildings and units into the same object map keyed by
+     * 0x6000 + scenario id, so these ids must be unique across both record kinds.
      * not ported.
      */
-    private int nextBuildingId() {
-        int maxBuildingId = 0;
+    private int nextScenarioObjectId() {
+        int maxScenarioObjectId = 0;
         for (BuildingDTO building : scenario.sec4Buildings) {
-            maxBuildingId = Math.max(maxBuildingId, building.buildingID);
+            maxScenarioObjectId = Math.max(maxScenarioObjectId, building.buildingID);
         }
-        if (maxBuildingId >= Short.MAX_VALUE) {
-            throw new IllegalStateException("No positive scenario building ids remain.");
+        for (UnitDTO unit : scenario.sec6Units) {
+            maxScenarioObjectId = Math.max(maxScenarioObjectId, MapEditorUnitDisplay.nativeUnitId(unit));
         }
-        return maxBuildingId + 1;
+        if (maxScenarioObjectId >= Short.MAX_VALUE) {
+            throw new IllegalStateException("No positive scenario object ids remain.");
+        }
+        return maxScenarioObjectId + 1;
     }
 
     /**
-     * Java support scenario-unit id allocation for newly added editor records.
+     * Java support validator for editor-assigned building ids that share the native scenario object-id namespace with
+     * units.
      * not ported.
      */
-    private int nextUnitId() {
-        int maxUnitId = 0;
+    private void ensureScenarioObjectIdAvailableForBuilding(int buildingID, int buildingIndex) {
+        ensurePositiveScenarioObjectId(buildingID);
+        for (int index = 0; index < scenario.sec4Buildings.size(); index++) {
+            if (index != buildingIndex && scenario.sec4Buildings.get(index).buildingID == buildingID) {
+                throw new IllegalArgumentException("Scenario object id " + buildingID + " is already used by another building.");
+            }
+        }
         for (UnitDTO unit : scenario.sec6Units) {
-            maxUnitId = Math.max(maxUnitId, MapEditorUnitDisplay.nativeUnitId(unit));
+            if (MapEditorUnitDisplay.nativeUnitId(unit) == buildingID) {
+                throw new IllegalArgumentException("Scenario object id " + buildingID + " is already used by a unit.");
+            }
         }
-        if (maxUnitId >= Short.MAX_VALUE) {
-            throw new IllegalStateException("No positive scenario unit ids remain.");
+    }
+
+    /**
+     * Java support validator for editor-assigned unit ids that share the native scenario object-id namespace with
+     * buildings.
+     * not ported.
+     */
+    private void ensureScenarioObjectIdAvailableForUnit(int unitID, int unitIndex) {
+        int nativeUnitId = MapEditorUnitDisplay.nativeUnitIdForStoredId(unitID);
+        ensurePositiveScenarioObjectId(nativeUnitId);
+        for (BuildingDTO building : scenario.sec4Buildings) {
+            if (building.buildingID == nativeUnitId) {
+                throw new IllegalArgumentException("Scenario object id " + nativeUnitId + " is already used by a building.");
+            }
         }
-        return maxUnitId + 1;
+        for (int index = 0; index < scenario.sec6Units.size(); index++) {
+            if (index != unitIndex && MapEditorUnitDisplay.nativeUnitId(scenario.sec6Units.get(index)) == nativeUnitId) {
+                throw new IllegalArgumentException("Scenario object id " + nativeUnitId + " is already used by another unit.");
+            }
+        }
+    }
+
+    /**
+     * Java support validator for native signed-WORD scenario object ids used by MapDescriptor object-map keys.
+     * not ported.
+     */
+    private static void ensurePositiveScenarioObjectId(int objectId) {
+        if (objectId <= 0 || objectId > Short.MAX_VALUE) {
+            throw new IllegalArgumentException("Scenario object id must be between 1 and " + Short.MAX_VALUE + ".");
+        }
     }
 
     /**

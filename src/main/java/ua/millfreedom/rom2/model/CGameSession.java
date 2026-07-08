@@ -815,6 +815,33 @@ public class CGameSession implements MfcSerializable {
     }
 
     /**
+     * Native support extracted from CGameSession::LoadCharacterRosterEntry @004904C5 header session-key read.
+     */
+    public static int readSavedCharacterHeaderSessionKeyPart1(byte[] headerSection) {
+        return ByteBuffer.wrap(headerSection).order(ByteOrder.LITTLE_ENDIAN)
+                .getInt(CHARACTER_HEADER_SESSION_KEY_PART1_OFFSET);
+    }
+
+    /**
+     * Native support extracted from CGameSession::LoadCharacterRosterEntry @004904C5 header session-key read.
+     */
+    public static int readSavedCharacterHeaderSessionKeyPart2(byte[] headerSection) {
+        return ByteBuffer.wrap(headerSection).order(ByteOrder.LITTLE_ENDIAN)
+                .getInt(CHARACTER_HEADER_SESSION_KEY_PART2_OFFSET);
+    }
+
+    /**
+     * Native support extracted from CGameSession::LoadCharacterRosterEntry @004904C5 header player-name read.
+     */
+    public static String readSavedCharacterHeaderPlayerName(byte[] headerSection) {
+        return readNullTerminatedString(
+                headerSection,
+                CHARACTER_HEADER_PLAYER_NAME_OFFSET,
+                CHARACTER_HEADER_PLAYER_NAME_SIZE
+        );
+    }
+
+    /**
      * Native support extracted from CGameSession::saveSelectedCharacterFile @004915CD and
      * GameServer::Save @004E9E97 saved-character stats construction.
      */

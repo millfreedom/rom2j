@@ -478,7 +478,8 @@ public final class CMainApp {
 
     /**
      * Native: Global::LoadConfig @004EF479.
-     * Fully ported.
+     * Java port status: native config parsing ported; Java additionally accepts dedicated-server raw TCP port and
+     * not-public keys.
      */
     public static int loadConfig(String configPath) {
         List<String> lines;
@@ -606,8 +607,20 @@ public final class CMainApp {
             Globals.serverConfig.chrbase = valueLower;
             return true;
         }
-        if (workingLine.startsWith("ipaddress")) {
-            Globals.serverConfig.ipaddress = valueLower;
+        if (isSettingsKey(workingLine, "ipaddress")) {
+            return Globals.serverConfig.applyConfiguredIpAddress(valueLower);
+        }
+        if (isNumberedSettingsKey(workingLine, "ipaddress")) {
+            return true;
+        }
+        if (isSettingsKey(workingLine, "gameport")) {
+            return Globals.serverConfig.setConfiguredGamePort(value);
+        }
+        if (isSettingsKey(workingLine, "discoveryport")) {
+            return Globals.serverConfig.setConfiguredDiscoveryPort(value);
+        }
+        if (isSettingsKey(workingLine, "notpublic")) {
+            Globals.serverConfig.notPublic = value == 0 ? 0 : 1;
             return true;
         }
         if (workingLine.startsWith("description")) {
@@ -634,6 +647,34 @@ public final class CMainApp {
             return applyConfigSaveLocation(valueLower);
         }
         return false;
+    }
+
+    /**
+     * Java support for exact `[settings]` key matching around Java-only config extensions.
+     * not ported.
+     */
+    private static boolean isSettingsKey(String workingLine, String expectedKey) {
+        int equalsIndex = workingLine.indexOf('=');
+        String keyText = equalsIndex < 0 ? workingLine : workingLine.substring(0, equalsIndex);
+        return trimBoth(keyText).equals(expectedKey);
+    }
+
+    /**
+     * Java support for ignoring numbered `ipaddressN` compatibility lines without letting them override `ipaddress`.
+     * not ported.
+     */
+    private static boolean isNumberedSettingsKey(String workingLine, String keyPrefix) {
+        int equalsIndex = workingLine.indexOf('=');
+        String keyText = trimBoth(equalsIndex < 0 ? workingLine : workingLine.substring(0, equalsIndex));
+        if (!keyText.startsWith(keyPrefix) || keyText.length() <= keyPrefix.length()) {
+            return false;
+        }
+        for (int index = keyPrefix.length(); index < keyText.length(); index++) {
+            if (!Character.isDigit(keyText.charAt(index))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

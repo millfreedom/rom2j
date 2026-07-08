@@ -25,6 +25,7 @@ import ua.millfreedom.rom2.model.action.NewPlayerAction;
 import ua.millfreedom.rom2.model.action.PlayerKnowledgeProgressAction;
 import ua.millfreedom.rom2.model.action.PlayerKickedAction;
 import ua.millfreedom.rom2.model.action.PlayerQuestsAction;
+import ua.millfreedom.rom2.model.action.PointProjectileVisualAction;
 import ua.millfreedom.rom2.model.action.QuestObjectivesQueryOpenAction;
 import ua.millfreedom.rom2.model.action.RangedAttackAction;
 import ua.millfreedom.rom2.model.action.SackAction;
@@ -2126,6 +2127,19 @@ public final class CServerApp {
     public static void sendEffectTokenVisualAction(Token effectToken, int visualType) {
         EffectAction action = EffectAction.prepareForEffectTokenVisual(effectToken, visualType);
         dispatchSpellEffectVisibilityGatedAction(action, effectToken.m_pTargetHandle);
+    }
+
+    /**
+     * Java support for sending a casterless point-projectile visual through spell-effect visibility gates.
+     * not ported.
+     */
+    public static void sendPointProjectileVisualAction(TargetHandle targetHandle, int projectileType, int segments) {
+        PointProjectileVisualAction action = PointProjectileVisualAction.prepareForPointProjectileVisual(
+                targetHandle,
+                projectileType,
+                segments
+        );
+        dispatchSpellEffectVisibilityGatedAction(action, targetHandle);
     }
 
     /**

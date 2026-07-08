@@ -13,6 +13,7 @@ import ua.millfreedom.rom2.model.container.CustomList;
 import ua.millfreedom.rom2.model.control.CGameListControl;
 import ua.millfreedom.rom2.model.enums.GameActionId;
 import ua.millfreedom.rom2.model.enums.MessageCodes;
+import ua.millfreedom.rom2.model.enums.ProtocolId;
 import ua.millfreedom.rom2.model.enums.SpellId;
 import ua.millfreedom.rom2.model.enums.TextAlign;
 import ua.millfreedom.rom2.model.gameobj.*;
@@ -494,6 +495,9 @@ public final class MapVisualObject extends CVisualObject {
 
     // MapVisualObject_Base +0x9AC / MapVisualObject +0x9B0.
     private int hoveredTileY;
+
+    // Java support, not a native field. Structure tokens that should use the town cursor for dedicated map transfer.
+    private final Set<Short> dedicatedMapTransferBuildingTokens = new HashSet<>();
 
     /**
      * Java convenience overload.
@@ -1391,6 +1395,7 @@ public final class MapVisualObject extends CVisualObject {
 
         PlayerJoinAction action = PlayerJoinAction.prepareForPlayerJoin(mainWindow.m_GameSession);
         objects.clear();
+        dedicatedMapTransferBuildingTokens.clear();
         pCUnit = null;
         updateSelectionState();
         CServerApp.sendClientGameAction(action);
@@ -1414,6 +1419,73 @@ public final class MapVisualObject extends CVisualObject {
             if (Integer.compareUnsigned(Globals.currentTickMillis() - startTick, Globals.networkTimeoutMillis) > 0) {
                 Globals.multiplayerBootstrapStatusWord = PLAYER_JOIN_TIMEOUT_STATUS_WORD;
                 return false;
+            }
+            CServerApp.processRemoteNetworkEvents();
+        }
+    }
+
+    /**
+     * Java support client-side redirect flow for dedicated map transfer.
+     * not ported.
+     */
+    public void handleDedicatedMapTransferRedirect(String targetHost, int targetGamePort, String transferToken) {
+        if (targetHost == null || targetHost.isBlank() || transferToken == null || transferToken.isBlank()) {
+            return;
+        }
+        String targetAddress = targetHost.strip() + ":" + targetGamePort;
+        drainPendingGameActionsBeforeNetworkClose();
+        clearLocalMapForDedicatedMapTransferRedirect();
+
+        CMainWindow mainWindow = Globals.mainWindow;
+        mainWindow.sessionMode = CMainWindow.SESSION_MODE_MULTIPLAYER_CLIENT;
+        CServerApp.setRemoteNetworkDriver(CLlDriver.class);
+        CLlDriver.bindRemoteServerAppBoundary();
+        CLlDriver.setProtocolId(ProtocolId.TCP_IP);
+        if (!CLlDriver.connectDirectAddressBoundary(targetAddress, mainWindow.m_GameSession.m_PlayerName)) {
+            CLlDriver.handleNetworkErrorAndClose();
+            return;
+        }
+
+        CServerApp.processRemoteNetworkEvents();
+        CServerApp.sendClientGameAction(MapTransferTokenAction.createForToken(transferToken));
+        waitForDedicatedMapTransferBootstrap();
+    }
+
+    /**
+     * Java support local-client map teardown before a dedicated map-transfer reconnect.
+     * not ported.
+     */
+    private void clearLocalMapForDedicatedMapTransferRedirect() {
+        pCUnit = null;
+        objects.clear();
+        dedicatedMapTransferBuildingTokens.clear();
+        transientObjects.clear();
+        floatingUnitTexts.clear();
+        removeExtraNetworkPlayersForLobbyReturn();
+        terrainLightOverrideCells.clear();
+        mapDescriptor = null;
+        cachedMapWidth = 0;
+        cachedMapHeight = 0;
+        updateSelectionState();
+        stopGameplayAudioForSessionTeardown();
+        GameplayMusicSupport.clearScenarioMusicRecordsForSessionTeardown();
+    }
+
+    /**
+     * Java support wait loop for target-server bootstrap after a dedicated map-transfer token is sent.
+     * not ported.
+     */
+    private void waitForDedicatedMapTransferBootstrap() {
+        int startTick = Globals.currentTickMillis();
+        while (true) {
+            if (CServerApp.getPendingSegmentMarkerCount() != 0) {
+                handleGameAction(null, GameActionId.NEW_SEGMENT_ACTION_64.id);
+                return;
+            }
+            MessageSystem.pumpPostedMessage();
+            if (Integer.compareUnsigned(Globals.currentTickMillis() - startTick, Globals.networkTimeoutMillis) > 0) {
+                CLlDriver.handleNetworkErrorAndClose();
+                return;
             }
             CServerApp.processRemoteNetworkEvents();
         }
@@ -2416,6 +2488,7 @@ public final class MapVisualObject extends CVisualObject {
     private void clearSessionForLobbyReturn(boolean allPlayers) {
         pCUnit = null;
         objects.clear();
+        dedicatedMapTransferBuildingTokens.clear();
         transientObjects.clear();
         floatingUnitTexts.clear();
         if (allPlayers) {
@@ -3339,6 +3412,9 @@ public final class MapVisualObject extends CVisualObject {
     private void drawFullTerrainFrame() {
         for (int row = 0; row < gridHeight + 4; row++) {
             for (int col = gridWidth - 1; col >= 0; col--) {
+                if (!isMapTerrainCell(col, row)) {
+                    continue;
+                }
                 int worldX = col + view.x;
                 int worldY = row + view.y;
                 drawTerrainCell(
@@ -3370,6 +3446,9 @@ public final class MapVisualObject extends CVisualObject {
                 int screenCol = col + renderRingOriginX;
                 if (screenCol >= gridWidth) {
                     screenCol -= gridWidth;
+                }
+                if (!isMapTerrainCell(col, row)) {
+                    continue;
                 }
                 int worldX = col + view.x;
                 int worldY = row + view.y;
@@ -3409,6 +3488,9 @@ public final class MapVisualObject extends CVisualObject {
                 if (screenCol >= gridWidth) {
                     screenCol -= gridWidth;
                 }
+                if (!isMapTerrainCell(col, row)) {
+                    continue;
+                }
                 int worldX = col + view.x;
                 int worldY = row + view.y;
                 drawTerrainCell(
@@ -3446,6 +3528,9 @@ public final class MapVisualObject extends CVisualObject {
                     continue;
                 }
 
+                if (!isMapTerrainCell(col, row)) {
+                    continue;
+                }
                 int worldX = col + view.x;
                 int worldY = row + view.y;
                 drawTerrainCell(
@@ -3729,7 +3814,6 @@ public final class MapVisualObject extends CVisualObject {
     private void drawGroundLayerAndTerrainObjects() {
         for (int row = -4; row < gridHeight + 8; row++) {
             for (int col = gridWidth + 3; col > -5; col--) {
-                int occupancyMask = combinedTileOccupancyMask(col, row);
                 int averageHeight = tileAverageHeightAt(col, row);
                 CGameObject structureObject = objectAt(structureObjectLayer, col, row);
                 if (structureObject instanceof CStructure structure && isDrawableObject(structure, true)) {
@@ -3756,6 +3840,12 @@ public final class MapVisualObject extends CVisualObject {
                     unit.draw(col, row, tileBrightnessAt(col, row));
                 }
 
+                boolean terrainCell = isMapTerrainCell(col, row);
+                if (!terrainCell) {
+                    continue;
+                }
+
+                int occupancyMask = combinedTileOccupancyMask(col, row);
                 if (isObjectLayerCell(col, row)) {
                     drawAnimatedWaterTransientEffect(col, row, averageHeight);
                 }
@@ -3784,7 +3874,11 @@ public final class MapVisualObject extends CVisualObject {
     private void drawTerrainLightOverridePass(boolean firstPass) {
         for (int row = -4; row < gridHeight + 8; row++) {
             for (int col = gridWidth + 3; col > -5; col--) {
-                if (row < 0 || row >= gridHeight + 4 || col < 0 || col >= gridWidth) {
+                if (row < 0
+                        || row >= gridHeight + 4
+                        || col < 0
+                        || col >= gridWidth
+                        || !isMapTerrainCell(col, row)) {
                     continue;
                 }
                 drawTerrainLightOverrideAt(col, row, combinedTileOccupancyMask(col, row), firstPass);
@@ -4535,6 +4629,15 @@ public final class MapVisualObject extends CVisualObject {
      */
     private boolean isObjectLayerCell(int col, int row) {
         return -4 < col && -4 < row && col < gridWidth + 3 && row < gridHeight + 7;
+    }
+
+    /**
+     * not ported. Java-only render guard for tiny maps whose visible/halo render scans can extend past map terrain data.
+     */
+    private boolean isMapTerrainCell(int col, int row) {
+        int worldX = view.x + col;
+        int worldY = view.y + row;
+        return 0 <= worldX && worldX < cachedMapWidth && 0 <= worldY && worldY < cachedMapHeight;
     }
 
     /**
@@ -5686,11 +5789,14 @@ public final class MapVisualObject extends CVisualObject {
             if (object == null) {
                 break;
             }
-            if (isIgnoredIndestructibleStructureHit(object)) {
+            if (isIgnoredIndestructibleStructureHit(objectToken, object)) {
                 continue;
             }
 
             int targetFlags = classifyHoveredTarget(object);
+            if (isDedicatedMapTransferStructureTarget(objectToken, object)) {
+                targetFlags |= MAP_TARGET_USABLE_STRUCTURE | MAP_TARGET_STRUCTURE;
+            }
             if (currentPlayer.isEnemy(object.cPlayer.playerId)) {
                 targetFlags |= MAP_TARGET_ENEMY;
             }
@@ -5705,7 +5811,10 @@ public final class MapVisualObject extends CVisualObject {
     /**
      * Native support extracted from MapVisualObject::RefreshMouseTargetFlags @004180C6 indestructible-structure skip.
      */
-    private static boolean isIgnoredIndestructibleStructureHit(CGameObject object) {
+    private boolean isIgnoredIndestructibleStructureHit(short objectToken, CGameObject object) {
+        if (dedicatedMapTransferBuildingTokens.contains(objectToken)) {
+            return false;
+        }
         if (object.getClass() != CStructure.class) {
             return false;
         }
@@ -5714,6 +5823,27 @@ public final class MapVisualObject extends CVisualObject {
                 "Missing StructureDef for id " + object.type
         );
         return def.usable == 0 && def.indestructible != 0;
+    }
+
+    /**
+     * Java support predicate for server-advertised transfer-backed structure tokens.
+     * not ported.
+     */
+    private boolean isDedicatedMapTransferStructureTarget(short objectToken, CGameObject object) {
+        return dedicatedMapTransferBuildingTokens.contains(objectToken) && object instanceof CStructure;
+    }
+
+    /**
+     * Java support registration for dedicated map-transfer building interaction tokens from the server.
+     * not ported.
+     */
+    public void markDedicatedMapTransferBuilding(int tokenId, boolean enabled) {
+        short token = (short) tokenId;
+        if (enabled) {
+            dedicatedMapTransferBuildingTokens.add(token);
+        } else {
+            dedicatedMapTransferBuildingTokens.remove(token);
+        }
     }
 
     /**
@@ -7504,6 +7634,7 @@ public final class MapVisualObject extends CVisualObject {
      */
     public void loadScenarioMap(String scenarioName) {
         mapDescriptor = null;
+        dedicatedMapTransferBuildingTokens.clear();
         cachedMapWidth = 0;
         cachedMapHeight = 0;
 

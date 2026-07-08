@@ -253,7 +253,7 @@ public class CStructure extends CGameObject {
         bIsBlocked = 2;
         boolean foundFullyOccupied = false;
         for (int x = 0; x < getTileWidth(); x++) {
-            for (int y = getTileHeight() - def.fullHeight; y < getTileHeight(); y++) {
+            for (int y = 0; y < getTileHeight(); y++) {
                 int structureTileX = tileX + x;
                 int structureTileY = tileY + y;
                 int tileIndex = pMapVisualObject.mapDescriptor.tileIndex(structureTileX, structureTileY);

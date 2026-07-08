@@ -5046,6 +5046,19 @@ public final class MissionScriptRuntime extends MissionRuntimeBase implements Mf
     }
 
     /**
+     * Java support for dedicated map-transfer building interactions.
+     * not ported.
+     */
+    public void initializeDedicatedMapTransferBuildingOrderUnit(Unit unit, Building building, int sourceCell) {
+        unit.resetScenarioMissionUnitScriptState(this);
+        unit.missionActionCode = INTERACT;
+        unit.missionRuntimeState.interactionTarget = building;
+        unit.missionRuntimeState.attackRange = 1;
+        unit.missionRuntimeState.command = UNIT_MISSION_COMMAND_NONE;
+        unit.missionRuntimeState.commandCell = sourceCell & 0xFFFF;
+    }
+
+    /**
      * Native: MissionScriptRuntime::initializePickupAllSacksOrderUnit @0056DAFE.
      * Fully ported.
      */
