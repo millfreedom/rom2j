@@ -316,7 +316,7 @@ public class SaveDialogVisualObject extends CenteredDialogVisualObject {
             while (zeroTerminatedLength < titleLength && rawTitle[zeroTerminatedLength] != 0) {
                 zeroTerminatedLength += 1;
             }
-            return SavedGameFiles.SAVE_FILE_CHARSET.decode(ByteBuffer.wrap(rawTitle, 0, zeroTerminatedLength)).toString();
+            return Globals.WINDOWS_CYRILLIC_CHARSET.decode(ByteBuffer.wrap(rawTitle, 0, zeroTerminatedLength)).toString();
         } catch (IOException ignored) {
             return null;
         }

@@ -3,7 +3,6 @@ package ua.millfreedom.rom2.model;
 import ua.millfreedom.rom2.Utils;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,9 +22,6 @@ public final class SavedGameFiles {
     private static final String RESERVED_AUTOSAVE_FILE_NAME = "game9998.sav";
     // Java support, not a native field.
     private static final String RESERVED_QUICKSAVE_FILE_NAME = "game9999.sav";
-    // Native support extracted from save-title reads in @0043DF48/@0043ECE0 and SaveFile::title write at @0048DDA1.
-    public static final Charset SAVE_FILE_CHARSET = Charset.forName("Cp1251");
-
     static {
         try {
             Files.createDirectories(SAVE_DIRECTORY);

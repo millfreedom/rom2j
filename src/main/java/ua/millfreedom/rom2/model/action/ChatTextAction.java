@@ -12,8 +12,6 @@ import ua.millfreedom.rom2.model.palette.Palettes;
 import ua.millfreedom.rom2.model.visobj.MapVisualObject;
 import ua.millfreedom.rom2.model.window.DialogsMaskFlag;
 
-import java.nio.charset.StandardCharsets;
-
 /**
  * Native chat/text packet used by command and speech message IDs (for example 0x06, 0x0F, 0x91, 0xAE).
  */
@@ -125,7 +123,7 @@ public class ChatTextAction extends CGameAction {
      */
     @Override
     public boolean WritePayload(CBufferManager target) {
-        textLength.set(text.get().getBytes(StandardCharsets.ISO_8859_1).length);
+        textLength.set(text.get().getBytes(Globals.WINDOWS_CYRILLIC_CHARSET).length);
         return target.Write(this, ID_OFFSET, textLength.get() + 7);
     }
 

@@ -1,5 +1,6 @@
 package ua.millfreedom.rom2.model.action;
 
+import ua.millfreedom.rom2.Globals;
 import ua.millfreedom.rom2.model.net.CBufferManager;
 import ua.millfreedom.rom2.model.Player;
 import ua.millfreedom.rom2.model.enums.GameActionId;
@@ -7,7 +8,6 @@ import ua.millfreedom.rom2.model.visobj.MapVisualObject;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
 import java.util.function.IntSupplier;
 
 /**
@@ -331,7 +331,7 @@ public class CGameAction implements Packet, GameActionHandler {
                 ByteBuffer duplicate = buffer.duplicate();
                 duplicate.position(startPosition);
                 duplicate.get(encoded, 0, textBytes);
-                return new String(encoded, StandardCharsets.ISO_8859_1);
+                return new String(encoded, Globals.WINDOWS_CYRILLIC_CHARSET);
             }
 
             /**
@@ -339,7 +339,7 @@ public class CGameAction implements Packet, GameActionHandler {
              */
             @Override
             public void put(ByteBuffer buffer, int startPosition, int size, String value) {
-                byte[] encoded = (value == null ? "" : value).getBytes(StandardCharsets.ISO_8859_1);
+                byte[] encoded = (value == null ? "" : value).getBytes(Globals.WINDOWS_CYRILLIC_CHARSET);
                 byteLengthProperty.set(encoded.length);
                 ByteBuffer duplicate = buffer.duplicate();
                 duplicate.position(startPosition);

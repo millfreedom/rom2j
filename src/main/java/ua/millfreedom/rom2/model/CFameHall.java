@@ -10,7 +10,6 @@ import ua.millfreedom.rom2.text.MainText;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +19,6 @@ import java.util.List;
  * Purpose: fame-hall score table plus the paired document/image entries shown by the fame-hall dialogs.
  */
 public class CFameHall {
-    private static final Charset FAME_HALL_CHARSET = Charset.forName("Cp1251");
-
     //0x00
     public int selectedDifficulty;
     //0x04
@@ -248,14 +245,14 @@ public class CFameHall {
         while (length < bytes.length && bytes[length] != 0) {
             length++;
         }
-        return new String(bytes, 0, length, FAME_HALL_CHARSET);
+        return new String(bytes, 0, length, Globals.WINDOWS_CYRILLIC_CHARSET);
     }
 
     /**
      * Native support extracted from CString::GetLength plus null-terminated CFile::Write in CFameHall::Save @004A90C9.
      */
     private static byte[] encodeNativeString(String value) {
-        byte[] bytes = value.getBytes(FAME_HALL_CHARSET);
+        byte[] bytes = value.getBytes(Globals.WINDOWS_CYRILLIC_CHARSET);
         return Arrays.copyOf(bytes, bytes.length + 1);
     }
 

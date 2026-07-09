@@ -17,10 +17,14 @@ import ua.millfreedom.rom2.model.window.CMainWindow;
 import ua.millfreedom.rom2.model.world.CWorldMap;
 import ua.millfreedom.rom2.model.world.ScenarioLib;
 
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.function.BooleanSupplier;
 
 public class Globals {
+    // not ported. Windows Cyrillic ANSI charset used by native text resources and packet byte strings.
+    public static final Charset WINDOWS_CYRILLIC_CHARSET = Charset.forName("windows-1251");
+
     public static boolean useCustomEncoding = false;
 
     public static final String HOME_DIR = System.getProperty("user.home");

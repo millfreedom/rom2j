@@ -5,7 +5,6 @@ import ua.millfreedom.rom2.CArchive.MfcSerializable;
 import ua.millfreedom.rom2.res.Resources;
 import ua.millfreedom.rom2.text.TextTableId;
 
-import java.nio.charset.Charset;
 import java.util.*;
 
 import static ua.millfreedom.rom2.Utils.readAllLines;
@@ -98,7 +97,7 @@ public class CTextFile implements MfcSerializable {
      */
     private void loadAndParse(String fileName) {
         Objects.requireNonNull(fileName, "fileName");
-        List<String> allLines = readAllLines(Resources.open(fileName), Charset.forName("Cp1251"));
+        List<String> allLines = readAllLines(Resources.open(fileName), Globals.WINDOWS_CYRILLIC_CHARSET);
         lines.clear();
         lines.addAll(allLines);
         all.put(name, new ArrayList<>(lines));
@@ -111,7 +110,7 @@ public class CTextFile implements MfcSerializable {
      * directly to Unicode for renderer/dialog consumers.
      */
     public static String loadTextFileToOemString(String fileName) {
-        return readText(Resources.open(fileName), Charset.forName("Cp1251"));
+        return readText(Resources.open(fileName), Globals.WINDOWS_CYRILLIC_CHARSET);
     }
 
     /**

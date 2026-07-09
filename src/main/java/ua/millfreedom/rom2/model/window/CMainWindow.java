@@ -3044,7 +3044,7 @@ public class CMainWindow extends CFrameWnd {
      */
     private void appendCurrentMissionSaveTitleBlock() {
         byte[] titleBlock = new byte[SAVE_FILE_TITLE_BLOCK_SIZE];
-        byte[] titleBytes = mSaveFile.title.getBytes(SavedGameFiles.SAVE_FILE_CHARSET);
+        byte[] titleBytes = mSaveFile.title.getBytes(Globals.WINDOWS_CYRILLIC_CHARSET);
         System.arraycopy(titleBytes, 0, titleBlock, 0, Math.min(titleBytes.length, titleBlock.length - 1));
         try {
             Files.write(SavedGameFiles.resolvePath(mSaveFile.filename), titleBlock, StandardOpenOption.APPEND);
