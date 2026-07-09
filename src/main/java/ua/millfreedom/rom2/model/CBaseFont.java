@@ -111,6 +111,9 @@ public class CBaseFont implements MfcSerializable {
     public void drawTextInternal(int x, int y, String text, int alignFlags, Palette16 palette) {
     }
 
+    /**
+     * Java support method, not ported
+     */
     protected static byte @NotNull [] getNativeTextBytes(String text) {
         return text.getBytes(NATIVE_FONT_CHARSET);
     }
