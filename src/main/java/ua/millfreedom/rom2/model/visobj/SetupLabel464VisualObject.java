@@ -160,27 +160,27 @@ public class SetupLabel464VisualObject extends CVisualObject {
 
     /**
      * vtbl +0x74: SetupLabel464VisualObject::OnChar @004323CF.
-     * Fully ported.
+     * Fully ported at the Java WM_CHAR boundary; GLFW supplies Unicode code points where native MFC supplied ANSI chars.
      */
     @Override
     public int onChar(int nChar) {
         if (text.length() < MAX_TEXT_LENGTH) {
-            appendNormalizedChar(normalizeHotKeyInput(nChar & 0xFF));
+            appendInputCodepoint(nChar);
             return 1;
         }
         return 0;
     }
 
     /**
-     * Native: SetupLabel464VisualObject::AppendNormalizedChar @004321E9.
-     * Fully ported.
+     * Native support extracted from SetupLabel464VisualObject::AppendNormalizedChar @004321E9.
+     * Java receives WM_CHAR from GLFW as a Unicode code point, not an ANSI byte.
      */
-    private void appendNormalizedChar(int normalizedChar) {
+    private void appendInputCodepoint(int codepoint) {
         caretVisibleFlag = 1;
         blinkTimestamp = (int) System.currentTimeMillis();
-        if (normalizedChar > 0x1F) {
+        if (codepoint > 0x1F) {
             ownerDialog.playSetupLabel464InputSound();
-            text += (char) normalizedChar;
+            text += Character.toString(codepoint);
         }
     }
 
@@ -210,21 +210,6 @@ public class SetupLabel464VisualObject extends CVisualObject {
         return text;
     }
 
-    /**
-     * Native helper: NormalizeHotKeyInput @00474C85.
-     */
-    private static int normalizeHotKeyInput(int c) {
-        int value = c & 0xFF;
-        if (Globals.useCustomEncoding && value > 0x7F) {
-            if (value >= 0xC0 && value <= 0xEF) {
-                return value - 0x40;
-            }
-            if (value > 0xEF) {
-                return value - 0x10;
-            }
-        }
-        return value;
-    }
 
     /**
      * Native owner: `gFont4` draw path inside SetupLabel464VisualObject::Update @0043240A.

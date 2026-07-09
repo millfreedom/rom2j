@@ -234,10 +234,11 @@ public class CBitmapFont extends CBaseFont {
             y -= graphics.xSizeOf(0) / 2;
         }
 
-        for (int index = 0; index < text.length(); index++) {
-            int currentFrameIndex = getDrawGlyphFrameIndex((byte) text.charAt(index));
-            int nextFrameIndex = getDrawGlyphFrameIndex(index + 1 < text.length()
-                    ? (byte) text.charAt(index + 1)
+        byte[] nativeText = getNativeTextBytes(text);
+        for (int index = 0; index < nativeText.length; index++) {
+            int currentFrameIndex = getDrawGlyphFrameIndex(nativeText[index]);
+            int nextFrameIndex = getDrawGlyphFrameIndex(index + 1 < nativeText.length
+                    ? nativeText[index + 1]
                     : (byte) 0);
 
             if (currentFrameIndex == 0x5E && nextFrameIndex != 0x5E) {

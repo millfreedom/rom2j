@@ -9,6 +9,7 @@ import ua.millfreedom.rom2.model.palette.Palette16;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static ua.millfreedom.rom2.model.visobj.VirtualKeyCodes.VK_BACK;
 import static ua.millfreedom.rom2.model.visobj.VirtualKeyCodes.VK_ESCAPE;
@@ -242,24 +243,24 @@ public class SoundConfigRootVisualObject extends CVisualObject {
 
     /**
      * vtbl +0x74: SoundConfigRootVisualObject::OnChar @0043A8EB.
-     * Fully ported.
+     * Fully ported at the Java WM_CHAR boundary; GLFW supplies Unicode code points where native MFC supplied ANSI chars.
      */
     @Override
     public int onChar(int nChar) {
         if (nChar < 0x20 || nChar == 0x7F) {
             return super.onChar(nChar);
         }
-        appendWrappedCharacter(normalizeHotKeyInput(nChar & 0xFF));
+        appendWrappedCodepoint(nChar);
         return 1;
     }
 
     /**
-     * Native: SoundConfigRootVisualObject::appendWrappedCharacter @0043A4CB.
-     * Fully ported.
+     * Native support extracted from SoundConfigRootVisualObject::appendWrappedCharacter @0043A4CB.
+     * Java receives WM_CHAR from GLFW as a Unicode code point, not an ANSI byte.
      */
-    private int appendWrappedCharacter(int normalizedChar) {
+    private int appendWrappedCodepoint(int codepoint) {
         if (bitmapFont.getTextWidth(inputText) + bitmapFont.getTextWidth(CURSOR_SUFFIX) < cRect.width()) {
-            inputText += (char) normalizedChar;
+            inputText += Character.toString(codepoint);
             Globals.mainWindow.pMapVisualObject.areaEffectRefreshPending = 1;
             return 1;
         }
@@ -277,7 +278,7 @@ public class SoundConfigRootVisualObject extends CVisualObject {
             inputText = inputText.substring(lastSpace + 1);
         }
         inputText = inputText.stripLeading();
-        appendWrappedCharacter(normalizedChar);
+        appendWrappedCodepoint(codepoint);
         return 0;
     }
 
@@ -404,22 +405,6 @@ public class SoundConfigRootVisualObject extends CVisualObject {
         bitmapFont.drawTextInternal(x, y, text, 0, palette);
     }
 
-    /**
-     * Native support extracted from Global::normalizeHotKeyInput @00474C85.
-     * Fully ported.
-     */
-    private static int normalizeHotKeyInput(int c) {
-        int value = c & 0xFF;
-        if (Globals.useCustomEncoding && value > 0x7F) {
-            if (value >= 0xC0 && value <= 0xEF) {
-                return value - 0x40;
-            }
-            if (value > 0xEF) {
-                return value - 0x10;
-            }
-        }
-        return value;
-    }
 
     /**
      * Native support extracted from Global::isAutocompleteDelimiter @0043A190.
@@ -431,25 +416,9 @@ public class SoundConfigRootVisualObject extends CVisualObject {
 
     /**
      * Native support extracted from Global::normalizeAutocompleteText @00474B12.
-     * Fully ported.
+     * Java keeps input text as Unicode, so autocomplete compares Unicode lowercase strings.
      */
     private static String normalizeAutocompleteText(String text) {
-        StringBuilder normalized = new StringBuilder(text.length());
-        for (int i = 0; i < text.length(); i++) {
-            int value = text.charAt(i) & 0xFF;
-            if (Globals.useCustomEncoding) {
-                if (value >= 0x80 && value <= 0x8F) {
-                    value += 0x20;
-                } else if (value >= 0x90 && value <= 0x9F) {
-                    value += 0x50;
-                } else if (value < 0x80) {
-                    value = Character.toLowerCase((char) value) & 0xFF;
-                }
-            } else {
-                value = Character.toLowerCase((char) value) & 0xFF;
-            }
-            normalized.append((char) value);
-        }
-        return normalized.toString();
+        return text.toLowerCase(Locale.ROOT);
     }
 }

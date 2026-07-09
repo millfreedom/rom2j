@@ -67,8 +67,9 @@ public class CA16Font extends CBaseFont {
         }
 
         Object paletteOverride = Palettes.a16FontPaletteOverride(palette);
-        for (int index = 0; index < text.length(); index++) {
-            int currentFrameIndex = getGlyphFrameIndex((byte) text.charAt(index));
+        byte[] nativeText = getNativeTextBytes(text);
+        for (int index = 0; index < nativeText.length; index++) {
+            int currentFrameIndex = getGlyphFrameIndex(nativeText[index]);
             if (currentFrameIndex == 0) {
                 x += getFrameHeight() >> 1;
             } else {

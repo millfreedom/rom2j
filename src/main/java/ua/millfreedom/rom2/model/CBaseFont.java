@@ -1,6 +1,7 @@
 package ua.millfreedom.rom2.model;
 
 import lombok.SneakyThrows;
+import org.jetbrains.annotations.NotNull;
 import ua.millfreedom.rom2.CArchive.CArchive;
 import ua.millfreedom.rom2.CArchive.MfcSerializable;
 import ua.millfreedom.rom2.Globals;
@@ -8,6 +9,7 @@ import ua.millfreedom.rom2.model.enums.TextAlign;
 import ua.millfreedom.rom2.model.palette.Palette16;
 
 import java.nio.IntBuffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -15,6 +17,8 @@ import java.util.Objects;
 import static ua.millfreedom.rom2.Globals.gameFileManager;
 
 public class CBaseFont implements MfcSerializable {
+    // Java support, not a native field.
+    protected static final Charset NATIVE_FONT_CHARSET = Charset.forName("Cp866");
     //0x04
     public final CGameBitmap graphics;
     //0x08
@@ -51,6 +55,7 @@ public class CBaseFont implements MfcSerializable {
 
     }
 
+
     /**
      * Native: CBaseFont::GetGlyphIndex @0045CAE1.
      * Full port.
@@ -75,14 +80,15 @@ public class CBaseFont implements MfcSerializable {
      */
     public int getTextWidth(String text) {
         int width = 0;
-        for (int index = 0; index < text.length(); index++) {
-            int rawChar = text.charAt(index) & 0xFF;
+        byte[] nativeText = getNativeTextBytes(text);
+        for (int index = 0; index < nativeText.length; index++) {
+            int rawChar = nativeText[index] & 0xFF;
             if (rawChar <= 0x1F) {
                 continue;
             }
 
             if (rawChar == '~') {
-                boolean hasEscapedTilde = index + 1 < text.length() && text.charAt(index + 1) == '~';
+                boolean hasEscapedTilde = index + 1 < nativeText.length && nativeText[index + 1] == '~';
                 if (!hasEscapedTilde) {
                     continue;
                 }
@@ -103,6 +109,10 @@ public class CBaseFont implements MfcSerializable {
      * Full port. Native base implementation is a no-op.
      */
     public void drawTextInternal(int x, int y, String text, int alignFlags, Palette16 palette) {
+    }
+
+    protected static byte @NotNull [] getNativeTextBytes(String text) {
+        return text.getBytes(NATIVE_FONT_CHARSET);
     }
 
     /**
