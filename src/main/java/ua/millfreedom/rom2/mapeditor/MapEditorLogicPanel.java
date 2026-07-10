@@ -5,6 +5,7 @@ import ua.millfreedom.rom2.model.world.scenario.Trigger;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -42,7 +43,7 @@ public final class MapEditorLogicPanel extends JPanel {
     private final JTextField instantNameField = new JTextField();
     private final JSpinner instantTypeSpinner = integerSpinner(0);
     private final JSpinner instantIndexSpinner = integerSpinner(1);
-    private final JSpinner instantExecuteOnceSpinner = integerSpinner(0);
+    private final JCheckBox instantExecuteOnceCheckBox = new JCheckBox();
     private final JSpinner[] instantArgumentValueSpinners = integerSpinners(SCRIPT_ARGUMENT_COUNT);
     private final JSpinner[] instantArgumentTypeSpinners = integerSpinners(SCRIPT_ARGUMENT_COUNT);
     private final JTextField[] instantArgumentNameFields = textFields(SCRIPT_ARGUMENT_COUNT);
@@ -58,7 +59,7 @@ public final class MapEditorLogicPanel extends JPanel {
     private final JTextField checkNameField = new JTextField();
     private final JSpinner checkTypeSpinner = integerSpinner(0);
     private final JSpinner checkIndexSpinner = integerSpinner(1);
-    private final JSpinner checkExecuteOnceSpinner = integerSpinner(1);
+    private final JCheckBox checkExecuteOnceCheckBox = new JCheckBox("", true);
     private final JSpinner[] checkArgumentValueSpinners = integerSpinners(SCRIPT_ARGUMENT_COUNT);
     private final JSpinner[] checkArgumentTypeSpinners = integerSpinners(SCRIPT_ARGUMENT_COUNT);
     private final JTextField[] checkArgumentNameFields = textFields(SCRIPT_ARGUMENT_COUNT);
@@ -74,7 +75,7 @@ public final class MapEditorLogicPanel extends JPanel {
     private final JSpinner check12OperatorSpinner = integerSpinner(0);
     private final JSpinner check34OperatorSpinner = integerSpinner(0);
     private final JSpinner check56OperatorSpinner = integerSpinner(0);
-    private final JSpinner triggerRunOnceSpinner = integerSpinner(0);
+    private final JCheckBox triggerRunOnceCheckBox = new JCheckBox();
     private final JButton addTriggerButton = button("Add Trigger", this::addTrigger);
     private final JButton deleteTriggerButton = button("Delete Trigger", this::deleteTrigger);
     private final JButton applyTriggerButton = button("Apply Trigger", this::applyTrigger);
@@ -209,7 +210,7 @@ public final class MapEditorLogicPanel extends JPanel {
                 instantNameField,
                 instantTypeSpinner,
                 instantIndexSpinner,
-                instantExecuteOnceSpinner,
+                instantExecuteOnceCheckBox,
                 instantArgumentValueSpinners,
                 instantArgumentTypeSpinners,
                 instantArgumentNameFields,
@@ -251,7 +252,7 @@ public final class MapEditorLogicPanel extends JPanel {
                 checkNameField,
                 checkTypeSpinner,
                 checkIndexSpinner,
-                checkExecuteOnceSpinner,
+                checkExecuteOnceCheckBox,
                 checkArgumentValueSpinners,
                 checkArgumentTypeSpinners,
                 checkArgumentNameFields,
@@ -282,7 +283,7 @@ public final class MapEditorLogicPanel extends JPanel {
             JTextField nameField,
             JSpinner typeSpinner,
             JSpinner indexSpinner,
-            JSpinner executeOnceSpinner,
+            JCheckBox executeOnceCheckBox,
             JSpinner[] argumentValueSpinners,
             JSpinner[] argumentTypeSpinners,
             JTextField[] argumentNameFields,
@@ -295,7 +296,7 @@ public final class MapEditorLogicPanel extends JPanel {
         addField(metadata, 0, 0, "Name", nameField);
         addField(metadata, 1, 0, "Type", typeSpinner);
         addField(metadata, 2, 0, "Index", indexSpinner);
-        addField(metadata, 3, 0, "Once", executeOnceSpinner);
+        addField(metadata, 3, 0, "Execute Once", executeOnceCheckBox);
         panel.add(MapEditorCollapsiblePanel.collapsed(title, metadata), BorderLayout.NORTH);
         panel.add(createArgumentPanel(argumentValueSpinners, argumentTypeSpinners, argumentNameFields), BorderLayout.CENTER);
         panel.add(createButtonPanel(addButton, deleteButton, applyButton), BorderLayout.SOUTH);
@@ -383,7 +384,7 @@ public final class MapEditorLogicPanel extends JPanel {
         addField(metadata, 1, 0, "Op 1/2", check12OperatorSpinner);
         addField(metadata, 2, 0, "Op 3/4", check34OperatorSpinner);
         addField(metadata, 3, 0, "Op 5/6", check56OperatorSpinner);
-        addField(metadata, 4, 0, "Once", triggerRunOnceSpinner);
+        addField(metadata, 4, 0, "Run Once", triggerRunOnceCheckBox);
         panel.add(MapEditorCollapsiblePanel.collapsed("Trigger", metadata), BorderLayout.NORTH);
         panel.add(createTriggerReferencesPanel(), BorderLayout.CENTER);
         panel.add(createButtonPanel(addTriggerButton, deleteTriggerButton, applyTriggerButton), BorderLayout.SOUTH);
@@ -591,7 +592,7 @@ public final class MapEditorLogicPanel extends JPanel {
                 instantNameField,
                 instantTypeSpinner,
                 instantIndexSpinner,
-                instantExecuteOnceSpinner,
+                instantExecuteOnceCheckBox,
                 instantArgumentValueSpinners,
                 instantArgumentTypeSpinners,
                 instantArgumentNameFields
@@ -619,7 +620,7 @@ public final class MapEditorLogicPanel extends JPanel {
                 checkNameField,
                 checkTypeSpinner,
                 checkIndexSpinner,
-                checkExecuteOnceSpinner,
+                checkExecuteOnceCheckBox,
                 checkArgumentValueSpinners,
                 checkArgumentTypeSpinners,
                 checkArgumentNameFields
@@ -648,7 +649,7 @@ public final class MapEditorLogicPanel extends JPanel {
         check12OperatorSpinner.setValue(trigger.check12Operator);
         check34OperatorSpinner.setValue(trigger.check34Operator);
         check56OperatorSpinner.setValue(trigger.check56Operator);
-        triggerRunOnceSpinner.setValue(trigger.runOnce);
+        triggerRunOnceCheckBox.setSelected(trigger.runOnce);
         updateControlsEnabled();
     }
 
@@ -661,7 +662,7 @@ public final class MapEditorLogicPanel extends JPanel {
             JTextField nameField,
             JSpinner typeSpinner,
             JSpinner indexSpinner,
-            JSpinner executeOnceSpinner,
+            JCheckBox executeOnceCheckBox,
             JSpinner[] argumentValueSpinners,
             JSpinner[] argumentTypeSpinners,
             JTextField[] argumentNameFields
@@ -669,7 +670,7 @@ public final class MapEditorLogicPanel extends JPanel {
         nameField.setText(instant.name.toString());
         typeSpinner.setValue(instant.typeId);
         indexSpinner.setValue(instant.index);
-        executeOnceSpinner.setValue(instant.executeOnce);
+        executeOnceCheckBox.setSelected(instant.executeOnce);
         for (int i = 0; i < instant.arguments.length; i++) {
             argumentValueSpinners[i].setValue(instant.arguments[i].value);
             argumentTypeSpinners[i].setValue(instant.arguments[i].type);
@@ -686,11 +687,11 @@ public final class MapEditorLogicPanel extends JPanel {
                 instantNameField,
                 instantTypeSpinner,
                 instantIndexSpinner,
-                instantExecuteOnceSpinner,
+                instantExecuteOnceCheckBox,
                 instantArgumentValueSpinners,
                 instantArgumentTypeSpinners,
                 instantArgumentNameFields,
-                0
+                false
         );
     }
 
@@ -703,11 +704,11 @@ public final class MapEditorLogicPanel extends JPanel {
                 checkNameField,
                 checkTypeSpinner,
                 checkIndexSpinner,
-                checkExecuteOnceSpinner,
+                checkExecuteOnceCheckBox,
                 checkArgumentValueSpinners,
                 checkArgumentTypeSpinners,
                 checkArgumentNameFields,
-                1
+                true
         );
     }
 
@@ -719,16 +720,16 @@ public final class MapEditorLogicPanel extends JPanel {
             JTextField nameField,
             JSpinner typeSpinner,
             JSpinner indexSpinner,
-            JSpinner executeOnceSpinner,
+            JCheckBox executeOnceCheckBox,
             JSpinner[] argumentValueSpinners,
             JSpinner[] argumentTypeSpinners,
             JTextField[] argumentNameFields,
-            int executeOnce
+            boolean executeOnce
     ) {
         nameField.setText("");
         typeSpinner.setValue(0);
         indexSpinner.setValue(1);
-        executeOnceSpinner.setValue(executeOnce);
+        executeOnceCheckBox.setSelected(executeOnce);
         setSpinnerArrayValues(argumentValueSpinners, new int[SCRIPT_ARGUMENT_COUNT]);
         setSpinnerArrayValues(argumentTypeSpinners, new int[SCRIPT_ARGUMENT_COUNT]);
         setTextFieldArrayValues(argumentNameFields, new String[SCRIPT_ARGUMENT_COUNT]);
@@ -745,7 +746,7 @@ public final class MapEditorLogicPanel extends JPanel {
         check12OperatorSpinner.setValue(0);
         check34OperatorSpinner.setValue(0);
         check56OperatorSpinner.setValue(0);
-        triggerRunOnceSpinner.setValue(0);
+        triggerRunOnceCheckBox.setSelected(false);
     }
 
     /**
@@ -760,7 +761,7 @@ public final class MapEditorLogicPanel extends JPanel {
             document.addInstant(
                     instantNameField.getText(),
                     spinnerInt(instantTypeSpinner),
-                    spinnerInt(instantExecuteOnceSpinner),
+                    instantExecuteOnceCheckBox.isSelected(),
                     spinnerArrayValues(instantArgumentValueSpinners),
                     spinnerArrayValues(instantArgumentTypeSpinners),
                     textFieldArrayValues(instantArgumentNameFields)
@@ -824,7 +825,7 @@ public final class MapEditorLogicPanel extends JPanel {
                     instantNameField.getText(),
                     spinnerInt(instantTypeSpinner),
                     spinnerInt(instantIndexSpinner),
-                    spinnerInt(instantExecuteOnceSpinner),
+                    instantExecuteOnceCheckBox.isSelected(),
                     spinnerArrayValues(instantArgumentValueSpinners),
                     spinnerArrayValues(instantArgumentTypeSpinners),
                     textFieldArrayValues(instantArgumentNameFields)
@@ -849,7 +850,7 @@ public final class MapEditorLogicPanel extends JPanel {
             document.addCheck(
                     checkNameField.getText(),
                     spinnerInt(checkTypeSpinner),
-                    spinnerInt(checkExecuteOnceSpinner),
+                    checkExecuteOnceCheckBox.isSelected(),
                     spinnerArrayValues(checkArgumentValueSpinners),
                     spinnerArrayValues(checkArgumentTypeSpinners),
                     textFieldArrayValues(checkArgumentNameFields)
@@ -895,7 +896,7 @@ public final class MapEditorLogicPanel extends JPanel {
                     checkNameField.getText(),
                     spinnerInt(checkTypeSpinner),
                     spinnerInt(checkIndexSpinner),
-                    spinnerInt(checkExecuteOnceSpinner),
+                    checkExecuteOnceCheckBox.isSelected(),
                     spinnerArrayValues(checkArgumentValueSpinners),
                     spinnerArrayValues(checkArgumentTypeSpinners),
                     textFieldArrayValues(checkArgumentNameFields)
@@ -924,7 +925,7 @@ public final class MapEditorLogicPanel extends JPanel {
                     spinnerInt(check12OperatorSpinner),
                     spinnerInt(check34OperatorSpinner),
                     spinnerInt(check56OperatorSpinner),
-                    spinnerInt(triggerRunOnceSpinner)
+                    triggerRunOnceCheckBox.isSelected()
             );
             refreshFromDocument();
             triggerList.setSelectedIndex(document.triggerCount() - 1);
@@ -970,7 +971,7 @@ public final class MapEditorLogicPanel extends JPanel {
                     spinnerInt(check12OperatorSpinner),
                     spinnerInt(check34OperatorSpinner),
                     spinnerInt(check56OperatorSpinner),
-                    spinnerInt(triggerRunOnceSpinner)
+                    triggerRunOnceCheckBox.isSelected()
             );
             refreshFromDocument();
             triggerList.setSelectedIndex(selectedIndex);
@@ -993,7 +994,7 @@ public final class MapEditorLogicPanel extends JPanel {
                 instantNameField,
                 instantTypeSpinner,
                 instantIndexSpinner,
-                instantExecuteOnceSpinner,
+                instantExecuteOnceCheckBox,
                 instantArgumentValueSpinners,
                 instantArgumentTypeSpinners,
                 instantArgumentNameFields,
@@ -1003,7 +1004,7 @@ public final class MapEditorLogicPanel extends JPanel {
                 checkNameField,
                 checkTypeSpinner,
                 checkIndexSpinner,
-                checkExecuteOnceSpinner,
+                checkExecuteOnceCheckBox,
                 checkArgumentValueSpinners,
                 checkArgumentTypeSpinners,
                 checkArgumentNameFields,
@@ -1032,7 +1033,7 @@ public final class MapEditorLogicPanel extends JPanel {
             JTextField nameField,
             JSpinner typeSpinner,
             JSpinner indexSpinner,
-            JSpinner executeOnceSpinner,
+            JCheckBox executeOnceCheckBox,
             JSpinner[] argumentValueSpinners,
             JSpinner[] argumentTypeSpinners,
             JTextField[] argumentNameFields,
@@ -1041,7 +1042,7 @@ public final class MapEditorLogicPanel extends JPanel {
         nameField.setEnabled(enabled);
         typeSpinner.setEnabled(enabled);
         indexSpinner.setEnabled(enabled);
-        executeOnceSpinner.setEnabled(enabled);
+        executeOnceCheckBox.setEnabled(enabled);
         setSpinnerArrayEnabled(argumentValueSpinners, enabled);
         setSpinnerArrayEnabled(argumentTypeSpinners, enabled);
         setTextFieldArrayEnabled(argumentNameFields, enabled);
@@ -1058,7 +1059,7 @@ public final class MapEditorLogicPanel extends JPanel {
         check12OperatorSpinner.setEnabled(enabled);
         check34OperatorSpinner.setEnabled(enabled);
         check56OperatorSpinner.setEnabled(enabled);
-        triggerRunOnceSpinner.setEnabled(enabled);
+        triggerRunOnceCheckBox.setEnabled(enabled);
     }
 
     /**
@@ -1146,7 +1147,7 @@ public final class MapEditorLogicPanel extends JPanel {
     private static String instantLabel(Instant instant) {
         return "#" + instant.index
                 + " type " + instant.typeId
-                + " once " + instant.executeOnce
+                + " execute once " + instant.executeOnce
                 + " " + instant.name;
     }
 
@@ -1157,7 +1158,8 @@ public final class MapEditorLogicPanel extends JPanel {
     private static String triggerLabel(Trigger trigger) {
         return trigger.description
                 + " checks " + Arrays.toString(trigger.checkIds)
-                + " instants " + Arrays.toString(trigger.instantIds);
+                + " instants " + Arrays.toString(trigger.instantIds)
+                + " run once " + trigger.runOnce;
     }
 
     /**

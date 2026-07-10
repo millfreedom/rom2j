@@ -1,17 +1,13 @@
 package ua.millfreedom.rom2.model.visobj;
 
-import ua.millfreedom.rom2.Globals;
 import ua.millfreedom.rom2.GUI;
-import ua.millfreedom.rom2.model.CBmp256;
-import ua.millfreedom.rom2.model.CBmp64k;
-import ua.millfreedom.rom2.model.CRect;
-import ua.millfreedom.rom2.model.CSize;
-import ua.millfreedom.rom2.model.GameBitmapFrame;
+import ua.millfreedom.rom2.Globals;
+import ua.millfreedom.rom2.model.*;
 import ua.millfreedom.rom2.model.sound.Sound;
 import ua.millfreedom.rom2.model.sound.SoundSystem;
 import ua.millfreedom.rom2.text.MainText;
 
-import java.awt.Point;
+import java.awt.*;
 
 import static ua.millfreedom.rom2.text.GameTexts.get;
 import static ua.millfreedom.rom2.text.MainText.BLADE_TOOLTIP_171;
@@ -28,8 +24,8 @@ public class SkillSelectionPanelVisualObject extends CVisualObject {
     private static final int OPTION_COUNT = 4;
     private static final int NATIVE_SLOT_COUNT = 5;
     private static final int PANEL_LEFT_WITHIN_DIALOG = 0xA0;
-    private static final long IDLE_HIGHLIGHT_START_DELAY_MS = 500;
-    private static final long IDLE_HIGHLIGHT_STEP_MS = 300;
+    private static final int IDLE_HIGHLIGHT_START_DELAY_MS = 500;
+    private static final int IDLE_HIGHLIGHT_STEP_MS = 500;
     private static final String CHRGEN_DIR = "graphics/interface/chrgen";
     private static final String FIGHTER_SKILL_DIR = CHRGEN_DIR + "/fighter";
     private static final String MAGE_SKILL_DIR = CHRGEN_DIR + "/mag";
@@ -136,10 +132,16 @@ public class SkillSelectionPanelVisualObject extends CVisualObject {
             0x98,
             0xbf
     };
+    // Native global: skillSelectionLastHoveredOptionIndex @005EECC4.
     private static int lastHoveredOptionIndex = -1;
+    // Native global: skillSelectionRotatingHighlightOptionIndex @0061ADE8.
     private static int rotatingHighlightOptionIndex;
-    private static long lastHoverChangeTimeMs;
-    private static long lastIdleHighlightStepTimeMs;
+    // Native global: skillSelectionHighlightTimerInitFlags @0061ADD4.
+    private static byte highlightTimerInitFlags;
+    // Native global: skillSelectionLastHoverChangeTime @0061ADC8.
+    private static int lastHoverChangeTimeMs;
+    // Native global: skillSelectionLastIdleHighlightStepTime @0061ADB0.
+    private static int lastIdleHighlightStepTimeMs;
 
     //0x5c
     public CharacterGeneratorDialogVisualObject ownerDialog;
@@ -540,11 +542,13 @@ public class SkillSelectionPanelVisualObject extends CVisualObject {
      * Fully ported.
      */
     private void drawRotatingIdleHighlight() {
-        long now = System.currentTimeMillis();
-        if (lastHoverChangeTimeMs == 0) {
+        int now = Globals.currentTickMillis();
+        if ((highlightTimerInitFlags & 0x1) == 0) {
+            highlightTimerInitFlags |= 0x1;
             lastHoverChangeTimeMs = now;
         }
-        if (lastIdleHighlightStepTimeMs == 0) {
+        if ((highlightTimerInitFlags & 0x2) == 0) {
+            highlightTimerInitFlags |= 0x2;
             lastIdleHighlightStepTimeMs = now;
         }
         int hoveredOptionIndex = getOptionIndexAtScreenPoint(
@@ -552,31 +556,43 @@ public class SkillSelectionPanelVisualObject extends CVisualObject {
                 Globals.mousePointer.getY()
         );
         if (ownerDialog.tipsRefreshStep != 0
-                || ownerDialog.tipsPrompt == null
-                || now - lastHoverChangeTimeMs <= IDLE_HIGHLIGHT_START_DELAY_MS) {
+                || ownerDialog.tipsPrompt == null) {
+            return;
+        }
+        if (Integer.compareUnsigned(
+                now - lastHoverChangeTimeMs,
+                IDLE_HIGHLIGHT_START_DELAY_MS
+        ) < 0) {
+            lastIdleHighlightStepTimeMs = now;
             return;
         }
 
         if (lastHoveredOptionIndex != -1) {
             rotatingHighlightOptionIndex = (lastHoveredOptionIndex + 1) % OPTION_COUNT;
         }
-        lastHoveredOptionIndex = hoveredOptionIndex;
-        lastHoverChangeTimeMs = now;
-        if (hoveredOptionIndex == -1) {
-            rotatingHighlightOptionIndex = Math.floorMod(rotatingHighlightOptionIndex, OPTION_COUNT);
-            CBmp64k graphic = optionStateFlags[rotatingHighlightOptionIndex] == 1
-                    ? rotatingHighlightOptionGraphics[rotatingHighlightOptionIndex]
-                    : hoveredOptionGraphics[rotatingHighlightOptionIndex];
-            drawOptionGraphic(
-                    graphic,
-                    optionDrawPoints[rotatingHighlightOptionIndex],
-                    optionDrawSizes[rotatingHighlightOptionIndex]
-            );
-            lastHoveredOptionIndex = -1;
-            if (now - lastIdleHighlightStepTimeMs > IDLE_HIGHLIGHT_STEP_MS) {
-                rotatingHighlightOptionIndex = (rotatingHighlightOptionIndex + 1) % OPTION_COUNT;
-                lastIdleHighlightStepTimeMs = now;
-            }
+        if (hoveredOptionIndex != -1) {
+            lastHoverChangeTimeMs = now;
+            lastIdleHighlightStepTimeMs = now;
+            lastHoveredOptionIndex = hoveredOptionIndex;
+            return;
+        }
+
+        rotatingHighlightOptionIndex = Math.floorMod(rotatingHighlightOptionIndex, OPTION_COUNT);
+        CBmp64k graphic = optionStateFlags[rotatingHighlightOptionIndex] == 1
+                ? rotatingHighlightOptionGraphics[rotatingHighlightOptionIndex]
+                : hoveredOptionGraphics[rotatingHighlightOptionIndex];
+        drawOptionGraphic(
+                graphic,
+                optionDrawPoints[rotatingHighlightOptionIndex],
+                optionDrawSizes[rotatingHighlightOptionIndex]
+        );
+        lastHoveredOptionIndex = -1;
+        if (Integer.compareUnsigned(
+                now - lastIdleHighlightStepTimeMs,
+                IDLE_HIGHLIGHT_STEP_MS
+        ) > 0) {
+            rotatingHighlightOptionIndex = (rotatingHighlightOptionIndex + 1) % OPTION_COUNT;
+            lastIdleHighlightStepTimeMs = now;
         }
     }
 

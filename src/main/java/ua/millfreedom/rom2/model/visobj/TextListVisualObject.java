@@ -199,7 +199,6 @@ public class TextListVisualObject extends CVisualObject {
         }
 
         int w = readMessageInt(wParam);
-        int l = readMessageInt(lParam);
 
         if (w != linkedChildId) {
             return 0;
@@ -207,7 +206,7 @@ public class TextListVisualObject extends CVisualObject {
 
         return switch (msg) {
             case TEXT_LIST_SET_SELECTED_ROW -> {
-                setSelectedRow(l);
+                setSelectedRow(readMessageInt(lParam));
                 yield 1;
             }
             case TEXT_LIST_SELECT_PREVIOUS_ROW -> {

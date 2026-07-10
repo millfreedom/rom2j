@@ -65,7 +65,7 @@ public class SackList implements MfcSerializable, Iterable<Sack> {
     ) {
         if (createOrMergeSackAtTarget(targetHandle, inventory, gold, ownerOnlyFlag)) {
             Sack sack = Globals.worldMap.findSackAtTargetHandle(targetHandle);
-            CServerApp.notifyBuildingStateChanged(sack);
+            CServerApp.notifyStateChanged(sack);
         }
     }
 
@@ -95,7 +95,7 @@ public class SackList implements MfcSerializable, Iterable<Sack> {
         double currentLogValue = Math.log10(sack.price);
         if ((double) previousLogBucket != currentLogValue) {
             if (Globals.gameServer.networkSessionActive == 0) {
-                CServerApp.notifyBuildingStateChanged(sack);
+                CServerApp.notifyStateChanged(sack);
             } else {
                 sack.visibilityRefreshMask = 0xFFFF;
             }
@@ -140,7 +140,7 @@ public class SackList implements MfcSerializable, Iterable<Sack> {
                         if (player != null
                                 && (sack.needsInitialSyncForPlayer(player)
                                 || (sack.visibilityRefreshMask & player.scanMask) != 0)) {
-                            CServerApp.notifyBuildingStateChanged(sack, player);
+                            CServerApp.notifyStateChanged(sack, player);
                         }
                     }
                 }

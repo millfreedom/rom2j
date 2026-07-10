@@ -15,8 +15,8 @@ public final class ScriptPattern implements MfcSerializable {
     public final CustomList<ScriptCondition> conditions = CustomList.std(ScriptCondition.class);
     //0x04
     public final CustomList<Integer> instantIds = CustomList.std(Integer.class);
-    //0x08
-    public int selfDestruct;
+    //0x08 Native Run Once/SelfDestruct BOOL.
+    public boolean selfDestruct;
     // Serialized reserved int copied/archived by native ScriptPattern methods; no recovered active use.
     //0x0C
     public int reserved0x0C;
@@ -68,14 +68,14 @@ public final class ScriptPattern implements MfcSerializable {
         if (ar.isStoring()) {
             ar.writeInt(Utils.encodePointerLike(conditions));
             ar.writeInt(Utils.encodePointerLike(instantIds));
-            ar.writeInt(selfDestruct);
+            ar.writeInt(selfDestruct ? 1 : 0);
             ar.writeInt(reserved0x0C);
             ar.writeInt(reserved0x10);
             ar.writeInt(digit);
         } else {
             ar.readInt();
             ar.readInt();
-            selfDestruct = ar.readInt();
+            selfDestruct = ar.readInt() != 0;
             reserved0x0C = ar.readInt();
             reserved0x10 = ar.readInt();
             digit = ar.readInt();

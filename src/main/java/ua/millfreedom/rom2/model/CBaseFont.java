@@ -9,7 +9,6 @@ import ua.millfreedom.rom2.model.enums.TextAlign;
 import ua.millfreedom.rom2.model.palette.Palette16;
 
 import java.nio.IntBuffer;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -17,8 +16,6 @@ import java.util.Objects;
 import static ua.millfreedom.rom2.Globals.gameFileManager;
 
 public class CBaseFont implements MfcSerializable {
-    // Java support, not a native field.
-    protected static final Charset NATIVE_FONT_CHARSET = Charset.forName("Cp866");
     //0x04
     public final CGameBitmap graphics;
     //0x08
@@ -115,7 +112,7 @@ public class CBaseFont implements MfcSerializable {
      * Java support method, not ported
      */
     protected static byte @NotNull [] getNativeTextBytes(String text) {
-        return text.getBytes(NATIVE_FONT_CHARSET);
+        return text.getBytes(Globals.OEM_CYRILLIC_CHARSET);
     }
 
     /**

@@ -876,10 +876,10 @@ public final class CServerApp {
      * Native: CServerApp::notifyStateChanged @00503672.
      * Fully ported.
      */
-    public static void notifyBuildingStateChanged(Building building) {
+    public static void notifyStateChanged(Building building) {
         for (Player player : Globals.gameServer.playerList.players) {
             if (player.isMapLoadPending() || player == building.owner) {
-                notifyBuildingStateChanged(building, player);
+                notifyStateChanged(building, player);
             }
         }
     }
@@ -888,19 +888,31 @@ public final class CServerApp {
      * Native: CServerApp::notifyStateChanged @00503672.
      * Fully ported.
      */
-    public static void notifyBuildingStateChanged(Sack sack) {
+    public static void notifyStateChanged(Sack sack) {
         for (Player player : Globals.gameServer.playerList.players) {
-            if (player.isMapLoadPending() || player == sack.owner) {
-                notifyBuildingStateChanged(sack, player);
+            if (player.isMapLoadPending() || player == sack.owner || shouldSendOwnerlessLocalSackVisual(player, sack)) {
+                notifyStateChanged(sack, player);
             }
         }
+    }
+
+    /**
+     * Java support for ownerless post-load sacks in the copied map-visual model.
+     * Native CServerApp::notifyStateChanged @00503672 can rely on the local native map observing server objects;
+     * Java's loaded local client needs SACK_ACTION_7A to create or refresh CBackPack visuals after map load.
+     * not ported.
+     */
+    private static boolean shouldSendOwnerlessLocalSackVisual(Player player, Sack sack) {
+        return Globals.gameServer.networkSessionActive == 0
+                && sack.owner == null
+                && shouldReceiveLiveMapVisualAction(player);
     }
 
     /**
      * Native support extracted from CServerApp::notifyStateChanged @00503672 building branch.
      * Fully ported.
      */
-    private static void notifyBuildingStateChanged(Building building, Player player) {
+    private static void notifyStateChanged(Building building, Player player) {
         if (building.isBuildingToken() == 0) {
             return;
         }
@@ -916,7 +928,7 @@ public final class CServerApp {
      * Native support extracted from CServerApp::notifyStateChanged @00503672 sack branch.
      * Fully ported.
      */
-    public static void notifyBuildingStateChanged(Sack sack, Player player) {
+    public static void notifyStateChanged(Sack sack, Player player) {
         SackAction action = SackAction.createForBuildingStateChanged(sack, player);
         if (Globals.gameServer.networkSessionActive != 0 && !canPlayerSeeSpellEffectTarget(sack.m_pTargetHandle, player)) {
             return;
@@ -930,10 +942,10 @@ public final class CServerApp {
      * Native: CServerApp::notifyStateChanged @00503672 unit dispatch.
      * Fully ported.
      */
-    public static void notifyBuildingStateChanged(Unit unit) {
+    public static void notifyStateChanged(Unit unit) {
         for (Player player : Globals.gameServer.playerList.players) {
             if (shouldReceiveLiveUnitVisualAction(player, unit)) {
-                notifyBuildingStateChanged(unit, player, '\0');
+                notifyStateChanged(unit, player, '\0');
             }
         }
     }
@@ -945,7 +957,7 @@ public final class CServerApp {
     public static void notifyUnitHitPointsChanged(Unit unit) {
         for (Player player : Globals.gameServer.playerList.players) {
             if (shouldReceiveLiveUnitVisualAction(player, unit)) {
-                notifyBuildingStateChanged(unit, player, 's');
+                notifyStateChanged(unit, player, 's');
             }
         }
     }
@@ -956,7 +968,7 @@ public final class CServerApp {
      * Fully ported.
      */
     public static void notifyUnitHitPointsChanged(Building building) {
-        notifyBuildingStateChanged(building);
+        notifyStateChanged(building);
     }
 
     /**
@@ -964,7 +976,7 @@ public final class CServerApp {
      * CServerApp::notifyStateChanged @00503672 unit branch.
      * Fully ported.
      */
-    private static void notifyBuildingStateChanged(Unit unit, Player player, char eventCode) {
+    private static void notifyStateChanged(Unit unit, Player player, char eventCode) {
         if (eventCode != 's') {
             return;
         }
@@ -1090,7 +1102,7 @@ public final class CServerApp {
         }
         for (Building building : Globals.gameServer.objectLists.buildings) {
             if (building != null && building.healthCurrent != building.healthMax) {
-                notifyBuildingStateChanged(building, player);
+                notifyStateChanged(building, player);
             }
         }
     }
@@ -1102,7 +1114,7 @@ public final class CServerApp {
     public static void sendInitialSackSnapshotsForPlayer(Player player) {
         for (Sack sack : Globals.gameServer.objectLists.sacks) {
             if (sack != null) {
-                notifyBuildingStateChanged(sack, player);
+                notifyStateChanged(sack, player);
             }
         }
     }
@@ -1145,9 +1157,9 @@ public final class CServerApp {
      */
     private static void sendInitialNonUnitTokenStateToPlayer(Token token, Player player) {
         if (token instanceof Sack sack) {
-            notifyBuildingStateChanged(sack, player);
+            notifyStateChanged(sack, player);
         } else if (token instanceof Building building) {
-            notifyBuildingStateChanged(building, player);
+            notifyStateChanged(building, player);
         }
     }
 

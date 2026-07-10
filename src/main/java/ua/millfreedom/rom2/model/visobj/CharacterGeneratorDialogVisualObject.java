@@ -373,7 +373,7 @@ public class CharacterGeneratorDialogVisualObject extends HandlerVisualObject {
                 || tipsPrompt == null) {
             return;
         }
-        tipsPrompt.messageText.setText(resolveTownTipText(TIP_ADJUST_STATS_7));
+        tipsPrompt.setPromptText(resolveTownTipText(TIP_ADJUST_STATS_7));
         tipsRefreshStep += 1;
     }
 
@@ -552,8 +552,7 @@ public class CharacterGeneratorDialogVisualObject extends HandlerVisualObject {
      */
     private void ensureTipsPrompt(String promptText) {
         clearTipsPrompt();
-        tipsPrompt = new TipsPromptDialogVisualObject(0x467, 0, 0x118, 0x138, 0x1E0);
-        tipsPrompt.messageText.setText(promptText);
+        tipsPrompt = new TipsPromptDialogVisualObject(0x467, 0, 0x118, 0x138, 0x1E0, promptText);
         skillSelectionPanel.addChild(tipsPrompt);
     }
 

@@ -624,7 +624,7 @@ public class GameServer implements MfcSerializable {
     }
 
     /**
-     * Fully ported native support extracted from GameServer::SaveGameFile @004E9816 active-player unit-group cleanup
+     * Fully ported native support extracted from GameServer::SaveGameFile @004E9816 inactive-player unit-group cleanup
      * block and UnitGroupList::RemoveAndDestroy @00539D50.
      */
     private void removeEmptyUnitGroupsBeforeSave() {
@@ -3646,11 +3646,23 @@ public class GameServer implements MfcSerializable {
         if (amount < 1 || player.gold < amount) {
             return;
         }
+        int destinationPackedCell = action.secondPayloadDword.get();
         player.gold -= amount;
-        dropGoldToGroundSack(headUnit, action.secondPayloadDword.get(), amount);
+        dropGoldToGroundSack(headUnit, destinationPackedCell, amount);
         if (shouldSaveControlledHumanoid(player)) {
             saveControlledHumanoid((Humanoid) headUnit);
         }
+    }
+
+    /**
+     * Native support extracted from GameServer::handleServerGameAction @004F515D case `0x23` target-distance gates
+     * at 004F61CE-004F622A.
+     */
+    private static boolean isDropGoldTargetNearUnit(Unit unit, int destinationPackedCell) {
+        int targetX = destinationPackedCell & 0xFF;
+        int targetY = (destinationPackedCell >>> 8) & 0xFF;
+        return Math.abs(unit.m_pTargetHandle.getX() - targetX) < 3
+                && Math.abs(unit.m_pTargetHandle.getY() - targetY) < 3;
     }
 
     /**
@@ -3660,8 +3672,7 @@ public class GameServer implements MfcSerializable {
         int targetX = destinationPackedCell & 0xFF;
         int targetY = (destinationPackedCell >>> 8) & 0xFF;
         TargetHandle targetHandle;
-        if (Math.abs(unit.m_pTargetHandle.getX() - targetX) < 3
-                && Math.abs(unit.m_pTargetHandle.getY() - targetY) < 3) {
+        if (isDropGoldTargetNearUnit(unit, destinationPackedCell)) {
             targetHandle = new TargetHandle();
             targetHandle.initFromBytes(targetX, targetY, Globals.worldMap);
         } else {
@@ -5761,11 +5772,22 @@ public class GameServer implements MfcSerializable {
 
     /**
      * Native: Global::__ioinit0 @004F8CC9.
-     * Fully ported.
+     * Fully ported, with Java copied-map support reserving the client bootstrap visual id.
      */
     private void ioInit0() {
         Arrays.fill(gBitsMap, (byte) 0);
         writeBitsMapDword(0, 1);
+        reserveCopiedMapBootstrapObjectId();
+    }
+
+    /**
+     * Java support for the copied MapVisualObject model.
+     * Native client bootstrap inserts the selected CUnit at object-map key 1, while Java-created server runtime tokens
+     * are later replayed into the same copied client object map through packets such as SACK_ACTION_7A.
+     * not ported.
+     */
+    private void reserveCopiedMapBootstrapObjectId() {
+        setBitForId(1);
     }
 
     /**

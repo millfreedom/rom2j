@@ -10,6 +10,7 @@ import ua.millfreedom.rom2.model.action.*;
 import ua.millfreedom.rom2.model.actiondata.ActionPayloads;
 import ua.millfreedom.rom2.model.color.RGB16;
 import ua.millfreedom.rom2.model.container.CustomList;
+import ua.millfreedom.rom2.model.container.MfcShortKeyMap;
 import ua.millfreedom.rom2.model.control.CGameListControl;
 import ua.millfreedom.rom2.model.enums.GameActionId;
 import ua.millfreedom.rom2.model.enums.MessageCodes;
@@ -186,7 +187,6 @@ public final class MapVisualObject extends CVisualObject {
     private static final int PLAYER_SLOT_FUNCTION_KEY_BASE = VK_F4;
     private static final int PLAYER_SLOT_TYPE_SPELL = 1;
     private static final int PLAYER_SLOT_TYPE_INVENTORY = 2;
-
     private static final int EFFECT_COUNT = StatsFromEffects.EFFECT_COUNT;
 
     // Native global g_Spell_IDs @005F8124 consumed by SpellPanelVisualObject::OnKeyDown @004C74B1.
@@ -196,7 +196,7 @@ public final class MapVisualObject extends CVisualObject {
     };
 
     // MapVisualObject_Base +0x9CC / MapVisualObject +0x9D0 (native `m_ObjectMap`; Java stores the recovered object map directly).
-    private final Map<Short, CGameObject> objects;
+    private final MfcShortKeyMap<CGameObject> objects;
 
     // MapVisualObject_Base +0x9E0 / MapVisualObject +0x9E4 (native `m_ObjectMap2` transient render object map).
     private final Map<Short, CGameObject> transientObjects = new HashMap<>();
@@ -514,7 +514,7 @@ public final class MapVisualObject extends CVisualObject {
     public MapVisualObject(int xLeft, int yTop, int xRight, int yBottom,
                            Map<Short, CGameObject> objects, StatModifiers statModifiers, byte[] spellIds) {
         super(1, xLeft, yTop, xRight, yBottom, null);
-        this.objects = objects == null ? new HashMap<>() : objects;
+        this.objects = objects == null ? new MfcShortKeyMap<>() : new MfcShortKeyMap<>(objects);
         this.statModifiers = Objects.requireNonNullElseGet(statModifiers, StatModifiers::new);
         this.spellIds = spellIds == null ? DEFAULT_SPELL_IDS.clone() : spellIds.clone();
 
@@ -551,6 +551,14 @@ public final class MapVisualObject extends CVisualObject {
         ambientAudioViewY = 40000;
         nextAmbientObjectSoundTick = 0;
         clientPlayers.add(createDefaultClientPlayer());
+    }
+
+    /**
+     * Native support extracted from MapVisualObject::cleanupCompletedMissionMapState @0041C897 and
+     * MapVisualObject::HandleGameAction @00415911 removal scans.
+     */
+    private List<Map.Entry<Short, CGameObject>> nativeObjectMapEntrySnapshot() {
+        return new ArrayList<>(objects.entrySet());
     }
 
     /**
@@ -1051,7 +1059,8 @@ public final class MapVisualObject extends CVisualObject {
      * Fully ported.
      */
     private void selectCurrentPlayerUnits() {
-        for (CGameObject object : objects.values()) {
+        for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+            CGameObject object = entry.getValue();
             if (!(object instanceof CUnit unit)
                     || unit.cPlayer != currentPlayer
                     || unit.field51_0x184 > 1
@@ -1174,7 +1183,8 @@ public final class MapVisualObject extends CVisualObject {
         action.playerID.set(0);
         action.entryCount.set(0);
         action.unitTokenIds.set(new byte[0]);
-        for (CGameObject object : objects.values()) {
+        for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+            CGameObject object = entry.getValue();
             if (object.isSelected() && object instanceof CUnit unit && (unit.unitFlags & 0x1) != 0) {
                 action.addUnitToken(object.m_id);
                 break;
@@ -1199,7 +1209,8 @@ public final class MapVisualObject extends CVisualObject {
         action.playerID.set(0);
         action.entryCount.set(0);
         action.unitTokenIds.set(new byte[0]);
-        for (CGameObject object : objects.values()) {
+        for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+            CGameObject object = entry.getValue();
             if (object.isSelected()) {
                 action.addUnitToken(object.m_id);
             }
@@ -1225,7 +1236,8 @@ public final class MapVisualObject extends CVisualObject {
         List<CUnit> primaryHeroes = new ArrayList<>();
         List<CUnit> equippedOrStoryUnits = new ArrayList<>();
         List<CUnit> unequippedSecondaryHeroes = new ArrayList<>();
-        for (CGameObject object : objects.values()) {
+        for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+            CGameObject object = entry.getValue();
             if (!(object instanceof CUnit unit) || !unit.isSelected() || unit.HP <= 0) {
                 continue;
             }
@@ -2039,7 +2051,8 @@ public final class MapVisualObject extends CVisualObject {
      * Native support extracted from SelectedUnitsSnapshot::rebuildFromCurrentPlayerUnits @00472460.
      */
     public void collectCurrentPlayerUnits(SelectedUnitsSnapshot snapshot) {
-        for (CGameObject object : objects.values()) {
+        for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+            CGameObject object = entry.getValue();
             if (!(object instanceof CUnit unit)
                     || unit.cPlayer != currentPlayer
                     || unit.field51_0x184 != 0) {
@@ -2140,7 +2153,8 @@ public final class MapVisualObject extends CVisualObject {
      * Fully ported.
      */
     public CUnit findUnitByQuestFlags(int questFlags) {
-        for (CGameObject object : objects.values()) {
+        for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+            CGameObject object = entry.getValue();
             if (object instanceof CUnit unit && unit.questFlags == questFlags) {
                 return unit;
             }
@@ -2278,7 +2292,8 @@ public final class MapVisualObject extends CVisualObject {
      * triggered by CMainWindow::showInnDialog @0048B885 through GameServer::PrepareInnEntryUnitUpdates @004F312A.
      */
     public CUnit findCUnitByServerId(int normalizedServerId) {
-        for (CGameObject object : objects.values()) {
+        for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+            CGameObject object = entry.getValue();
             if (object instanceof CUnit unit && Short.toUnsignedInt(unit.serverID) == normalizedServerId) {
                 return unit;
             }
@@ -2508,14 +2523,13 @@ public final class MapVisualObject extends CVisualObject {
      * Fully ported.
      */
     public void cleanupCompletedMissionMapState() {
-        Iterator<Map.Entry<Short, CGameObject>> iterator = objects.entrySet().iterator();
-        while (iterator.hasNext()) {
-            CGameObject object = iterator.next().getValue();
+        for (Map.Entry<Short, CGameObject> entry : nativeObjectMapEntrySnapshot()) {
+            CGameObject object = entry.getValue();
             if (!(object instanceof CUnit unit)
                     || (unit.unitFlags & UNIT_FLAG_HUMANOID) == 0
                     || unit.HP < -10
                     || unit.cPlayer != currentPlayer) {
-                iterator.remove();
+                objects.remove(entry.getKey());
             } else {
                 unit.field51_0x184 = 0;
                 unit.action = 0;
@@ -3000,7 +3014,8 @@ public final class MapVisualObject extends CVisualObject {
         }
         fillByteGrid(dynamicLightOverrideGrid, (byte) 0xFF);
         dynamicLightCellCount = 0;
-        for (CGameObject object : objects.values()) {
+        for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+            CGameObject object = entry.getValue();
             object.refreshMapDerivedState();
             object.updateMapLayer();
             object.updateMapOverlay();
@@ -4884,7 +4899,8 @@ public final class MapVisualObject extends CVisualObject {
 
         boolean refreshSelection = advancePrimaryObjectMap();
         advanceTransientEffectCells();
-        for (CGameObject object : objects.values()) {
+        for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+            CGameObject object = entry.getValue();
             refreshSelection |= object.updateBlockedState();
         }
         if (refreshSelection) {
@@ -4905,7 +4921,8 @@ public final class MapVisualObject extends CVisualObject {
         for (int i = 0; i < cellCount; i++) {
             tileFlags[i] = (short) (tileFlags[i] & ~TERRAIN_CURRENT_VISIBLE_MASK);
         }
-        for (CGameObject object : objects.values()) {
+        for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+            CGameObject object = entry.getValue();
             object.occupyMapCells();
         }
     }
@@ -6295,7 +6312,8 @@ public final class MapVisualObject extends CVisualObject {
         action.targetCellY.set(targetY & 0xFFFF);
         action.entryCount.set(0);
         action.unitTokenIds.set(new byte[0]);
-        for (CGameObject object : objects.values()) {
+        for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+            CGameObject object = entry.getValue();
             if (object.isSelected()) {
                 action.inventoryInsertIndex.set(object.shopInventoryVisibleStart[0] & 0xFFFF);
                 action.addUnitToken(object.m_id);
@@ -6529,7 +6547,8 @@ public final class MapVisualObject extends CVisualObject {
      * Native support extracted from MapVisualObject::RefreshLayoutAfterAction @00416388.
      */
     private void deselectAllMapObjects() {
-        for (CGameObject object : objects.values()) {
+        for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+            CGameObject object = entry.getValue();
             object.setSelected(false);
         }
     }
@@ -6858,7 +6877,8 @@ public final class MapVisualObject extends CVisualObject {
      * Fully ported.
      */
     private void selectGroup(int group) {
-        for (CGameObject object : objects.values()) {
+        for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+            CGameObject object = entry.getValue();
             if (object.belongsToGroup(group) == 0) {
                 if (!Globals.shiftKeyDown) {
                     object.setSelected(false);
@@ -6879,7 +6899,8 @@ public final class MapVisualObject extends CVisualObject {
             return;
         }
 
-        for (CGameObject object : objects.values()) {
+        for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+            CGameObject object = entry.getValue();
             if (object.belongsToGroup(group) != 0) {
                 object.removeFromGroup(group);
             }
@@ -6899,7 +6920,8 @@ public final class MapVisualObject extends CVisualObject {
             return;
         }
 
-        for (CGameObject object : objects.values()) {
+        for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+            CGameObject object = entry.getValue();
             if (object.belongsToGroup(group) != 0) {
                 object.removeFromGroup(group);
             }
@@ -6918,7 +6940,8 @@ public final class MapVisualObject extends CVisualObject {
         int x = 0;
         int y = 0;
         int total = 0;
-        for (CGameObject object : objects.values()) {
+        for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+            CGameObject object = entry.getValue();
             if (object.belongsToGroup(group) == 0) {
                 object.setSelected(false);
             } else {
@@ -6986,7 +7009,8 @@ public final class MapVisualObject extends CVisualObject {
      * Native support extracted from MinimapVisualObject::Update @004AC414.
      */
     public void drawMinimapObjects(int minimapLeft, int minimapTop, int zoomLevel) {
-        for (CGameObject object : objects.values()) {
+        for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+            CGameObject object = entry.getValue();
             object.drawMinimap(minimapLeft, minimapTop, zoomLevel);
         }
     }
@@ -7251,7 +7275,8 @@ public final class MapVisualObject extends CVisualObject {
     private void addSelectedUnitTokens(UnitTokenListAction action) {
         action.entryCount.set(0);
         action.unitTokenIds.set(new byte[0]);
-        for (CGameObject object : objects.values()) {
+        for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+            CGameObject object = entry.getValue();
             if (object.isSelected()) {
                 action.addUnitToken(object.m_id);
             }
@@ -7334,7 +7359,8 @@ public final class MapVisualObject extends CVisualObject {
      */
     private void addSelectedAvailableSpellCasterTokens(UnitTokenListAction action, int zeroBasedSpellSlot) {
         int spellMask = 1 << (zeroBasedSpellSlot & 0x1F);
-        for (CGameObject object : objects.values()) {
+        for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+            CGameObject object = entry.getValue();
             if (object.isSelected() && (object.availableSpellMask & spellMask) != 0) {
                 action.addUnitToken(object.m_id);
             }
@@ -7359,7 +7385,8 @@ public final class MapVisualObject extends CVisualObject {
         }
 
         int spellMask = 1 << (zeroBasedSlot & 0x1F);
-        for (CGameObject object : objects.values()) {
+        for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+            CGameObject object = entry.getValue();
             if (!object.isSelected() || (object.activeSpellEffectMask & spellMask) == 0) {
                 continue;
             }
@@ -7390,7 +7417,8 @@ public final class MapVisualObject extends CVisualObject {
         }
 
         int spellMask = 1 << (zeroBasedSlot & 0x1F);
-        for (CGameObject object : objects.values()) {
+        for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+            CGameObject object = entry.getValue();
             if (!object.isSelected() || (object.activeSpellEffectMask & spellMask) == 0) {
                 continue;
             }
@@ -7513,7 +7541,8 @@ public final class MapVisualObject extends CVisualObject {
         int zeroBasedSlot = spellSlot - 1;
         if (spellPanel.hasSelectedAvailableSpellSlot(zeroBasedSlot) && spellPanel.selectedSpellEntryIndex < 0) {
             int spellMask = 1 << (zeroBasedSlot & 0x1F);
-            for (CGameObject object : objects.values()) {
+            for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+                CGameObject object = entry.getValue();
                 if (!object.isSelected() || (object.availableSpellMask & spellMask) == 0) {
                     continue;
                 }
@@ -7523,7 +7552,8 @@ public final class MapVisualObject extends CVisualObject {
 
         if (spellPanel.hasActiveSpellEffectSlot(zeroBasedSlot)) {
             int spellMask = 1 << (zeroBasedSlot & 0x1F);
-            for (CGameObject object : objects.values()) {
+            for (Map.Entry<Short, CGameObject> entry : objects.entrySet()) {
+                CGameObject object = entry.getValue();
                 if (!object.isSelected() || (object.activeSpellEffectMask & spellMask) == 0) {
                     continue;
                 }
@@ -7999,11 +8029,10 @@ public final class MapVisualObject extends CVisualObject {
      * Native support extracted from MapVisualObject::HandleGameAction @00415911 object removal by owner pointer.
      */
     public void removeScenarioObjectsOwnedBy(CPlayer removedPlayer) {
-        Iterator<CGameObject> iterator = objects.values().iterator();
-        while (iterator.hasNext()) {
-            CGameObject object = iterator.next();
+        for (Map.Entry<Short, CGameObject> entry : nativeObjectMapEntrySnapshot()) {
+            CGameObject object = entry.getValue();
             if (removedPlayer != null && object.cPlayer == removedPlayer) {
-                iterator.remove();
+                objects.remove(entry.getKey());
             }
         }
     }

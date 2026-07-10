@@ -18,8 +18,8 @@ public final class Instant {
     public int typeId;
     //0x44
     public int index;
-    //0x318
-    public int executeOnce;
+    //0x318 Native Execute Once BOOL; the game copies it only for check records and has no behavioral read.
+    public boolean executeOnce;
     //0x48 values, 0x70 types, 0x98 names
     public final InstArgument[] arguments = new InstArgument[ARGUMENT_COUNT];
 
@@ -37,7 +37,7 @@ public final class Instant {
      * Native: Instant::Instant @00536B24.
      * Fully ported.
      */
-    public Instant(String name, int typeId, int[] argumentValues, String[] argumentNames, int executeOnce) {
+    public Instant(String name, int typeId, int[] argumentValues, String[] argumentNames, boolean executeOnce) {
         this();
         this.name.set(name.getBytes(StandardCharsets.ISO_8859_1));
         this.typeId = typeId;
@@ -74,7 +74,7 @@ public final class Instant {
         instant.name.read(section);
         instant.typeId = section.getInt();
         instant.index = section.getInt();
-        instant.executeOnce = section.getInt();
+        instant.executeOnce = section.getInt() != 0;
         for (int i = 0; i < instant.arguments.length; i++) {
             instant.arguments[i].value = section.getInt();
         }

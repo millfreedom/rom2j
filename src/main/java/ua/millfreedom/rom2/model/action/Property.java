@@ -343,4 +343,12 @@ public final class Property<T> {
         validateRelativeRange(relativeOffset, elementSize);
         return relativeOffset;
     }
+
+    /**
+     * not ported.
+     */
+    @Override
+    public String toString() {
+        return get().toString();
+    }
 }

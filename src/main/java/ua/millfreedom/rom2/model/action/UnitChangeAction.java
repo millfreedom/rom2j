@@ -785,9 +785,8 @@ public class UnitChangeAction extends CGameAction {
      * Native support extracted from MapVisualObject::HandleGameAction @004101B5 / @0041020F.
      */
     private static boolean shouldMarkPlayerUnit(MapVisualObject mapVisualObject, CUnit unit) {
-        if (Globals.mainWindow.sessionMode == CMainWindow.SESSION_MODE_CAMPAIGN
-                && Short.toUnsignedInt(unit.serverID) == 0x15) {
-            return true;
+        if (Globals.mainWindow.sessionMode == CMainWindow.SESSION_MODE_CAMPAIGN) {
+            return Short.toUnsignedInt(unit.serverID) == 0x15;
         }
         return unit.cPlayer == mapVisualObject.currentPlayer && (unit.unitFlags & UNIT_FLAG_HUMANOID) != 0;
     }

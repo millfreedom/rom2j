@@ -1114,7 +1114,7 @@ public final class MapEditorDocument {
     public Instant addInstant(
             String name,
             int typeId,
-            int executeOnce,
+            boolean executeOnce,
             int[] argumentValues,
             int[] argumentTypes,
             String[] argumentNames
@@ -1154,7 +1154,7 @@ public final class MapEditorDocument {
         return addInstant(
                 MISSION_ENTRY_DROP_INSTANT_NAME,
                 MISSION_ENTRY_DROP_INSTANT_TYPE,
-                0,
+                false,
                 argumentValues,
                 argumentTypes,
                 argumentNames
@@ -1180,7 +1180,7 @@ public final class MapEditorDocument {
             String name,
             int typeId,
             int index,
-            int executeOnce,
+            boolean executeOnce,
             int[] argumentValues,
             int[] argumentTypes,
             String[] argumentNames
@@ -1233,7 +1233,7 @@ public final class MapEditorDocument {
     public Instant addCheck(
             String name,
             int typeId,
-            int executeOnce,
+            boolean executeOnce,
             int[] argumentValues,
             int[] argumentTypes,
             String[] argumentNames
@@ -1263,7 +1263,7 @@ public final class MapEditorDocument {
             String name,
             int typeId,
             int index,
-            int executeOnce,
+            boolean executeOnce,
             int[] argumentValues,
             int[] argumentTypes,
             String[] argumentNames
@@ -1320,7 +1320,7 @@ public final class MapEditorDocument {
             int check12Operator,
             int check34Operator,
             int check56Operator,
-            int runOnce
+            boolean runOnce
     ) {
         Trigger trigger = new Trigger();
         updateTriggerFields(
@@ -1350,7 +1350,7 @@ public final class MapEditorDocument {
             int check12Operator,
             int check34Operator,
             int check56Operator,
-            int runOnce
+            boolean runOnce
     ) {
         ensureTriggerIndex(triggerIndex);
         updateTriggerFields(
@@ -2382,7 +2382,7 @@ public final class MapEditorDocument {
             String name,
             int typeId,
             int index,
-            int executeOnce,
+            boolean executeOnce,
             int[] argumentValues,
             int[] argumentTypes,
             String[] argumentNames
@@ -2427,7 +2427,7 @@ public final class MapEditorDocument {
             int check12Operator,
             int check34Operator,
             int check56Operator,
-            int runOnce
+            boolean runOnce
     ) {
         ensureTriggerReferenceArrayLengths(checkIds, instantIds);
         trigger.description.set(description.getBytes(StandardCharsets.ISO_8859_1));

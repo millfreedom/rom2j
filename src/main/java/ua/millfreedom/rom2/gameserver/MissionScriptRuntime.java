@@ -4335,7 +4335,7 @@ public final class MissionScriptRuntime extends MissionRuntimeBase implements Mf
         ScriptPattern pattern = new ScriptPattern();
         for (ScriptPattern storedPattern : scriptPatterns) {
             pattern.copyFrom(storedPattern);
-            if (pattern.selfDestruct != 0 && readScriptPatternFiredFlag(pattern.digit) != 0) {
+            if (pattern.selfDestruct && readScriptPatternFiredFlag(pattern.digit) != 0) {
                 continue;
             }
             writeScriptPatternFiredFlag(pattern.digit, 0);
@@ -4348,7 +4348,7 @@ public final class MissionScriptRuntime extends MissionRuntimeBase implements Mf
             }
             if (matched != 0) {
                 writeScriptPatternFiredFlag(pattern.digit, 1);
-                if (pattern.selfDestruct != 0 && Globals.gameServer.isScriptTracingEnabled()) {
+                if (pattern.selfDestruct && Globals.gameServer.isScriptTracingEnabled()) {
                     CServerApp.sendServerChatText(
                             "Script: Trigger %d ( %d ifs, %d instants ).\n".formatted(
                                     pattern.digit,
@@ -5390,7 +5390,7 @@ public final class MissionScriptRuntime extends MissionRuntimeBase implements Mf
             default -> {
             }
         }
-        CServerApp.notifyBuildingStateChanged(instant.unit);
+        CServerApp.notifyStateChanged(instant.unit);
     }
 
     /**
@@ -6164,7 +6164,7 @@ public final class MissionScriptRuntime extends MissionRuntimeBase implements Mf
         }
 
         pattern.digit = digit;
-        pattern.selfDestruct = scriptResource.getInt(sectionName, "SelfDestruct", 0);
+        pattern.selfDestruct = scriptResource.getInt(sectionName, "SelfDestruct", 0) != 0;
         pattern.reserved0x10 = 0;
         scriptPatterns.add(pattern);
     }

@@ -212,15 +212,14 @@ public class TipsPromptDialogVisualObject extends HandlerVisualObject {
     @Override
     public int onMessage(MessageCodes msg, Object wParam, Object lParam) {
         int w = readMessageInt(wParam);
-        int l = readMessageInt(lParam);
         if (msg == TEXT_LIST_SELECTION_CHANGED && w == SHOW_TIPS_CHECKBOX_ID) {
-            setTipsMode(l);
+            setTipsMode(readMessageInt(lParam));
         }
         if (msg == WM_KEYDOWN || msg == DIALOG_OK || msg == RETURN_TO_GAME) {
             return 0;
         }
-        Point p = point(l);
         if (msg == WM_LBUTTONUP) {
+            Point p = point(readMessageInt(lParam));
             onLButtonUp(w, p.x, p.y);
         }
         return super.onMessage(msg, wParam, lParam);

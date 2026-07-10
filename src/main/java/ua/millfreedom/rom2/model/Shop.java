@@ -81,7 +81,7 @@ public class Shop extends Building {
         if (Globals.gameServer.networkSessionActive != 0) {
             unit.returnToMissionMap();
         }
-        CServerApp.notifyBuildingStateChanged(unit);
+        CServerApp.notifyStateChanged(unit);
     }
 
     /**

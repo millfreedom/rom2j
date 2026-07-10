@@ -8,8 +8,8 @@ import java.io.IOException;
  * Native ScriptCheck object stored in CList<ScriptCheck> at MissionScriptRuntime +0xEAAC.
  */
 public final class ScriptCheck extends ScriptInstant {
-    //0x74
-    public int executeOnce;
+    //0x74 Native Execute Once BOOL; archived but not behaviorally read after materialization.
+    public boolean executeOnce;
     //0x78
     public int referenceCount;
 
@@ -18,7 +18,7 @@ public final class ScriptCheck extends ScriptInstant {
      * Fully ported.
      */
     public ScriptCheck() {
-        executeOnce = 1;
+        executeOnce = true;
     }
 
     /**
@@ -47,10 +47,10 @@ public final class ScriptCheck extends ScriptInstant {
     public void serialize(CArchive ar) throws IOException {
         super.serialize(ar);
         if (ar.isStoring()) {
-            ar.writeInt(executeOnce);
+            ar.writeInt(executeOnce ? 1 : 0);
             ar.writeInt(referenceCount);
         } else {
-            executeOnce = ar.readInt();
+            executeOnce = ar.readInt() != 0;
             referenceCount = ar.readInt();
         }
     }

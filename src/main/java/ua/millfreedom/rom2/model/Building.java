@@ -177,7 +177,7 @@ public class Building extends Token {
                 && (short) healthCurrent < (short) healthMax
                 && (short) healthCurrent >= 0) {
             healthCurrent = (short) (healthCurrent + 1);
-            CServerApp.notifyBuildingStateChanged(this);
+            CServerApp.notifyStateChanged(this);
         }
     }
 
@@ -193,7 +193,7 @@ public class Building extends Token {
      */
     public void consumeMagicWellRewardCharge() {
         healthCurrent -= 1;
-        CServerApp.notifyBuildingStateChanged(this);
+        CServerApp.notifyStateChanged(this);
     }
 
     /**

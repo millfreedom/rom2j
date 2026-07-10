@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static ua.millfreedom.rom2.model.enums.MessageCodes.DIALOG_OK;
+import static ua.millfreedom.rom2.model.enums.MessageCodes.RENDER_FRAME;
 import static ua.millfreedom.rom2.model.enums.MessageCodes.RETURN_TO_GAME;
 import static ua.millfreedom.rom2.text.DialogsText.*;
 import static ua.millfreedom.rom2.text.GameTexts.get;
@@ -128,6 +129,20 @@ public class DropGoldPromptVisualObject extends HandlerVisualObject {
         } finally {
             Globals.renderer.unlockSurface();
         }
+    }
+
+    /**
+     * Java rendering extension for the active drop-gold modal during gameplay full-surface redraws.
+     * not ported.
+     */
+    @Override
+    public int onMessage(MessageCodes msg, Object wParam, Object lParam) {
+        if (msg == RENDER_FRAME && activeFlag != 0) {
+            int result = super.onMessage(msg, wParam, lParam);
+            draw();
+            return result;
+        }
+        return super.onMessage(msg, wParam, lParam);
     }
 
     /**

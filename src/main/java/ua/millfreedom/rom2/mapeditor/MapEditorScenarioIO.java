@@ -631,7 +631,7 @@ public final class MapEditorScenarioIO {
         instant.name.write(section);
         section.putInt(instant.typeId);
         section.putInt(instant.index);
-        section.putInt(instant.executeOnce);
+        section.putInt(instant.executeOnce ? 1 : 0);
         for (int i = 0; i < instant.arguments.length; i++) {
             section.putInt(instant.arguments[i].value);
         }

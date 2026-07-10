@@ -103,7 +103,7 @@ public class Effect_DirectDamage extends Effect {
                 short updatedHealth = (short) (building.healthCurrent - (short) damage);
                 building.healthCurrent = updatedHealth < 0 ? 0 : updatedHealth & 0xFFFF;
                 if (damage > 0) {
-                    CServerApp.notifyBuildingStateChanged(building);
+                    CServerApp.notifyStateChanged(building);
                 }
             }
             return;

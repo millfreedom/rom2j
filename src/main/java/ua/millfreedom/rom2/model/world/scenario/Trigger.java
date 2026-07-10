@@ -22,8 +22,8 @@ public final class Trigger {
     public int check34Operator;
     //0xB0
     public int check56Operator;
-    //0xB4
-    public int runOnce;
+    //0xB4 Native Run Once BOOL copied unchanged to ScriptPattern.selfDestruct.
+    public boolean runOnce;
 
     /**
      * Native support extracted from Trigger::SerializeElements @0054A730 loading branch and
@@ -42,7 +42,7 @@ public final class Trigger {
         trigger.check12Operator = section.getInt();
         trigger.check34Operator = section.getInt();
         trigger.check56Operator = section.getInt();
-        trigger.runOnce = section.getInt();
+        trigger.runOnce = section.getInt() != 0;
         return trigger;
     }
 
@@ -61,6 +61,6 @@ public final class Trigger {
         section.putInt(check12Operator);
         section.putInt(check34Operator);
         section.putInt(check56Operator);
-        section.putInt(runOnce);
+        section.putInt(runOnce ? 1 : 0);
     }
 }

@@ -44,9 +44,6 @@ public class DiplomacySettingsDialogVisualObject extends HeaderDialogVisualObjec
                 get(DIALOGS, DIPLOMACY_SETTINGS_145)
         );
         this.diplomacyWrapper = diplomacyWrapper;
-        if (getClass() == DiplomacySettingsDialogVisualObject.class) {
-            initialize();
-        }
     }
 
     /**

@@ -1158,7 +1158,7 @@ public class Unit extends Token {
 
             if (isToggleBuilding(interactive)) {
                 interactive.healthCurrent = interactive.healthCurrent == 0 ? 1 : 0;
-                CServerApp.notifyBuildingStateChanged(interactive);
+                CServerApp.notifyStateChanged(interactive);
             }
         }
 
