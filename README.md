@@ -65,11 +65,57 @@ Use the project root as the working directory because the runtime expects the or
 
 </details>
 
-## Build and validation
+## How to Run the Game
 
-The main runtime is Maven based.
+### 1. Prerequisites
+
+1. **Java 25**
+
+   Download and install for your OS.
+
+   Examples:
+
+    * https://www.graalvm.org/downloads/
+    * https://www.oracle.com/java/technologies/downloads/#java25
+
+2. **Apache Maven**
+
+   Follow the installation instructions for your OS:
+
+    * https://maven.apache.org/install.html
+
+3. **Git**
+
+   Follow the installation instructions for your OS:
+
+    * https://git-scm.com/install/
+
+### 2. Get and Build
+
+From the terminal of your choice, run the following commands:
+
 ```bash
-mvn package
+git clone --depth 1 https://github.com/millfreedom/rom2j.git
+cd rom2j
+mvn clean package
+```
+
+### 3. Copy Resources
+
+Create a `res` directory inside the `rom2j` folder, copy everything from the normal client (GOG/CD) into it.
+
+### 4. Run
+
+**Windows / Linux**
+
+```bash
+java -jar ./target/rom2nxt-1.0-SNAPSHOT.jar
+```
+
+**MacOS**
+
+```bash
+java -XstartOnFirstThread -jar ./target/rom2nxt-1.0-SNAPSHOT.jar
 ```
 
 ## License
