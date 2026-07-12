@@ -1,5 +1,6 @@
 package ua.millfreedom.rom2.model.action;
 
+import ua.millfreedom.rom2.GameCharsets;
 import ua.millfreedom.rom2.Globals;
 import ua.millfreedom.rom2.model.*;
 import ua.millfreedom.rom2.model.actiondata.UnitChangePayloads;
@@ -19,7 +20,6 @@ import ua.millfreedom.rom2.text.NpcNamesText;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
 
 import static ua.millfreedom.rom2.model.window.DialogsMaskFlag.GAMEPLAY;
 import static ua.millfreedom.rom2.text.GameTexts.get;
@@ -771,7 +771,7 @@ public class UnitChangeAction extends CGameAction {
         while (end < limit && payloadBytes[end] != 0) {
             end++;
         }
-        return new String(payloadBytes, offset, end - offset, StandardCharsets.ISO_8859_1);
+        return new String(payloadBytes, offset, end - offset, GameCharsets.GAME_TEXT);
     }
 
     /**

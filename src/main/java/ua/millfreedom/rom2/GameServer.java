@@ -694,7 +694,7 @@ public class GameServer implements MfcSerializable {
         int titleOffset = output.size();
         if (networkSessionActive != 0) {
             byte[] titleBlock = new byte[SAVE_TITLE_BLOCK_SIZE];
-            byte[] title = SERVER_MULTIPLAYER_SAVE_TITLE.getBytes(StandardCharsets.ISO_8859_1);
+            byte[] title = SERVER_MULTIPLAYER_SAVE_TITLE.getBytes(GameCharsets.GAME_TEXT);
             System.arraycopy(title, 0, titleBlock, 0, title.length);
             output.writeBytes(titleBlock);
         }
@@ -1955,7 +1955,10 @@ public class GameServer implements MfcSerializable {
                 .timeout(MAP_TRANSFER_HAT_REQUEST_TIMEOUT)
                 .GET()
                 .build();
-        return HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+        return HttpClient.newHttpClient().send(
+                request,
+                HttpResponse.BodyHandlers.ofString(GameCharsets.GAME_TEXT)
+        );
     }
 
     /**
@@ -1975,7 +1978,24 @@ public class GameServer implements MfcSerializable {
      * not ported.
      */
     private static String encodeHatQueryComponent(String value) {
-        return URLEncoder.encode(Objects.requireNonNullElse(value, ""), StandardCharsets.UTF_8);
+        return URLEncoder.encode(Objects.requireNonNullElse(value, ""), GameCharsets.GAME_TEXT);
+    }
+
+    /**
+     * Java CP1251 network-boundary adaptation for Global::reportToWebEndpoint @004E174F query parameters.
+     */
+    private static String encodeHatRawQuery(String parameters) {
+        StringJoiner encodedQuery = new StringJoiner("&");
+        for (String parameter : parameters.split("&", -1)) {
+            int separator = parameter.indexOf('=');
+            if (separator < 0) {
+                encodedQuery.add(encodeHatQueryComponent(parameter));
+            } else {
+                encodedQuery.add(encodeHatQueryComponent(parameter.substring(0, separator))
+                        + "=" + encodeHatQueryComponent(parameter.substring(separator + 1)));
+            }
+        }
+        return encodedQuery.toString();
     }
 
     /**
@@ -4510,7 +4530,7 @@ public class GameServer implements MfcSerializable {
             Files.writeString(
                     lockFlagPath,
                     serverStatusFilePath,
-                    StandardCharsets.ISO_8859_1,
+                    StandardCharsets.UTF_8,
                     StandardOpenOption.CREATE,
                     StandardOpenOption.TRUNCATE_EXISTING,
                     StandardOpenOption.WRITE
@@ -5074,8 +5094,8 @@ public class GameServer implements MfcSerializable {
         int entryX = entryCell & 0xFF;
         int entryY = (entryCell >>> 8) & 0xFF;
         if (entryX * entryY == 0) {
-            entryX = Utils.randInclusive(MISSION_ENTRY_FALLBACK_CELL_RANDOM_MAX) + MISSION_ENTRY_FALLBACK_CELL_MIN;
-            entryY = Utils.randInclusive(MISSION_ENTRY_FALLBACK_CELL_RANDOM_MAX) + MISSION_ENTRY_FALLBACK_CELL_MIN;
+            entryX = Utils.randBasedInclusive(MISSION_ENTRY_FALLBACK_CELL_MIN, MISSION_ENTRY_FALLBACK_CELL_RANDOM_MAX);
+            entryY = Utils.randBasedInclusive(MISSION_ENTRY_FALLBACK_CELL_MIN, MISSION_ENTRY_FALLBACK_CELL_RANDOM_MAX);
             pushMessage("Warning - no drop location in map, random position used");
         }
 
@@ -5338,7 +5358,7 @@ public class GameServer implements MfcSerializable {
     private static boolean reportToSrvSendTargets(String urlParameters, boolean readResponse) {
         BufferedReader reader;
         try {
-            reader = Files.newBufferedReader(Path.of("srv_send.txt"), StandardCharsets.ISO_8859_1);
+            reader = Files.newBufferedReader(Path.of("srv_send.txt"), GameCharsets.GAME_TEXT);
         } catch (IOException e) {
             return false;
         }
@@ -5363,7 +5383,7 @@ public class GameServer implements MfcSerializable {
         if (reportTarget == null || urlParameters == null) {
             return false;
         }
-        String normalizedParameters = urlParameters.replace(' ', '+');
+        String normalizedParameters = encodeHatRawQuery(urlParameters);
         String url = reportTarget + "?" + normalizedParameters;
         if (!url.regionMatches(true, 0, "http://", 0, "http://".length())) {
             url = "http://" + url;
@@ -5400,7 +5420,7 @@ public class GameServer implements MfcSerializable {
             Files.writeString(
                     Path.of(serverStatusFilePath),
                     mapName + playerList.getPlayersCount(),
-                    StandardCharsets.UTF_8,
+                    GameCharsets.GAME_TEXT,
                     StandardOpenOption.CREATE,
                     StandardOpenOption.TRUNCATE_EXISTING,
                     StandardOpenOption.WRITE
@@ -6087,7 +6107,7 @@ public class GameServer implements MfcSerializable {
         try {
             logFile = Files.newBufferedWriter(
                     Path.of(Globals.serverConfig.logfile),
-                    StandardCharsets.ISO_8859_1,
+                    GameCharsets.GAME_TEXT,
                     StandardOpenOption.CREATE,
                     StandardOpenOption.WRITE,
                     StandardOpenOption.APPEND

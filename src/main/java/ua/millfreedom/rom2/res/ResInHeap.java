@@ -1,6 +1,7 @@
 package ua.millfreedom.rom2.res;
 
 
+import ua.millfreedom.rom2.GameCharsets;
 import ua.millfreedom.rom2.model.SavedGameFiles;
 import ua.millfreedom.rom2.model.CRect;
 
@@ -8,7 +9,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -373,7 +373,7 @@ public final class ResInHeap extends Res {
             throw new IllegalStateException("not a string associated with specified keys");
         }
 
-        byte[] bytes = value.getBytes(StandardCharsets.ISO_8859_1);
+        byte[] bytes = value.getBytes(GameCharsets.GAME_TEXT);
         int byteSize = bytes.length + 1;
         int offset = ResNodeData.firstWord(key.atom().data());
         int allocatedSize = ResNodeData.secondWord(key.atom().data());
@@ -635,7 +635,7 @@ public final class ResInHeap extends Res {
         String outputFileName = resolveTextImportRegistryFileName(dstFile);
         byte[] textBytes = Files.readAllBytes(Path.of(srcFile));
         resetForTextImport(outputFileName, textBytes);
-        String text = new String(textBytes, StandardCharsets.ISO_8859_1);
+        String text = new String(textBytes, GameCharsets.GAME_TEXT);
         createTextImportGroups(text);
         importTextRegistryEntries(text);
         totalDataSize = 0;
@@ -832,7 +832,7 @@ public final class ResInHeap extends Res {
             ));
         }
 
-        byte[] valueBytes = value.getBytes(StandardCharsets.ISO_8859_1);
+        byte[] valueBytes = value.getBytes(GameCharsets.GAME_TEXT);
         int appendSize = valueBytes.length + 1;
         if (type == RESTYPE_STRING) {
             ensureTextImportHeapCapacity(Integer.BYTES + appendSize);
@@ -856,7 +856,7 @@ public final class ResInHeap extends Res {
      * Native support extracted from ResInHeap::TextToReg @004E4EC3 string value heap writes.
      */
     private void writeTextRegistryString(ResNode entry, String value) {
-        byte[] valueBytes = value.getBytes(StandardCharsets.ISO_8859_1);
+        byte[] valueBytes = value.getBytes(GameCharsets.GAME_TEXT);
         int byteSize = valueBytes.length + 1;
         ensureTextImportHeapCapacity(byteSize);
         int offset = heap.used;
@@ -1209,12 +1209,13 @@ public final class ResInHeap extends Res {
         if (off < 0 || len <= 0 || off >= heap.data().length) return;
         int n = Math.min(len, heap.data().length - off);
         n = Math.min(n, destSize); // mimic min(destSize, childCount)
-        for (int i = 0; i < n; i++) {
-            int b = heap.data()[off + i] & 0xff;
-            if (b == 0) break; // strlen-style termination
-            out.append((char) b);
-            if (out.length() >= destSize - 1) break;
+        int byteLength = 0;
+        while (byteLength < n && heap.data()[off + byteLength] != 0) {
+            byteLength++;
         }
+        String value = new String(heap.data(), off, byteLength, GameCharsets.GAME_TEXT);
+        int remaining = Math.max(0, destSize - 1 - out.length());
+        out.append(value, 0, Math.min(value.length(), remaining));
     }
 
     // not ported.
@@ -1249,11 +1250,11 @@ public final class ResInHeap extends Res {
         if (max <= 0 || src < 0 || src >= heap.data().length) return;
 
         int n = Math.min(max, heap.data().length - src);
-        for (int i = 0; i < n; i++) {
-            int b = heap.data()[src + i] & 0xff;
-            if (b == 0) break; // strlen-style termination
-            out.append((char) b);
+        int byteLength = 0;
+        while (byteLength < n && heap.data()[src + byteLength] != 0) {
+            byteLength++;
         }
+        out.append(new String(heap.data(), src, byteLength, GameCharsets.GAME_TEXT));
     }
 
     // not ported.
@@ -1285,16 +1286,11 @@ public final class ResInHeap extends Res {
      */
     private String readCStringFromHeap(int off, int endExclusive) {
         requireHeapRange(off, Math.max(0, endExclusive - off));
-        StringBuilder value = new StringBuilder();
         int pos = off;
-        while (pos < endExclusive) {
-            int b = heap.data()[pos++] & 0xFF;
-            if (b == 0) {
-                break;
-            }
-            value.append((char) b);
+        while (pos < endExclusive && heap.data()[pos] != 0) {
+            pos++;
         }
-        return value.toString();
+        return new String(heap.data(), off, pos - off, GameCharsets.GAME_TEXT);
     }
 
     // not ported.

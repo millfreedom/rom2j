@@ -1,5 +1,6 @@
 package ua.millfreedom.rom2.model.visobj;
 
+import ua.millfreedom.rom2.GameCharsets;
 import ua.millfreedom.rom2.Globals;
 import ua.millfreedom.rom2.model.CBitmapFont;
 import ua.millfreedom.rom2.model.CRect;
@@ -11,7 +12,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -356,7 +356,7 @@ public class HatServerBrowserDialogVisualObject extends CenteredDialogVisualObje
         }
 
         HAT_SERVER_ROWS.clear();
-        String responseText = new String(responseBytes, StandardCharsets.ISO_8859_1);
+        String responseText = new String(responseBytes, GameCharsets.GAME_TEXT);
         if (!responseText.contains(HAT_SERVER_COUNT_MARKER)) {
             return 0;
         }
@@ -380,7 +380,12 @@ public class HatServerBrowserDialogVisualObject extends CenteredDialogVisualObje
             while (rowEnd < responseBytes.length && Byte.toUnsignedInt(responseBytes[rowEnd]) > 0x1F) {
                 rowEnd++;
             }
-            HAT_SERVER_ROWS.add("|" + new String(responseBytes, rowStart, rowEnd - rowStart, StandardCharsets.ISO_8859_1));
+            HAT_SERVER_ROWS.add("|" + new String(
+                    responseBytes,
+                    rowStart,
+                    rowEnd - rowStart,
+                    GameCharsets.GAME_TEXT
+            ));
             rowCursor = rowEnd;
         }
         return 1;
@@ -436,7 +441,7 @@ public class HatServerBrowserDialogVisualObject extends CenteredDialogVisualObje
      */
     private static boolean isNativePrintable(byte value) {
         int unsignedValue = Byte.toUnsignedInt(value);
-        return unsignedValue >= 0x20 && unsignedValue <= 0x7E;
+        return unsignedValue >= 0x20;
     }
 
     /**

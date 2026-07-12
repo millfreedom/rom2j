@@ -29,7 +29,6 @@ import ua.millfreedom.rom2.text.TextTableId;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.IntBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -484,7 +483,7 @@ public final class CMainApp {
     public static int loadConfig(String configPath) {
         List<String> lines;
         try {
-            lines = Files.readAllLines(Path.of(configPath), Charset.defaultCharset());
+            lines = Files.readAllLines(Path.of(configPath), GameCharsets.GAME_TEXT);
         } catch (Throwable ignored) {
             return LOAD_CONFIG_OPEN_FAILED;
         }

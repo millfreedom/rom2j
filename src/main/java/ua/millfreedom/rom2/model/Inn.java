@@ -9,19 +9,7 @@ import ua.millfreedom.rom2.model.column.WorldItemColumn;
 import ua.millfreedom.rom2.model.container.CustomList;
 import ua.millfreedom.rom2.model.enums.EffectId;
 import ua.millfreedom.rom2.model.enums.SpellId;
-import ua.millfreedom.rom2.model.quest.Quest;
-import ua.millfreedom.rom2.model.quest.Quest_1;
-import ua.millfreedom.rom2.model.quest.Quest_2;
-import ua.millfreedom.rom2.model.quest.Quest_3;
-import ua.millfreedom.rom2.model.quest.Quest_4;
-import ua.millfreedom.rom2.model.quest.Quest_5;
-import ua.millfreedom.rom2.model.quest.Quest_6;
-import ua.millfreedom.rom2.model.quest.Quest_8;
-import ua.millfreedom.rom2.model.quest.Quest_9;
-import ua.millfreedom.rom2.model.quest.Quest_10;
-import ua.millfreedom.rom2.model.quest.Quest_11;
-import ua.millfreedom.rom2.model.quest.Quest_12;
-import ua.millfreedom.rom2.model.quest.Quest_13;
+import ua.millfreedom.rom2.model.quest.*;
 import ua.millfreedom.rom2.model.unit.Unit;
 import ua.millfreedom.rom2.model.unit.UnitDirtyFlags;
 import ua.millfreedom.rom2.model.unit.UnitInfo;
@@ -427,13 +415,13 @@ public class Inn extends Building {
         int matchingUnits = unitCountsByTypeFace.get(selectedKey);
         int targetCount;
         if (matchingUnits < 2) {
-            targetCount = Utils.randInclusive(3) + 1;
+            targetCount = Utils.randBasedInclusive(1, 3);
         } else if (matchingUnits < 4) {
-            targetCount = Utils.randInclusive(4) + 2;
+            targetCount = Utils.randBasedInclusive(2, 4);
         } else if (matchingUnits < 8) {
-            targetCount = Utils.randInclusive(5) + 2;
+            targetCount = Utils.randBasedInclusive(2, 5);
         } else {
-            targetCount = Utils.randInclusive(8) + 2;
+            targetCount = Utils.randBasedInclusive(2, 8);
         }
         int unitInfoIndex = CStaticDataMgr.getInstance().findInnQuestUnitInfoIndexByTypeAndFace(
                 selectedKey & 0xFF,
@@ -739,7 +727,8 @@ public class Inn extends Building {
      */
     private static boolean isInnQuestThreatInSkillWindow(Unit unit, int strongestSkillLevel) {
         int threat = unit.computeInnQuestThreatRating();
-        return strongestSkillLevel * 3 - 0x32 < threat && threat < strongestSkillLevel * 3 + 0x4B;
+        int skillPart = strongestSkillLevel * 3;
+        return skillPart - 50 < threat && threat < skillPart + 75;
     }
 
     /**
@@ -747,7 +736,7 @@ public class Inn extends Building {
      * Fully ported.
      */
     private static int randomKey(Map<Integer, Integer> candidates) {
-        int index = Utils.randInclusive(candidates.size() - 1);
+        int index = Utils.randExclusive(candidates.size());
         Iterator<Integer> iterator = candidates.keySet().iterator();
         for (int skipped = 0; skipped < index; skipped++) {
             iterator.next();
@@ -840,7 +829,7 @@ public class Inn extends Building {
                 idFull,
                 0,
                 idFull,
-                Utils.randInclusive(6) + 3,
+                Utils.randBasedInclusive(3, 6),
                 0
         );
         quest.setState(3);

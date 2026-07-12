@@ -165,7 +165,7 @@ public class MpConnectionDialogVisualObject extends HeaderDialogVisualObject {
     private void populateAvailableProtocolRows(TextListVisualObject availableProtocolsList) {
         availableProtocolsList.rows.clear();
         for (LlDriverProtocolOption availableProtocol : availableProtocols) {
-            availableProtocolsList.rows.add(normalizeProtocolDisplayName(availableProtocol.displayName));
+            availableProtocolsList.rows.add(availableProtocol.displayName);
         }
     }
 
@@ -258,32 +258,4 @@ public class MpConnectionDialogVisualObject extends HeaderDialogVisualObject {
         selectedProtocolIndexPointer.set(selectedProtocolIndex);
     }
 
-    /**
-     * Native helper block inside MpConnectionDialogVisualObject::createDialogContent @004451FE using
-     * NormalizeHotKeyInput @00474C85.
-     * Fully ported. Java rebuilds the display row through StringBuilder instead of CString.
-     */
-    private static String normalizeProtocolDisplayName(String protocolDisplayName) {
-        StringBuilder normalizedName = new StringBuilder(protocolDisplayName.length());
-        for (int index = 0; index < protocolDisplayName.length(); index++) {
-            normalizedName.append((char) normalizeHotKeyInput(protocolDisplayName.charAt(index)));
-        }
-        return normalizedName.toString();
-    }
-
-    /**
-     * Native helper: NormalizeHotKeyInput @00474C85.
-     */
-    private static int normalizeHotKeyInput(int c) {
-        int value = c & 0xFF;
-        if (Globals.useCustomEncoding && value > 0x7F) {
-            if (value >= 0xC0 && value <= 0xEF) {
-                return value - 0x40;
-            }
-            if (value > 0xEF) {
-                return value - 0x10;
-            }
-        }
-        return value;
-    }
 }

@@ -15,7 +15,6 @@ import ua.millfreedom.rom2.model.world.scenario.Trigger;
 import ua.millfreedom.rom2.model.world.scenario.UnitDTO;
 import ua.millfreedom.rom2.model.world.scenario.WorldSack;
 
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -131,8 +130,8 @@ public final class MapEditorDocument {
      * not ported.
      */
     public void applyMetadata(String mapName, String authors, int recommendedPlayers, int mapLevel) {
-        scenario.mapName.set(mapName.getBytes(StandardCharsets.ISO_8859_1));
-        scenario.authors.set(authors.getBytes(StandardCharsets.ISO_8859_1));
+        scenario.mapName.set(mapName);
+        scenario.authors.set(authors);
         scenario.recommendedPlayers = recommendedPlayers;
         scenario.mapLevel = mapLevel;
         dirty = true;
@@ -1433,7 +1432,7 @@ public final class MapEditorDocument {
      */
     public void updatePlayer(int playerIndex, String name, int color, int gold, int flags) {
         CPlayer player = playerAt(playerIndex);
-        player.name.set(name.getBytes(StandardCharsets.ISO_8859_1));
+        player.name.set(name);
         player.color = color;
         player.gold = gold;
         player.flags = flags;
@@ -2388,14 +2387,14 @@ public final class MapEditorDocument {
             String[] argumentNames
     ) {
         ensureInstantArgumentArrayLengths(argumentValues, argumentTypes, argumentNames);
-        instant.name.set(name.getBytes(StandardCharsets.ISO_8859_1));
+        instant.name.set(name);
         instant.typeId = typeId;
         instant.index = index;
         instant.executeOnce = executeOnce;
         for (int i = 0; i < instant.arguments.length; i++) {
             instant.arguments[i].value = argumentValues[i];
             instant.arguments[i].type = argumentTypes[i];
-            instant.arguments[i].name.set(argumentNames[i].getBytes(StandardCharsets.ISO_8859_1));
+            instant.arguments[i].name.set(argumentNames[i]);
         }
     }
 
@@ -2430,7 +2429,7 @@ public final class MapEditorDocument {
             boolean runOnce
     ) {
         ensureTriggerReferenceArrayLengths(checkIds, instantIds);
-        trigger.description.set(description.getBytes(StandardCharsets.ISO_8859_1));
+        trigger.description.set(description);
         System.arraycopy(checkIds, 0, trigger.checkIds, 0, trigger.checkIds.length);
         System.arraycopy(instantIds, 0, trigger.instantIds, 0, trigger.instantIds.length);
         trigger.check12Operator = check12Operator;

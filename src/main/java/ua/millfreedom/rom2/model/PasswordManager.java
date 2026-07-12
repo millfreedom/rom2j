@@ -1,8 +1,9 @@
 package ua.millfreedom.rom2.model;
 
+import ua.millfreedom.rom2.GameCharsets;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class PasswordManager {
         }
         List<String> lines;
         try {
-            lines = Files.readAllLines(path, StandardCharsets.ISO_8859_1);
+            lines = Files.readAllLines(path, GameCharsets.GAME_TEXT);
         } catch (IOException exception) {
             return;
         }

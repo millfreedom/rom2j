@@ -97,7 +97,7 @@ public class CTextFile implements MfcSerializable {
      */
     private void loadAndParse(String fileName) {
         Objects.requireNonNull(fileName, "fileName");
-        List<String> allLines = readAllLines(Resources.open(fileName), Globals.WINDOWS_CYRILLIC_CHARSET);
+        List<String> allLines = readAllLines(Resources.open(fileName), GameCharsets.GAME_TEXT);
         lines.clear();
         lines.addAll(allLines);
         all.put(name, new ArrayList<>(lines));
@@ -110,7 +110,7 @@ public class CTextFile implements MfcSerializable {
      * directly to Unicode for renderer/dialog consumers.
      */
     public static String loadTextFileToOemString(String fileName) {
-        return readText(Resources.open(fileName), Globals.WINDOWS_CYRILLIC_CHARSET);
+        return readText(Resources.open(fileName), GameCharsets.GAME_TEXT);
     }
 
     /**

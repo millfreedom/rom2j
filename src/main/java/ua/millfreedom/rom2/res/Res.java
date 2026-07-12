@@ -2,6 +2,7 @@ package ua.millfreedom.rom2.res;
 
 import ua.millfreedom.rom2.CString;
 import ua.millfreedom.rom2.CFile.CFileException;
+import ua.millfreedom.rom2.GameCharsets;
 import ua.millfreedom.rom2.Utils.Counter;
 
 import java.io.BufferedWriter;
@@ -9,7 +10,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -76,7 +76,7 @@ public class Res {
     public void resToTextFile(String filename) throws IOException {
         byte[] heapData = ((ResInHeap) this).heap.data();
         Path outputPath = resolveTextExportPath(filename);
-        try (BufferedWriter writer = Files.newBufferedWriter(outputPath, StandardCharsets.ISO_8859_1)) {
+        try (BufferedWriter writer = Files.newBufferedWriter(outputPath, GameCharsets.GAME_TEXT)) {
             ResContainerNode rootContainer = (ResContainerNode) resNode.atom().data();
             for (int groupOffset = 0; groupOffset < rootContainer.childCount(); groupOffset++) {
                 ResNode group = nodes.get(rootContainer.firstChildIndex() + groupOffset);
@@ -271,7 +271,7 @@ public class Res {
         for (int index = 0; index < count; index++) {
             String value = readHeapCString(heapData, cursor);
             writer.write(name + "=" + value + "\n");
-            cursor += value.getBytes(StandardCharsets.ISO_8859_1).length + 1;
+            cursor += value.getBytes(GameCharsets.GAME_TEXT).length + 1;
         }
     }
 
@@ -314,7 +314,7 @@ public class Res {
         while (end < heapData.length && heapData[end] != 0) {
             end++;
         }
-        return new String(heapData, offset, end - offset, StandardCharsets.ISO_8859_1);
+        return new String(heapData, offset, end - offset, GameCharsets.GAME_TEXT);
     }
 
     /**

@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import ua.millfreedom.rom2.CArchive.CArchive;
 import ua.millfreedom.rom2.CArchive.MfcSerializable;
 import ua.millfreedom.rom2.Globals;
+import ua.millfreedom.rom2.GameCharsets;
 import ua.millfreedom.rom2.model.enums.TextAlign;
 import ua.millfreedom.rom2.model.palette.Palette16;
 
@@ -112,7 +113,7 @@ public class CBaseFont implements MfcSerializable {
      * Java support method, not ported
      */
     protected static byte @NotNull [] getNativeTextBytes(String text) {
-        return text.getBytes(Globals.OEM_CYRILLIC_CHARSET);
+        return text.getBytes(GameCharsets.FONT_GLYPHS);
     }
 
     /**

@@ -1,5 +1,6 @@
 package ua.millfreedom.rom2.model;
 
+import ua.millfreedom.rom2.GameCharsets;
 import ua.millfreedom.rom2.Globals;
 import ua.millfreedom.rom2.Utils;
 import ua.millfreedom.rom2.CFile.LEReader;
@@ -245,14 +246,14 @@ public class CFameHall {
         while (length < bytes.length && bytes[length] != 0) {
             length++;
         }
-        return new String(bytes, 0, length, Globals.WINDOWS_CYRILLIC_CHARSET);
+        return new String(bytes, 0, length, GameCharsets.GAME_TEXT);
     }
 
     /**
      * Native support extracted from CString::GetLength plus null-terminated CFile::Write in CFameHall::Save @004A90C9.
      */
     private static byte[] encodeNativeString(String value) {
-        byte[] bytes = value.getBytes(Globals.WINDOWS_CYRILLIC_CHARSET);
+        byte[] bytes = value.getBytes(GameCharsets.GAME_TEXT);
         return Arrays.copyOf(bytes, bytes.length + 1);
     }
 

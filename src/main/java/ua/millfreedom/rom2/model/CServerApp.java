@@ -1,6 +1,7 @@
 package ua.millfreedom.rom2.model;
 
 import ua.millfreedom.rom2.model.net.CBufferManager;
+import ua.millfreedom.rom2.GameCharsets;
 import ua.millfreedom.rom2.Globals;
 import ua.millfreedom.rom2.NetBuffer;
 import ua.millfreedom.rom2.model.action.BuildingHealthAction;
@@ -806,6 +807,7 @@ public final class CServerApp {
         Files.writeString(
                 Path.of(name),
                 log,
+                GameCharsets.GAME_TEXT,
                 StandardOpenOption.CREATE,
                 StandardOpenOption.TRUNCATE_EXISTING,
                 StandardOpenOption.WRITE

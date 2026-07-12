@@ -1,7 +1,8 @@
 package ua.millfreedom.rom2.model.action;
 
+import ua.millfreedom.rom2.GameCharsets;
+
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -53,7 +54,7 @@ enum StandardMarshaller implements Marshaller<Object> {
             writeBytes(buffer, startPosition, size, bytes);
         }
     },
-    FIXED_C_STRING_ISO_8859_1 {
+    FIXED_C_STRING_WINDOWS_CYRILLIC {
         @Override
         public Object get(ByteBuffer buffer, int startPosition, int size) {
             byte[] raw = readBytes(buffer, startPosition, size);
@@ -61,14 +62,14 @@ enum StandardMarshaller implements Marshaller<Object> {
             while (length < raw.length && raw[length] != 0) {
                 length++;
             }
-            return new String(raw, 0, length, StandardCharsets.ISO_8859_1);
+            return new String(raw, 0, length, GameCharsets.GAME_TEXT);
         }
 
         @Override
         public void put(ByteBuffer buffer, int startPosition, int size, Object value) {
             byte[] raw = new byte[size];
             if (value != null) {
-                byte[] encoded = value.toString().getBytes(StandardCharsets.ISO_8859_1);
+                byte[] encoded = value.toString().getBytes(GameCharsets.GAME_TEXT);
                 System.arraycopy(encoded, 0, raw, 0, Math.clamp(size - 1, 0, encoded.length));
             }
             writeBytes(buffer, startPosition, size, raw);

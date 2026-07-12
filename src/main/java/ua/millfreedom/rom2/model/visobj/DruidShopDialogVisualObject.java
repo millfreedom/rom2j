@@ -116,9 +116,9 @@ public class DruidShopDialogVisualObject extends ShopDialogVisualObject {
      */
     @Override
     protected void initializeVariantAmbientTimers() {
-        nextBirdAmbientDelay = Utils.randInclusive(2000) + 2000;
+        nextBirdAmbientDelay = Utils.randBasedInclusive(2000, 2000);
         birdAmbientTick = currentTick();
-        nextToolAmbientDelay = Utils.randInclusive(2000) + 2000;
+        nextToolAmbientDelay = Utils.randBasedInclusive(2000, 2000);
         toolAmbientTick = currentTick();
     }
 
@@ -153,7 +153,7 @@ public class DruidShopDialogVisualObject extends ShopDialogVisualObject {
                 default -> {
                 }
             }
-            nextBirdAmbientDelay = Utils.randInclusive(2000) + 2000;
+            nextBirdAmbientDelay = Utils.randBasedInclusive(2000, 2000);
             birdAmbientTick = currentTick();
         }
 
@@ -166,7 +166,7 @@ public class DruidShopDialogVisualObject extends ShopDialogVisualObject {
                 default -> {
                 }
             }
-            nextToolAmbientDelay = Utils.randInclusive(2000) + 2000;
+            nextToolAmbientDelay = Utils.randBasedInclusive(2000, 2000);
             toolAmbientTick = currentTick();
         }
     }

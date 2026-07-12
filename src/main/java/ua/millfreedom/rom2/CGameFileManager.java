@@ -12,7 +12,6 @@ import ua.millfreedom.rom2.res.Resources;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -353,7 +352,7 @@ public final class CGameFileManager implements MfcSerializable {
         if (!Files.exists(updateList)) {
             return;
         }
-        try (BufferedReader reader = Files.newBufferedReader(updateList, StandardCharsets.ISO_8859_1)) {
+        try (BufferedReader reader = Files.newBufferedReader(updateList, GameCharsets.GAME_TEXT)) {
             processUpdateList(reader);
         } catch (IOException e) {
             throw new RuntimeException("Global::LoadUpdateList failed for " + path, e);
@@ -372,7 +371,7 @@ public final class CGameFileManager implements MfcSerializable {
                 return;
             }
             try (BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(input, StandardCharsets.ISO_8859_1))) {
+                    new InputStreamReader(input, GameCharsets.GAME_TEXT))) {
                 processUpdateList(reader);
             }
         } catch (IOException e) {
@@ -399,9 +398,10 @@ public final class CGameFileManager implements MfcSerializable {
 
     /**
      * Native support extracted from Global::LoadUpdateList @004E2A1D `isprint(line[0])`.
+     * Java applies the byte-era control-character test to decoded Unicode text so CP1251 path characters remain valid.
      */
     private static boolean isNativePrintable(char value) {
-        return value >= 0x20 && value <= 0x7e;
+        return value >= 0x20 && value != 0x7F;
     }
 
     /**

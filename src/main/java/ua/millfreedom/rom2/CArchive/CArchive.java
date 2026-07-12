@@ -3,6 +3,7 @@ package ua.millfreedom.rom2.CArchive;
 import lombok.SneakyThrows;
 import ua.millfreedom.rom2.CFile.CFile;
 import ua.millfreedom.rom2.ClassNameIndex;
+import ua.millfreedom.rom2.GameCharsets;
 import ua.millfreedom.rom2.data.RWAdaptor;
 import ua.millfreedom.rom2.data.ByteBufferAdaptor;
 import ua.millfreedom.rom2.res.CGameFile;
@@ -513,7 +514,7 @@ public final class CArchive implements AutoCloseable {
             throw new IOException("CRuntimeClass::Load class name too long");
         }
         byte[] nameBytes = readBytes(nameLen);
-        String className = new String(nameBytes, StandardCharsets.ISO_8859_1);
+        String className = new String(nameBytes, GameCharsets.GAME_TEXT);
         return new RuntimeClassInfo(className, schema);
     }
 
@@ -522,7 +523,7 @@ public final class CArchive implements AutoCloseable {
      */
     private void writeRuntimeClassInfo(Class<?> runtimeClass) throws IOException {
         String className = runtimeClass.getSimpleName();
-        byte[] nameBytes = className.getBytes(StandardCharsets.ISO_8859_1);
+        byte[] nameBytes = className.getBytes(GameCharsets.GAME_TEXT);
         if (nameBytes.length >= 64) {
             throw new IOException("CRuntimeClass::Store class name too long");
         }

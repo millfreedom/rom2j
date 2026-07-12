@@ -1,17 +1,16 @@
 package ua.millfreedom.rom2;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Objects;
 
 public final class CString {
-    private final byte[] byteString;
-    private String cachedString;
+    private final int byteCapacity;
+    private String value;
 
     // not ported.
     public CString(byte[] bytes) {
-        byteString = bytes == null ? new byte[0] : bytes.clone();
+        byteCapacity = bytes == null ? 0 : bytes.length;
+        set(bytes);
     }
 
     // not ported.
@@ -19,56 +18,68 @@ public final class CString {
         if (size < 0) {
             throw new IllegalArgumentException("size must be >= 0");
         }
-        byteString = new byte[size];
+        byteCapacity = size;
+        value = "";
     }
 
     // not ported.
     public void set(byte[] bytes) {
-        clear();
-        if (bytes != null && byteString.length > 0) {
-            int copy = Math.min(byteString.length, bytes.length);
-            System.arraycopy(bytes, 0, byteString, 0, copy);
+        if (bytes == null) {
+            value = "";
+            return;
         }
+        int length = 0;
+        int limit = Math.min(byteCapacity, bytes.length);
+        while (length < limit && bytes[length] != 0) {
+            length++;
+        }
+        value = new String(bytes, 0, length, GameCharsets.GAME_TEXT);
+    }
+
+    // not ported. Stores Java text as Unicode; fixed-field encoding happens only in write(ByteBuffer).
+    public void set(String value) {
+        String text = value == null ? "" : value;
+        int codePointCount = text.codePointCount(0, text.length());
+        if (codePointCount > byteCapacity) {
+            text = text.substring(0, text.offsetByCodePoints(0, byteCapacity));
+        }
+        this.value = text;
     }
 
     // not ported.
     public void clear() {
-        Arrays.fill(byteString, (byte) 0);
-        cachedString = null;
+        value = "";
     }
 
     // not ported.
     public CString read(ByteBuffer bb) {
         Objects.requireNonNull(bb, "bb");
-        clear();
-        int copy = Math.min(byteString.length, bb.remaining());
+        byte[] bytes = new byte[byteCapacity];
+        int copy = Math.min(byteCapacity, bb.remaining());
         if (copy > 0) {
-            bb.get(byteString, 0, copy);
+            bb.get(bytes, 0, copy);
         }
+        set(bytes);
         return this;
     }
 
     // not ported.
     public void write(ByteBuffer bb) {
         Objects.requireNonNull(bb, "bb");
-        bb.put(byteString);
+        byte[] bytes = new byte[byteCapacity];
+        byte[] encoded = value.getBytes(GameCharsets.GAME_TEXT);
+        System.arraycopy(encoded, 0, bytes, 0, Math.min(bytes.length, encoded.length));
+        bb.put(bytes);
     }
 
     // not ported.
     public int length() {
-        return byteString.length;
+        return byteCapacity;
     }
 
     @Override
     // not ported.
     public String toString() {
-        if (cachedString == null) {
-            int len = 0;
-            while (len < byteString.length && byteString[len] != 0) {
-                len++;
-            }
-            cachedString = new String(byteString, 0, len, StandardCharsets.ISO_8859_1);
-        }
-        return cachedString;
+        return value;
     }
 }

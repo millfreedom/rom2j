@@ -2,6 +2,7 @@ package ua.millfreedom.rom2.hatserver;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import ua.millfreedom.rom2.GameCharsets;
 import ua.millfreedom.rom2.ServerConfigurationLoader;
 import ua.millfreedom.rom2.model.ServerConfig;
 import ua.millfreedom.rom2.model.net.CLlDriver;
@@ -11,7 +12,6 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -22,10 +22,10 @@ import java.util.concurrent.Executors;
  */
 public final class HatHttpServer {
     private static final int DEFAULT_PORT = 6666;
-    private static final Charset HAT_CHARSET = StandardCharsets.ISO_8859_1;
+    private static final Charset HAT_CHARSET = GameCharsets.GAME_TEXT;
     private static final String DEFAULT_BIND_ADDRESS = "0.0.0.0";
     private static final String LOOPBACK_CONNECT_ADDRESS = "127.0.0.1";
-    private static final String RESPONSE_CONTENT_TYPE = "text/plain; charset=ISO-8859-1";
+    private static final String RESPONSE_CONTENT_TYPE = "text/plain; charset=windows-1251";
     private static final String NO_MAP_NAME = "no map";
     public static final String MAP_EXTENSION = ".alm";
     private static final String NO_MAP_SIZE = "0x0";

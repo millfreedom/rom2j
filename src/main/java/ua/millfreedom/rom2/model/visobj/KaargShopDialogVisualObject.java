@@ -115,9 +115,9 @@ public class KaargShopDialogVisualObject extends ShopDialogVisualObject {
      */
     @Override
     protected void initializeVariantAmbientTimers() {
-        nextVoiceAmbientDelay = Utils.randInclusive(2000) + 2000;
+        nextVoiceAmbientDelay = Utils.randBasedInclusive(2000, 2000);
         voiceAmbientTick = currentTick();
-        nextToolAmbientDelay = Utils.randInclusive(2000) + 2000;
+        nextToolAmbientDelay = Utils.randBasedInclusive(2000, 2000);
         toolAmbientTick = currentTick();
     }
 
@@ -152,7 +152,7 @@ public class KaargShopDialogVisualObject extends ShopDialogVisualObject {
                 default -> {
                 }
             }
-            nextVoiceAmbientDelay = Utils.randInclusive(2000) + 2000;
+            nextVoiceAmbientDelay = Utils.randBasedInclusive(2000, 2000);
             voiceAmbientTick = currentTick();
         }
 
@@ -165,7 +165,7 @@ public class KaargShopDialogVisualObject extends ShopDialogVisualObject {
                 default -> {
                 }
             }
-            nextToolAmbientDelay = Utils.randInclusive(2000) + 2000;
+            nextToolAmbientDelay = Utils.randBasedInclusive(2000, 2000);
             toolAmbientTick = currentTick();
         }
     }

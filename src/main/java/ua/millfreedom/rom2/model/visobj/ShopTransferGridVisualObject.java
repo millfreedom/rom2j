@@ -476,7 +476,7 @@ public class ShopTransferGridVisualObject extends ShopItemGridVisualObject {
                 shopSpeechDirectory,
                 tokenEntry.getType(),
                 tokenEntry.getId(),
-                Utils.randInclusive(3) + 1
+                Utils.randBasedInclusive(1, 3)
         );
     }
 

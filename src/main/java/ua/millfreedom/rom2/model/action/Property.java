@@ -80,7 +80,7 @@ public final class Property<T> {
      * not ported.
      */
     public static Property<String> fixedCString(ByteBuffer buffer, int startPosition, int size) {
-        return new Property<>(buffer, startPosition, size, String.class, typed(StandardMarshaller.FIXED_C_STRING_ISO_8859_1));
+        return new Property<>(buffer, startPosition, size, String.class, typed(StandardMarshaller.FIXED_C_STRING_WINDOWS_CYRILLIC));
     }
 
     /**
@@ -316,7 +316,7 @@ public final class Property<T> {
             return typed(StandardMarshaller.BYTE_ARRAY);
         }
         if (type == String.class) {
-            return typed(StandardMarshaller.FIXED_C_STRING_ISO_8859_1);
+            return typed(StandardMarshaller.FIXED_C_STRING_WINDOWS_CYRILLIC);
         }
         throw new IllegalArgumentException("No default marshaller for " + type.getName() + "[" + size + "]");
     }

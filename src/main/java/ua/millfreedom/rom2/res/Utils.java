@@ -1,6 +1,6 @@
 package ua.millfreedom.rom2.res;
 
-import java.nio.charset.StandardCharsets;
+import ua.millfreedom.rom2.GameCharsets;
 
 public class Utils {
     // not ported.
@@ -19,7 +19,7 @@ public class Utils {
     public static byte[] encodeName16(String s) {
         byte[] out = new byte[16];
         if (s != null) {
-            byte[] src = s.getBytes(StandardCharsets.ISO_8859_1);
+            byte[] src = s.getBytes(GameCharsets.GAME_TEXT);
             System.arraycopy(src, 0, out, 0, Math.min(src.length, 15));
         }
         return out;
@@ -30,7 +30,7 @@ public class Utils {
         int n = 0;
         int max = Math.min(16, name16.length);
         while (n < max && name16[n] != 0) n++;
-        return new String(name16, 0, n, StandardCharsets.ISO_8859_1);
+        return new String(name16, 0, n, GameCharsets.GAME_TEXT);
     }
 
 /*    public static int readI32LE(SeekableByteChannel ch) throws IOException {

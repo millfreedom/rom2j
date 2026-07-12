@@ -429,7 +429,7 @@ public final class ItemAssortmentGenerator {
             generated.count = 1;
             return;
         }
-        generated.count = Utils.randInclusive(maxSameTypeItems) + 1;
+        generated.count = Utils.randBasedInclusive(1, maxSameTypeItems);
     }
 
     /**
@@ -1111,7 +1111,7 @@ public final class ItemAssortmentGenerator {
         Item candidate;
         int attempts = 0;
         do {
-            candidate = MagicItem.createByIndex(Utils.randInclusive(0x0C) + 1);
+            candidate = MagicItem.createByIndex(Utils.randBasedInclusive(1, 0x0C));
             attempts++;
             if (attempts > RANDOM_POTION_RETRY_LIMIT) {
                 return candidate;
@@ -1142,7 +1142,7 @@ public final class ItemAssortmentGenerator {
         WorldItem itemInfo;
         boolean hasAllowedShape;
         do {
-            itemIndex = Utils.randInclusive(items.size() - 1 - minimumItemIndex) + minimumItemIndex;
+            itemIndex = Utils.randExclusive(minimumItemIndex, items.size());
             itemInfo = items.get(itemIndex);
             hasAllowedShape = false;
             for (int shapeId = 0; shapeId < itemInfo.materialMasks.length; shapeId++) {

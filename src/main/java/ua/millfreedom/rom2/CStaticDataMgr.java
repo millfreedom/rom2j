@@ -17,7 +17,6 @@ import ua.millfreedom.rom2.res.Resources;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -398,7 +397,7 @@ public final class CStaticDataMgr implements MfcSerializable {
             return null;
         }
         try {
-            List<String> lines = Files.readAllLines(textPath, StandardCharsets.ISO_8859_1);
+            List<String> lines = Files.readAllLines(textPath, GameCharsets.GAME_TEXT);
             if (lines.isEmpty()) {
                 columns.clear();
                 return List.of();

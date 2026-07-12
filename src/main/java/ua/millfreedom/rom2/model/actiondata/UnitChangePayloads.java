@@ -1,5 +1,6 @@
 package ua.millfreedom.rom2.model.actiondata;
 
+import ua.millfreedom.rom2.GameCharsets;
 import ua.millfreedom.rom2.model.action.CGameAction;
 import ua.millfreedom.rom2.model.action.UnitChangeAction;
 import ua.millfreedom.rom2.model.action.UnitChangeAction_6C;
@@ -8,8 +9,6 @@ import ua.millfreedom.rom2.model.action.UnitChangeAction_6F;
 import ua.millfreedom.rom2.model.action.UnitChangeAction_70;
 import ua.millfreedom.rom2.model.enums.GameActionId;
 import ua.millfreedom.rom2.model.unit.UnitDirtyFlags;
-
-import java.nio.charset.StandardCharsets;
 
 /**
  * Native support extracted from UnitChangeAction packet packing routines.
@@ -90,7 +89,7 @@ public final class UnitChangePayloads {
         markFlag(action, UnitDirtyFlags.DISPLAY_NAME.value);
         int offset = action.size2.get();
         action.payload.fillAt(offset, 0x18, (byte) 0);
-        byte[] encoded = displayName.getBytes(StandardCharsets.ISO_8859_1);
+        byte[] encoded = displayName.getBytes(GameCharsets.GAME_TEXT);
         action.payload.setBytesAt(offset, encoded, 0, Math.min(encoded.length, 0x17));
         action.size2.set(offset + 0x18);
     }

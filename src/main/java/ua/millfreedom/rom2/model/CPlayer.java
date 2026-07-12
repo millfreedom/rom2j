@@ -5,7 +5,6 @@ import ua.millfreedom.rom2.CArchive.MfcSerializable;
 import ua.millfreedom.rom2.CString;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public class CPlayer implements MfcSerializable {
@@ -17,7 +16,7 @@ public class CPlayer implements MfcSerializable {
     public static final int DIPLOMACY_VISIBLE_MASK = 0x10;
     private static final int DIPLOMACY_WORD_COUNT = 0x20;
     private static final int SCENARIO_DIPLOMACY_WORD_COUNT = 0x10;
-    private static final byte[] DEFAULT_NAME = "NoName".getBytes(StandardCharsets.ISO_8859_1);
+    private static final String DEFAULT_NAME = "NoName";
 
 
     //0x04
@@ -61,7 +60,7 @@ public class CPlayer implements MfcSerializable {
         color = from.color;
         gold = from.gold;
         flags = from.flags;
-        name.set(from.name.toString().getBytes(StandardCharsets.ISO_8859_1));
+        name.set(from.name.toString());
         diplomacyFlags = from.diplomacyFlags.clone();
     }
 

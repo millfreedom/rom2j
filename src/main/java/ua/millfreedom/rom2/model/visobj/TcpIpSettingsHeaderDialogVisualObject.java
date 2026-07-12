@@ -7,7 +7,6 @@ import ua.millfreedom.rom2.model.CRect;
 import ua.millfreedom.rom2.model.enums.MessageCodes;
 import ua.millfreedom.rom2.model.palette.Palettes;
 
-import java.nio.charset.StandardCharsets;
 
 import static ua.millfreedom.rom2.model.enums.MessageCodes.DIALOG_OK;
 import static ua.millfreedom.rom2.model.enums.MessageCodes.SHOW_MULTIPLAYER_CONNECTION_DIALOG;
@@ -70,7 +69,7 @@ public class TcpIpSettingsHeaderDialogVisualObject extends HeaderDialogVisualObj
             getChildById(2).getValue(selectedConnection);
 
             String selectedConnectionText = selectedConnection.toString();
-            context.set(selectedConnectionText.getBytes(StandardCharsets.ISO_8859_1));
+            context.set(selectedConnectionText);
             Globals.mainWindow.postMessage(SHOW_MULTIPLAYER_SESSION_DIALOG, 0, 0);
             Globals.mainWindow.setPendingConnectionString(selectedConnectionText);
             return;

@@ -2,6 +2,7 @@ package ua.millfreedom.rom2.model.action;
 
 import ua.millfreedom.rom2.model.net.CBufferManager;
 import ua.millfreedom.rom2.CString;
+import ua.millfreedom.rom2.GameCharsets;
 import ua.millfreedom.rom2.Globals;
 import ua.millfreedom.rom2.model.CPlayer;
 import ua.millfreedom.rom2.model.Player;
@@ -123,7 +124,7 @@ public class ChatTextAction extends CGameAction {
      */
     @Override
     public boolean WritePayload(CBufferManager target) {
-        textLength.set(text.get().getBytes(Globals.WINDOWS_CYRILLIC_CHARSET).length);
+        textLength.set(text.get().getBytes(GameCharsets.GAME_TEXT).length);
         return target.Write(this, ID_OFFSET, textLength.get() + 7);
     }
 

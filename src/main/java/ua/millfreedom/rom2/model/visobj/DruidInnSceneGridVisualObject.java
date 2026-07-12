@@ -104,8 +104,8 @@ public class DruidInnSceneGridVisualObject extends BasicInnSceneGridVisualObject
 
         if (Globals.mainWindow.sessionMode == CMainWindow.SESSION_MODE_CAMPAIGN
                 && nextAmbientBirdSoundDelay < currentTick - lastAmbientBirdSoundTick) {
-            Sound.playPointer(druidOwner.druidSceneSounds, Utils.randExclusive(3) + 8);
-            nextAmbientBirdSoundDelay = Utils.randBased(2000, 2000);
+            Sound.playPointer(druidOwner.druidSceneSounds, Utils.randBased(8, 3));
+            nextAmbientBirdSoundDelay = Utils.randBasedInclusive(2000, 2000);
             lastAmbientBirdSoundTick = (int) System.currentTimeMillis();
         }
     }

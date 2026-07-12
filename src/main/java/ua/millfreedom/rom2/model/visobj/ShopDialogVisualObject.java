@@ -495,8 +495,7 @@ public class ShopDialogVisualObject extends HandlerVisualObject {
         }
 
         int currentTick = (int) System.currentTimeMillis();
-        int ambientDelay = Utils.randInclusive(SHOP_AMBIENT_IDLE_RANDOM_DELAY_MS)
-                + SHOP_AMBIENT_IDLE_BASE_DELAY_MS;
+        int ambientDelay = Utils.randBasedInclusive(SHOP_AMBIENT_IDLE_BASE_DELAY_MS, SHOP_AMBIENT_IDLE_RANDOM_DELAY_MS);
         int stateFlags = shopCompass.stateFlags;
         if ((stateFlags & 0x70) == 0) {
             if (ambientDelay < currentTick - shopAmbientTick

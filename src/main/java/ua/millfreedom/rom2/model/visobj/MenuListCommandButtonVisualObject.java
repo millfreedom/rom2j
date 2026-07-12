@@ -2,7 +2,6 @@ package ua.millfreedom.rom2.model.visobj;
 
 import org.jetbrains.annotations.NotNull;
 import ua.millfreedom.rom2.Globals;
-import ua.millfreedom.rom2.Utils;
 import ua.millfreedom.rom2.model.CBitmapFont;
 import ua.millfreedom.rom2.model.CRect;
 import ua.millfreedom.rom2.model.enums.MessageCodes;
@@ -100,7 +99,7 @@ public class MenuListCommandButtonVisualObject extends CommandButtonVisualObject
             return 0;
         }
 
-        int normalizedChar = Utils.customToLower(normalizeHotKeyInput(nChar));
+        int normalizedChar = Character.toLowerCase(nChar);
         if (normalizedChar != VK_RETURN && normalizedChar != hotKey) {
             return 0;
         }

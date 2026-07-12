@@ -7,7 +7,6 @@ import ua.millfreedom.rom2.model.world.scenario.*;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -214,8 +213,8 @@ public final class ScenarioDescriptor {
         darkness = source.darkness;
         contrast = source.contrast;
         time = source.time;
-        mapName.set(source.mapName.toString().getBytes(StandardCharsets.ISO_8859_1));
-        authors.set(source.authors.toString().getBytes(StandardCharsets.ISO_8859_1));
+        mapName.set(source.mapName.toString());
+        authors.set(source.authors.toString());
         mapLevel = source.mapLevel;
         recommendedPlayers = source.recommendedPlayers;
         unk = source.unk;

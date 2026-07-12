@@ -1,11 +1,12 @@
 package ua.millfreedom.rom2.data;
 
+import ua.millfreedom.rom2.GameCharsets;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 public final class ByteBufferAdaptor implements RWAdaptor {
@@ -177,7 +178,7 @@ public final class ByteBufferAdaptor implements RWAdaptor {
      */
     @Override
     public Charset getCharset() {
-        return StandardCharsets.ISO_8859_1;
+        return GameCharsets.GAME_TEXT;
     }
 
     /**

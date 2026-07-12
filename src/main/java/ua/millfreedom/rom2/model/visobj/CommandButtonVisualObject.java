@@ -2,7 +2,6 @@ package ua.millfreedom.rom2.model.visobj;
 
 import org.jetbrains.annotations.NotNull;
 import ua.millfreedom.rom2.Globals;
-import ua.millfreedom.rom2.Utils;
 import ua.millfreedom.rom2.model.CBitmapFont;
 import ua.millfreedom.rom2.model.CRect;
 import ua.millfreedom.rom2.model.enums.MessageCodes;
@@ -249,7 +248,7 @@ public class CommandButtonVisualObject extends CVisualObject {
         if (m_pParent == null || checkStateFlag(STATE_ACTIVE) == 0) {
             return 0;
         }
-        if (normalizeHotKeyInput(nChar & 0xFF) != hotKey) {
+        if (Character.toLowerCase(nChar) != hotKey) {
             return 0;
         }
         postButtonMessage();
@@ -276,7 +275,7 @@ public class CommandButtonVisualObject extends CVisualObject {
                 continue;
             }
             if (curr != '~' && prev == '~') {
-                return Utils.customToLower(curr);
+                return Character.toLowerCase(curr);
             }
         }
     }
@@ -371,21 +370,4 @@ public class CommandButtonVisualObject extends CVisualObject {
         Globals.mainWindow.postMessage(msg, 0, 0);
     }
 
-    /**
-     * Native helper: FUN_00474C85 used by CommandButtonVisualObject::OnChar @004D5F60.
-     * Fully ported.
-     */
-    @SuppressWarnings("DuplicatedCode")
-    protected static int normalizeHotKeyInput(int c) {
-        int value = c & 0xFF;
-        if (Globals.useCustomEncoding && value > 0x7F) {
-            if (value >= 0xC0 && value <= 0xEF) {
-                return value - 0x40;
-            }
-            if (value > 0xEF) {
-                return value - 0x10;
-            }
-        }
-        return value;
-    }
 }

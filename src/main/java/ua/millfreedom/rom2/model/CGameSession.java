@@ -2,6 +2,7 @@ package ua.millfreedom.rom2.model;
 
 import ua.millfreedom.rom2.CArchive.CArchive;
 import ua.millfreedom.rom2.CArchive.MfcSerializable;
+import ua.millfreedom.rom2.GameCharsets;
 import ua.millfreedom.rom2.Globals;
 import ua.millfreedom.rom2.Utils;
 import ua.millfreedom.rom2.model.enums.HumanId;
@@ -20,7 +21,6 @@ import java.io.UncheckedIOException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -553,7 +553,7 @@ public class CGameSession implements MfcSerializable {
         while (length < maxLength && bytes[offset + length] != 0) {
             length++;
         }
-        return new String(bytes, offset, length, StandardCharsets.ISO_8859_1);
+        return new String(bytes, offset, length, GameCharsets.GAME_TEXT);
     }
 
     /**
@@ -885,7 +885,7 @@ public class CGameSession implements MfcSerializable {
      * Native support extracted from CGameSession::saveSelectedCharacterFile @004915CD CString copy into local_34.
      */
     private static void writeFixedNativeCString(byte[] bytes, int offset, int maxLength, String value) {
-        byte[] encoded = value.getBytes(StandardCharsets.ISO_8859_1);
+        byte[] encoded = value.getBytes(GameCharsets.GAME_TEXT);
         System.arraycopy(encoded, 0, bytes, offset, Math.min(encoded.length, maxLength - 1));
     }
 

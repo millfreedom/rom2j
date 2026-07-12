@@ -39,7 +39,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -1086,6 +1085,7 @@ public class CMainWindow extends CFrameWnd {
             Files.writeString(
                     TRACE_ERROR_LOG,
                     line,
+                    GameCharsets.GAME_TEXT,
                     StandardOpenOption.CREATE,
                     StandardOpenOption.WRITE,
                     StandardOpenOption.APPEND
@@ -2044,7 +2044,7 @@ public class CMainWindow extends CFrameWnd {
      * CMainWindow::runSessionBootstrap @0048C8A3 map-name handoff.
      */
     private void setDedicatedServerMapName(String mapName) {
-        map_.set(mapName.getBytes(StandardCharsets.ISO_8859_1));
+        map_.set(mapName);
     }
 
     /**
@@ -3044,7 +3044,7 @@ public class CMainWindow extends CFrameWnd {
      */
     private void appendCurrentMissionSaveTitleBlock() {
         byte[] titleBlock = new byte[SAVE_FILE_TITLE_BLOCK_SIZE];
-        byte[] titleBytes = mSaveFile.title.getBytes(Globals.WINDOWS_CYRILLIC_CHARSET);
+        byte[] titleBytes = mSaveFile.title.getBytes(GameCharsets.GAME_TEXT);
         System.arraycopy(titleBytes, 0, titleBlock, 0, Math.min(titleBytes.length, titleBlock.length - 1));
         try {
             Files.write(SavedGameFiles.resolvePath(mSaveFile.filename), titleBlock, StandardOpenOption.APPEND);

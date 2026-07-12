@@ -433,7 +433,7 @@ public class StaticTextVisualObject extends CVisualObject {
                 && checkStateFlag(STATE_ACTIVE) != 0) {
             lastBlinkTick = (int) System.currentTimeMillis();
             if (nChar > 0x1F) {
-                insertNormalizedCharacter((byte) nChar);
+                insertInputCodepoint(nChar);
             }
             draw();
             m_pParent.onMessage(MessageCodes.TEXT_LIST_SELECTION_CHANGED, id, 0);
@@ -443,22 +443,22 @@ public class StaticTextVisualObject extends CVisualObject {
     }
 
     /**
-     * Native helper: StaticTextVisualObject::InsertNormalizedCharacter @004D667A.
-     * Fully ported.
+     * Native support extracted from StaticTextVisualObject::InsertNormalizedCharacter @004D667A.
+     * Java receives the input as a Unicode code point instead of an ANSI byte.
      */
-    private void insertNormalizedCharacter(byte rawChar) {
+    private void insertInputCodepoint(int codepoint) {
         if (selectionEnd != selectionStart
                 && selectionEnd - selectionStart >= 0) {
             deleteSelectedText();
         }
 
-        char normalizedChar = (char) normalizeHotKeyInput(rawChar);
+        String inputCharacter = Character.toString(codepoint);
         String suffix = rightText(text, text.length() - caretIndex);
         String prefix = leftText(text, caretIndex);
-        String updatedText = prefix + normalizedChar + suffix;
+        String updatedText = prefix + inputCharacter + suffix;
         if (getTextWidth(updatedText) + 8 < cRect.width()) {
             text = updatedText;
-            caretIndex++;
+            caretIndex += inputCharacter.length();
         }
         resetCaretBlink();
     }
@@ -579,23 +579,6 @@ public class StaticTextVisualObject extends CVisualObject {
      */
     private static int getShiftState() {
         return Globals.shiftKeyDown ? 1 : 0;
-    }
-
-    /**
-     * Native helper: NormalizeHotKeyInput @00474C85.
-     * Fully ported.
-     */
-    private static int normalizeHotKeyInput(int c) {
-        int value = c & 0xFF;
-        if (Globals.useCustomEncoding && value > 0x7F) {
-            if (value >= 0xC0 && value <= 0xEF) {
-                return value - 0x40;
-            }
-            if (value > 0xEF) {
-                return value - 0x10;
-            }
-        }
-        return value;
     }
 
     /**

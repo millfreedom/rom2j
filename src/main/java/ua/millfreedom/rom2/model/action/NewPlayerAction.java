@@ -7,7 +7,6 @@ import ua.millfreedom.rom2.model.enums.GameActionId;
 import ua.millfreedom.rom2.model.enums.MessageCodes;
 import ua.millfreedom.rom2.model.visobj.MapVisualObject;
 
-import java.nio.charset.StandardCharsets;
 
 /**
  * Native `ChatTextAction` packet id `0x96` used by `GameServer::handlePlayerJoinRequest @004F0CBE`
@@ -101,7 +100,7 @@ public class NewPlayerAction extends ChatTextAction {
         } else {
             player.flags |= 1;
         }
-        player.name.set(text.get() == null ? null : text.get().getBytes(StandardCharsets.ISO_8859_1));
+        player.name.set(text.get());
 
         if (firstClientPlayerSlotOnly) {
             Globals.mainWindow.m_GameSession.skipFormerCharacterPrompt = (packedPlayerState & 0x02000000) != 0 ? 1 : 0;

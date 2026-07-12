@@ -3,7 +3,6 @@ package ua.millfreedom.rom2.model.world.scenario;
 import ua.millfreedom.rom2.CString;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Native Instant scenario record constructed by Instant::Instant @00536AB0 and read by
@@ -39,11 +38,11 @@ public final class Instant {
      */
     public Instant(String name, int typeId, int[] argumentValues, String[] argumentNames, boolean executeOnce) {
         this();
-        this.name.set(name.getBytes(StandardCharsets.ISO_8859_1));
+        this.name.set(name);
         this.typeId = typeId;
         for (int i = 0; i < arguments.length; i++) {
             arguments[i].value = argumentValues[i];
-            arguments[i].name.set(argumentNames[i].getBytes(StandardCharsets.ISO_8859_1));
+            arguments[i].name.set(argumentNames[i]);
         }
         this.executeOnce = executeOnce;
     }
@@ -54,14 +53,14 @@ public final class Instant {
      */
     public Instant(Instant source) {
         this();
-        name.set(source.name.toString().getBytes(StandardCharsets.ISO_8859_1));
+        name.set(source.name.toString());
         typeId = source.typeId;
         index = source.index;
         executeOnce = source.executeOnce;
         for (int i = 0; i < arguments.length; i++) {
             arguments[i].value = source.arguments[i].value;
             arguments[i].type = source.arguments[i].type;
-            arguments[i].name.set(source.arguments[i].name.toString().getBytes(StandardCharsets.ISO_8859_1));
+            arguments[i].name.set(source.arguments[i].name.toString());
         }
     }
 

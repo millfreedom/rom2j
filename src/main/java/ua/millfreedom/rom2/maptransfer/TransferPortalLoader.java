@@ -1,7 +1,8 @@
 package ua.millfreedom.rom2.maptransfer;
 
+import ua.millfreedom.rom2.GameCharsets;
+
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -78,7 +79,7 @@ public final class TransferPortalLoader {
         }
         List<String> lines;
         try {
-            lines = Files.readAllLines(portalFile, Charset.defaultCharset());
+            lines = Files.readAllLines(portalFile, GameCharsets.GAME_TEXT);
         } catch (IOException exception) {
             throw new IllegalStateException("Failed to read " + portalFile, exception);
         }

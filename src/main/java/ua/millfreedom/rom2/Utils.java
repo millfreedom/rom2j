@@ -107,33 +107,6 @@ public class Utils {
     }
 
     /**
-     * Native: CustomToLower @00474CF9.
-     * Fully ported. Native applies custom-encoding byte remaps before the CRT tolower ASCII fast path.
-     */
-    public static int customToLower(int c) {
-        int value = c & 0xFF;
-        if (Globals.useCustomEncoding) {
-            if (value >= 0x80 && value < 0x90) {
-                return value + 0x20;
-            }
-            if (value >= 0x90 && value < 0xA0) {
-                return value + 0x50;
-            }
-        }
-        return asciiToLower(value);
-    }
-
-    /**
-     * Native support extracted from CRT tolower @00584890 no-locale branch called by CustomToLower @00474CF9.
-     */
-    private static int asciiToLower(int c) {
-        if (c > 0x40 && c < 0x5B) {
-            return c + 0x20;
-        }
-        return c;
-    }
-
-    /**
      * Native: RandExclusive @004A0FD0. Fully ported.
      *
      * @param minInclusive
@@ -197,6 +170,14 @@ public class Utils {
      */
     public static int randBased(int base, int rangeExclusive) {
         return randExclusive(rangeExclusive) + base;
+    }
+
+    /**
+     *  Same as: randInclusive(rangeInclusive) + base
+     *  not ported
+     */
+    public static int randBasedInclusive(int base, int rangeInclusive) {
+        return Utils.randInclusive(rangeInclusive) + base;
     }
 
     /**

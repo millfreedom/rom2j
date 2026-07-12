@@ -6,7 +6,6 @@ import ua.millfreedom.rom2.model.enums.MessageCodes;
 import ua.millfreedom.rom2.model.visobj.MultiplayerMapSelectionDialogVisualObject;
 import ua.millfreedom.rom2.model.window.CMainWindow;
 
-import java.nio.charset.StandardCharsets;
 
 /**
  * Native support extracted from the `PREPARE_MULTIPLAYER_MAP_SELECTION` branch in CMainWindow::WindowProc @004852D8.
@@ -67,6 +66,6 @@ public final class PrepareMultiplayerMapSelectionMessageHandler {
      * Native support extracted from CString::operator= calls in CMainWindow::WindowProc @004852D8.
      */
     private static void assignMapName(CString target, String mapName) {
-        target.set(mapName.getBytes(StandardCharsets.ISO_8859_1));
+        target.set(mapName);
     }
 }

@@ -1,5 +1,6 @@
 package ua.millfreedom.rom2.model.visobj;
 
+import ua.millfreedom.rom2.GameCharsets;
 import ua.millfreedom.rom2.Globals;
 import ua.millfreedom.rom2.model.CBitmapFont;
 import ua.millfreedom.rom2.model.CRect;
@@ -316,7 +317,7 @@ public class SaveDialogVisualObject extends CenteredDialogVisualObject {
             while (zeroTerminatedLength < titleLength && rawTitle[zeroTerminatedLength] != 0) {
                 zeroTerminatedLength += 1;
             }
-            return Globals.WINDOWS_CYRILLIC_CHARSET.decode(ByteBuffer.wrap(rawTitle, 0, zeroTerminatedLength)).toString();
+            return GameCharsets.GAME_TEXT.decode(ByteBuffer.wrap(rawTitle, 0, zeroTerminatedLength)).toString();
         } catch (IOException ignored) {
             return null;
         }

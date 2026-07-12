@@ -499,7 +499,7 @@ public class Unit extends Token {
         movementState.resetToDefaults();
         missionRuntimeState.resetToDefaults();
         pTargetHandle0x200 = null;
-        movementState.facing = Utils.randInclusive(0x80) + 0x40;
+        movementState.facing = Utils.randBasedInclusive(0x40, 0x80);
         movementState.facingLast = movementState.facing;
         unitGroup = null;
         missionActionCode = MissionActionCode.DYING;

@@ -8,7 +8,6 @@ import ua.millfreedom.rom2.model.window.CMainWindow;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -251,7 +250,7 @@ public final class ApplicationPreferences {
      * Native support extracted from CString assignment in LastIp::Load @0043C795.
      */
     private static void setCString(CString target, String value) {
-        target.set(value.getBytes(StandardCharsets.ISO_8859_1));
+        target.set(value);
     }
 
     /**

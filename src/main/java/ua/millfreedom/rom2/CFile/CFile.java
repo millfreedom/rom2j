@@ -2,6 +2,7 @@ package ua.millfreedom.rom2.CFile;
 
 
 import lombok.SneakyThrows;
+import ua.millfreedom.rom2.GameCharsets;
 import ua.millfreedom.rom2.data.RWAdaptor;
 import ua.millfreedom.rom2.res.Resources;
 
@@ -11,7 +12,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -38,7 +38,7 @@ public final class CFile implements AutoCloseable, RWAdaptor {
      * not ported. Java resource-path constructor.
      */
     public CFile(String fileName) {
-        this(fileName, StandardCharsets.ISO_8859_1);
+        this(fileName, GameCharsets.GAME_TEXT);
     }
 
     /**
@@ -55,7 +55,7 @@ public final class CFile implements AutoCloseable, RWAdaptor {
      * not ported. Java filesystem-path constructor.
      */
     public CFile(Path path) throws IOException {
-        this(path, StandardCharsets.ISO_8859_1);
+        this(path, GameCharsets.GAME_TEXT);
     }
 
     /**

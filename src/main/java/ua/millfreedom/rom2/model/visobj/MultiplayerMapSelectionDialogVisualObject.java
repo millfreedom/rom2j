@@ -18,7 +18,6 @@ import java.awt.*;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -796,7 +795,7 @@ public class MultiplayerMapSelectionDialogVisualObject extends CenteredDialogVis
      * Fully ported.
      */
     private static void writeCString(CString target, String value) {
-        target.set(value.getBytes(StandardCharsets.ISO_8859_1));
+        target.set(value);
     }
 
 }
