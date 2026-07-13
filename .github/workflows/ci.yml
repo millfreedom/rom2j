@@ -24,6 +24,3 @@ jobs:
 
       - name: Build Maven package
         run: mvn --batch-mode --update-snapshots package
-
-      - name: Run method and field directive checks
-        run: mvn --batch-mode -Dtest=MethodFieldDirectiveTest test
