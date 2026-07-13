@@ -10,9 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static ua.millfreedom.rom2.Globals.gameFileManager;
-import static ua.millfreedom.rom2.res.Constants.GRAPHICS;
-import static ua.millfreedom.rom2.res.Constants.MAIN;
-import static ua.millfreedom.rom2.res.Constants.UNITS;
+import static ua.millfreedom.rom2.res.Constants.*;
 
 /**
  * Java/Ghidra grouping owner for native material and render-distance startup globals.
@@ -95,10 +93,14 @@ public final class MaterialRuntimeData {
      */
     private static void loadMainIdCustomEncodingFlag() {
         byte[] buffer = new byte[MAIN_ID_BUFFER_SIZE];
-        ByteBuffer idData = gameFileManager.get(Resources.path(MAIN, "id"));
-        idData.get(buffer, 0, idData.remaining());
-        int idLength = nativeStringLength(buffer);
-        Globals.useCustomEncoding = buffer[idLength - 1] - '0' != 0;
+        try { //on some clients the main/id may not be present...
+            ByteBuffer idData = gameFileManager.get(Resources.path(MAIN, "id"));
+            idData.get(buffer, 0, idData.remaining());
+            int idLength = nativeStringLength(buffer);
+            Globals.useCustomEncoding = buffer[idLength - 1] - '0' != 0;
+        } catch (Throwable ignored) { //fallback to English
+            Globals.useCustomEncoding = false;
+        }
     }
 
     /**
