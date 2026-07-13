@@ -1,0 +1,29 @@
+name: Maven CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Maven build and directive checks
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out sources
+        uses: actions/checkout@v4
+
+      - name: Set up GraalVM 25.1
+        uses: graalvm/setup-graalvm@v1
+        with:
+          version: '25.1'
+          distribution: graalvm
+          cache: maven
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Maven package
+        run: mvn --batch-mode --update-snapshots package
+
+      - name: Run method and field directive checks
+        run: mvn --batch-mode -Dtest=MethodFieldDirectiveTest test

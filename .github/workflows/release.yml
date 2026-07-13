@@ -1,0 +1,97 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      release_name:
+        description: Release name to use for manually dispatched builds.
+        required: false
+        default: manual
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    name: Package ${{ matrix.platform }} ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux
+            arch: x86_64
+            graalvm_version: '25.1'
+            runner: ubuntu-24.04
+          - platform: linux
+            arch: arm64
+            graalvm_version: '25.1'
+            runner: ubuntu-24.04-arm
+          - platform: windows
+            arch: x86_64
+            graalvm_version: '25.1'
+            runner: windows-2025
+          - platform: macos
+            arch: x86_64
+            package_id: macos-x86_64
+            graalvm_version: '25.0.1'
+            runner: macos-15-intel
+          - platform: macos
+            arch: x86_64
+            package_id: macos-12.7.6-x86_64
+            minimum_macos_version: 12.7.6
+            graalvm_version: '25.0.1'
+            runner: macos-15-intel
+          - platform: macos
+            arch: arm64
+            package_id: macos-arm64
+            graalvm_version: '25.1'
+            runner: macos-15
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Check out sources
+        uses: actions/checkout@v4
+
+      - name: Set up GraalVM ${{ matrix.graalvm_version }}
+        uses: graalvm/setup-graalvm@v1
+        with:
+          version: ${{ matrix.graalvm_version }}
+          distribution: graalvm
+          cache: maven
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Maven package
+        env:
+          MACOSX_DEPLOYMENT_TARGET: ${{ matrix.minimum_macos_version || '' }}
+        run: mvn --batch-mode --update-snapshots package
+
+      - name: Package release asset
+        shell: bash
+        run: .github/scripts/package-release.sh "${{ matrix.platform }}" "${{ matrix.arch }}" dist "${{ matrix.package_id || format('{0}-{1}', matrix.platform, matrix.arch) }}" "${{ matrix.minimum_macos_version || '' }}"
+
+      - name: Upload packaged asset
+        uses: actions/upload-artifact@v4
+        with:
+          name: rom2nxt-${{ matrix.package_id || format('{0}-{1}', matrix.platform, matrix.arch) }}
+          path: dist/*
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub release
+    needs: package
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Download packaged assets
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.event.inputs.release_name || github.ref_name }}
+          files: dist/*
+          generate_release_notes: true

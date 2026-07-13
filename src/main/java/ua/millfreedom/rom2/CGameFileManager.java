@@ -17,9 +17,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import static ua.millfreedom.rom2.CFile.CFileException.Cause.BAD_PATH;
 import static ua.millfreedom.rom2.CFile.CFileException.Cause.FILE_NOT_FOUND;
 import static ua.millfreedom.rom2.res.Constants.*;
+import static org.lwjgl.util.tinyfd.TinyFileDialogs.tinyfd_selectFolderDialog;
 
 
 public final class CGameFileManager implements MfcSerializable {
@@ -144,15 +144,29 @@ public final class CGameFileManager implements MfcSerializable {
 
     /**
      * Native: CGameFileManager::AddSearchPath @004E2963.
-     * Fully ported with Java-only `~/` expansion before native path classification.
+     * Java preserves native directory acceptance while adding `~/` expansion and case-preserving normalization, and
+     * replaces the native BAD_PATH failure with interactive resource-directory selection.
      */
     public void addSearchPath(String path) {
         String expandedPath = expandHomeDirectory(path);
-        String normalizedPath = copyLowerIfEnabled(expandedPath);
         if (getPathType(expandedPath) != PathType.DIRECTORY) {
-            throw new CFileException(BAD_PATH);
+            expandedPath = chooseGameResourcesDirectory().toString();
         }
+        String normalizedPath = Path.of(expandedPath).toAbsolutePath().normalize().toString();
         names.add(normalizedPath);
+    }
+
+    /**
+     * Native-dialog support for interactively replacing an invalid game-resource search path.
+     * not ported.
+     */
+    private static Path chooseGameResourcesDirectory() {
+        while (true) {
+            String selectedDirectory = tinyfd_selectFolderDialog("Select game resources directory", null);
+            if (selectedDirectory != null && getPathType(selectedDirectory) == PathType.DIRECTORY) {
+                return Path.of(selectedDirectory);
+            }
+        }
     }
 
     /**
