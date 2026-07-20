@@ -42,6 +42,7 @@ import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -53,7 +54,8 @@ import java.util.concurrent.locks.LockSupport;
 import static ua.millfreedom.rom2.model.enums.MessageCodes.*;
 import static ua.millfreedom.rom2.model.visobj.VirtualKeyCodes.*;
 import static ua.millfreedom.rom2.model.window.DialogsMaskFlag.*;
-import static ua.millfreedom.rom2.text.StringTableIndex.*;
+import static ua.millfreedom.rom2.text.StringTableIndex.MAIN_GAME_PAUSED_CLICK_OK_TO_CONTINUE_119;
+import static ua.millfreedom.rom2.text.StringTableIndex.MAIN_GAME_SPEED_IS_SLOWER_THAN_SYRUP_108;
 import static ua.millfreedom.rom2.text.TextTableId.MAIN;
 
 @Slf4j
@@ -102,6 +104,7 @@ public class CMainWindow extends CFrameWnd {
     private static final int SERVER_MESSAGE_EDIT_CREATE_STYLE = 0x50400480;
     private static final int SERVER_PLAYER_LIST_CREATE_STYLE = 0x50700040;
     private static int allodsBmpCaptureIndex;
+    private static final long SCROLL_PERIOD_NANOS = Duration.ofMillis(50).toNanos();
 
     //0xbc
     public int haveFocus = 1;
@@ -295,6 +298,13 @@ public class CMainWindow extends CFrameWnd {
     public DedicatedServerControlDialog pDedicatedServerControlDialog;
     //0x798
     public int dedicatedServerControlDialogCreated;
+
+    //Java-only field for scrolling speed. 0 = unlimited
+    public int scrollSpeed = 10;
+    //Java-only field for scrolling limit
+    public long lastTimeScrolled = 0;
+    //Java-only field for VSync
+    public int vsync = 1;
 
     // Java support, not a native field.
     private boolean windowCloseRequested;
@@ -1151,6 +1161,12 @@ public class CMainWindow extends CFrameWnd {
      */
     private void scrollMapAtScreenEdges(boolean notifyMapContextChanged) {
         if (!Globals.mousePointer.isSelecting() && DialogsMaskFlag.contains(dialogsMask, GAMEPLAY)) {
+            long now = System.nanoTime();
+            if (scrollSpeed > 0
+                    && now - lastTimeScrolled < SCROLL_PERIOD_NANOS / scrollSpeed) {
+                return;
+            }
+            lastTimeScrolled = now;
             boolean scrolled = false;
             if (Globals.mousePointer.getX() == 0) {
                 pMapVisualObject.scrollCameraXBy(-1);

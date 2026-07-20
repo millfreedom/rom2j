@@ -22,7 +22,7 @@ public final class GameOptionsMessageHandler {
      */
     public static int handle(CMainWindow mainWindow, Object wParam, Object lParam) {
         if (DialogsMaskFlag.isExactly(mainWindow.dialogsMask, GAMEPLAY)) {
-            mainWindow.showDialog(new CenteredDialogVariantVisualObject(1, 0x14, 0, 0x26C, 0x1E0));
+            mainWindow.showDialog(new CenteredDialogVariantVisualObject(1, 0x14, 0, 0x26C, 520));
         }
         return 1;
     }

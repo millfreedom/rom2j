@@ -4,13 +4,10 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
-import ua.millfreedom.rom2.model.CMousePointer;
-import ua.millfreedom.rom2.model.CServerApp;
-import ua.millfreedom.rom2.model.ScriptDataSupport;
-import ua.millfreedom.rom2.model.Screen;
-import ua.millfreedom.rom2.model.ServerConfig;
-import ua.millfreedom.rom2.model.SkillProgression;
+import ua.millfreedom.rom2.CFile.LEReader;
+import ua.millfreedom.rom2.model.*;
 import ua.millfreedom.rom2.model.enums.MessageCodes;
+import ua.millfreedom.rom2.model.net.CLlDriver;
 import ua.millfreedom.rom2.model.palette.Palettes;
 import ua.millfreedom.rom2.model.render.FpsCounter;
 import ua.millfreedom.rom2.model.render.GLCursor;
@@ -20,8 +17,6 @@ import ua.millfreedom.rom2.model.window.CMainWindow;
 import ua.millfreedom.rom2.model.window.DialogsMaskFlag;
 import ua.millfreedom.rom2.model.window.MessageSystem;
 import ua.millfreedom.rom2.model.world.TerrainGraphics;
-import ua.millfreedom.rom2.CFile.LEReader;
-import ua.millfreedom.rom2.model.net.CLlDriver;
 import ua.millfreedom.rom2.platform.glfw.GlfwKeyboardMessageAdapter;
 import ua.millfreedom.rom2.platform.glfw.GlfwMouseMessageAdapter;
 import ua.millfreedom.rom2.text.GameTexts;
@@ -37,54 +32,12 @@ import java.util.Locale;
 import java.util.stream.Stream;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
-import static org.lwjgl.glfw.GLFW.GLFW_AUTO_ICONIFY;
-import static org.lwjgl.glfw.GLFW.GLFW_BLUE_BITS;
-import static org.lwjgl.glfw.GLFW.GLFW_DECORATED;
-import static org.lwjgl.glfw.GLFW.GLFW_FLOATING;
-import static org.lwjgl.glfw.GLFW.GLFW_FOCUS_ON_SHOW;
-import static org.lwjgl.glfw.GLFW.GLFW_GREEN_BITS;
-import static org.lwjgl.glfw.GLFW.GLFW_MAXIMIZED;
-import static org.lwjgl.glfw.GLFW.GLFW_RED_BITS;
-import static org.lwjgl.glfw.GLFW.GLFW_TRUE;
-import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
-import static org.lwjgl.glfw.GLFW.glfwDefaultWindowHints;
-import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
-import static org.lwjgl.glfw.GLFW.glfwFocusWindow;
-import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
-import static org.lwjgl.glfw.GLFW.glfwGetPrimaryMonitor;
-import static org.lwjgl.glfw.GLFW.glfwGetVideoMode;
-import static org.lwjgl.glfw.GLFW.glfwInit;
-import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
-import static org.lwjgl.glfw.GLFW.glfwPollEvents;
-import static org.lwjgl.glfw.GLFW.glfwSetCharCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetCursorEnterCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetScrollCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
-import static org.lwjgl.glfw.GLFW.glfwShowWindow;
-import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
-import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
-import static org.lwjgl.glfw.GLFW.glfwTerminate;
-import static org.lwjgl.glfw.GLFW.glfwWindowHint;
-import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_UNPACK_ALIGNMENT;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.glPixelStorei;
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
-import static ua.millfreedom.rom2.model.enums.MessageCodes.STATIC_TEXT_CARET_BLINK_TICK;
-import static ua.millfreedom.rom2.model.window.DialogsMaskFlag.FAME_HALL_DOCUMENT;
-import static ua.millfreedom.rom2.model.window.DialogsMaskFlag.GAMEPLAY;
-import static ua.millfreedom.rom2.model.window.DialogsMaskFlag.MODAL_DIALOG;
-import static ua.millfreedom.rom2.model.enums.MessageCodes.SHOW_INVALID_CD_PROMPT;
-import static ua.millfreedom.rom2.model.enums.MessageCodes.SHOW_MAIN_MENU;
+import static ua.millfreedom.rom2.model.enums.MessageCodes.*;
+import static ua.millfreedom.rom2.model.window.DialogsMaskFlag.*;
 import static ua.millfreedom.rom2.text.StringTableIndex.MAIN_RAGE_OF_MAGES_2_NECROMANCER_150;
 
 /**
@@ -202,7 +155,7 @@ public final class CMainApp {
     private void initializeNativeVideoMode() {
         glfwMakeContextCurrent(window);
         GL.createCapabilities();
-        glfwSwapInterval(0);
+        glfwSwapInterval(1);
         initPalettes();
         try (MemoryStack stack = stackPush()) {
             IntBuffer width = stack.mallocInt(1);
@@ -1223,6 +1176,15 @@ public final class CMainApp {
             // Native ignores DeleteFileA failure.
         }
     }
+
+    /**
+     * Set VSync
+     * not ported
+     */
+    public static void setVSync(int newState) {
+        glfwSwapInterval(newState != 0 ? 1 : 0);
+    }
+
 
     /**
      * Entry point for the CMainApp Java shell.

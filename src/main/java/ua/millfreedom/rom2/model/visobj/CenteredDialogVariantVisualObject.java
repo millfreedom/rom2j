@@ -1,5 +1,6 @@
 package ua.millfreedom.rom2.model.visobj;
 
+import ua.millfreedom.rom2.CMainApp;
 import ua.millfreedom.rom2.Globals;
 import ua.millfreedom.rom2.model.CBitmapFont;
 import ua.millfreedom.rom2.model.CRect;
@@ -12,41 +13,9 @@ import java.awt.*;
 
 import static ua.millfreedom.rom2.model.enums.MessageCodes.DIALOG_OK;
 import static ua.millfreedom.rom2.model.enums.MessageCodes.RETURN_TO_GAME;
-import static ua.millfreedom.rom2.text.DialogsText.ALLIES_168;
-import static ua.millfreedom.rom2.text.DialogsText.AUTOCAST_FOR_UNITS_166;
-import static ua.millfreedom.rom2.text.DialogsText.AUTOCAST_MODE_170;
-import static ua.millfreedom.rom2.text.DialogsText.AUTO_61;
-import static ua.millfreedom.rom2.text.DialogsText.AVERAGE_172;
-import static ua.millfreedom.rom2.text.DialogsText.CANCEL_1;
-import static ua.millfreedom.rom2.text.DialogsText.DAY_NIGHT_CHANGES_55;
-import static ua.millfreedom.rom2.text.DialogsText.DISPLAY_DAMAGE_POINTS_78;
-import static ua.millfreedom.rom2.text.DialogsText.FORMATION_MODE_58;
-import static ua.millfreedom.rom2.text.DialogsText.FORMATION_MODE_59;
-import static ua.millfreedom.rom2.text.DialogsText.GAME_OPTIONS_150;
-import static ua.millfreedom.rom2.text.DialogsText.GAME_SPEED_50;
-import static ua.millfreedom.rom2.text.DialogsText.GAME_SPEED_51;
-import static ua.millfreedom.rom2.text.DialogsText.LOW_HEALTH_66;
-import static ua.millfreedom.rom2.text.DialogsText.MAXIMUM_173;
-import static ua.millfreedom.rom2.text.DialogsText.MEDIUM_HEALTH_67;
-import static ua.millfreedom.rom2.text.DialogsText.MINIMUM_171;
-import static ua.millfreedom.rom2.text.DialogsText.NAMES_AND_CLANS_175;
-import static ua.millfreedom.rom2.text.DialogsText.NEUTRAL_169;
-import static ua.millfreedom.rom2.text.DialogsText.NEVER_65;
-import static ua.millfreedom.rom2.text.DialogsText.OFF_60;
-import static ua.millfreedom.rom2.text.DialogsText.OK_0;
-import static ua.millfreedom.rom2.text.DialogsText.ON_62;
-import static ua.millfreedom.rom2.text.DialogsText.OWN_167;
-import static ua.millfreedom.rom2.text.DialogsText.RETREAT_MODE_63;
-import static ua.millfreedom.rom2.text.DialogsText.RETREAT_MODE_64;
-import static ua.millfreedom.rom2.text.DialogsText.SHOW_HEALTH_57;
-import static ua.millfreedom.rom2.text.DialogsText.SMOOTHING_53;
-import static ua.millfreedom.rom2.text.DialogsText.TIPS_156;
-import static ua.millfreedom.rom2.text.DialogsText.AUTOCAST_MODE_174;
+import static ua.millfreedom.rom2.text.DialogsText.*;
 import static ua.millfreedom.rom2.text.GameTexts.get;
-import static ua.millfreedom.rom2.text.PatchText.ALT_MESSAGE_COLORS_87;
-import static ua.millfreedom.rom2.text.PatchText.DYNAMIC_LIGHTING_53;
-import static ua.millfreedom.rom2.text.PatchText.OBJECT_ANIMATIONS_54;
-import static ua.millfreedom.rom2.text.PatchText.SHADOWS_52;
+import static ua.millfreedom.rom2.text.PatchText.*;
 import static ua.millfreedom.rom2.text.TextTableId.DIALOGS;
 import static ua.millfreedom.rom2.text.TextTableId.PATCH;
 
@@ -84,6 +53,11 @@ public class CenteredDialogVariantVisualObject extends CenteredDialogVisualObjec
     private static final int GAME_SPEED_MAX_VALUE = 8;
     private static final int BUTTON_ROW_DIVISOR = 7;
 
+    private static final int SCROLL_SPEED_LABEL_ID = 0xF1;
+    private static final int SCROLL_SPEED_SLIDER_ID = 0xF2;
+    private static final int VSYNC_ID = 0xF3;
+    private static final int SCROLL_SPEED_MAX_VALUE = 10;
+
     /**
      * Native: CenteredDialogVariantVisualObject::CenteredDialogVariantVisualObject @004417C3.
      * Fully ported.
@@ -117,9 +91,9 @@ public class CenteredDialogVariantVisualObject extends CenteredDialogVisualObjec
         DialogWindowVisualObject gameSpeedLabel = new DialogWindowVisualObject(
                 GAME_SPEED_LABEL_ID,
                 0x28,
-                0x38,
+                26,
                 0xE8,
-                0x50,
+                44,
                 get(DIALOGS, GAME_SPEED_50),
                 dialogFont,
                 Palettes.grayDim,
@@ -130,9 +104,9 @@ public class CenteredDialogVariantVisualObject extends CenteredDialogVisualObjec
         PostSetupVisualObject gameSpeedSlider = new PostSetupVisualObject(
                 GAME_SPEED_SLIDER_ID,
                 0x28,
-                0x54,
+                44,
                 0xE8,
-                0x6C,
+                68,
                 get(DIALOGS, GAME_SPEED_51)
         );
         addChild(gameSpeedSlider);
@@ -141,6 +115,34 @@ public class CenteredDialogVariantVisualObject extends CenteredDialogVisualObjec
         }
         gameSpeedSlider.setCurrentValueAndMaxValue(new Point(preferences.gameSpeed, GAME_SPEED_MAX_VALUE));
         gameSpeedSlider.gameDialogControls = gameSpeedLabel;
+
+        DialogWindowVisualObject scrollSpeedLabel = new DialogWindowVisualObject(
+                SCROLL_SPEED_LABEL_ID,
+                0x28,
+                66,
+                0xE8,
+                88,
+                "Scroll Speed",//get(DIALOGS, GAME_SPEED_50),
+                dialogFont,
+                Palettes.grayDim,
+                2
+        );
+        addChild(scrollSpeedLabel);
+
+        PostSetupVisualObject scrollSpeedSlider = new PostSetupVisualObject(
+                SCROLL_SPEED_SLIDER_ID,
+                0x28,
+                88,
+                0xE8,
+                112,
+                "Scroll Speed"//get(DIALOGS, GAME_SPEED_51)
+        );
+        addChild(scrollSpeedSlider);
+        scrollSpeedSlider.setCurrentValueAndMaxValue(new Point(preferences.scrollSpeed, SCROLL_SPEED_MAX_VALUE));
+        scrollSpeedSlider.gameDialogControls = scrollSpeedLabel;
+
+        scrollSpeedSlider.upNeighbor = gameSpeedSlider;
+        gameSpeedSlider.downNeighbor = scrollSpeedSlider;
 
         StringListVariantAVisualObject showTimeFlow = createBinaryOption(
                 SHOW_TIME_FLOW_ID,
@@ -152,8 +154,8 @@ public class CenteredDialogVariantVisualObject extends CenteredDialogVisualObjec
                 get(DIALOGS, DAY_NIGHT_CHANGES_55),
                 preferences.showTimeFlow
         );
-        showTimeFlow.upNeighbor = gameSpeedSlider;
-        gameSpeedSlider.downNeighbor = showTimeFlow;
+        showTimeFlow.upNeighbor = scrollSpeedSlider;
+        scrollSpeedSlider.downNeighbor = showTimeFlow;
 
         StringListVariantAVisualObject smoothing = createBinaryOption(
                 SMOOTHING_ID,
@@ -402,8 +404,22 @@ public class CenteredDialogVariantVisualObject extends CenteredDialogVisualObjec
         autocastMode.upNeighbor = autocastNeutral;
         autocastNeutral.downNeighbor = autocastMode;
 
-        int buttonTop = 0x170;
-        int buttonBottom = 0x188;
+        StringListVariantAVisualObject vsync = createBinaryOption(
+                VSYNC_ID,
+                dialogFont,
+                0x28,
+                378,
+                0xE8,
+                402,
+                "VSync",//get(PATCH, ALT_MESSAGE_COLORS_87),
+                preferences.vsync != 0 ? 1 : 0
+        );
+        vsync.upNeighbor = formationMode;
+        formationMode.downNeighbor = vsync;
+
+
+        int buttonTop = 368+54;
+        int buttonBottom = 392 + 54;
         CRect okRect = new CRect(
                 cRect.width() / BUTTON_ROW_DIVISOR,
                 buttonTop,
@@ -536,6 +552,8 @@ public class CenteredDialogVariantVisualObject extends CenteredDialogVisualObjec
     private void commitSelections(GamePreferences preferences) {
         preferences.gameSpeed = readGameSpeed();
         Globals.mainWindow.setGameSpeed(preferences.gameSpeed);
+        preferences.scrollSpeed = ((PostSetupVisualObject) getChildById(SCROLL_SPEED_SLIDER_ID)).currentValue;
+        preferences.vsync = readSelectionValue(VSYNC_ID);;
 
         if (Globals.mainWindow.sessionMode == CMainWindow.SESSION_MODE_CAMPAIGN) {
             preferences.tipsMode = readSelectionValue(TIPS_OR_NAMES_ID);

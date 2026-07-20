@@ -1,5 +1,6 @@
 package ua.millfreedom.rom2.model;
 
+import ua.millfreedom.rom2.CMainApp;
 import ua.millfreedom.rom2.model.window.CMainWindow;
 
 import java.util.prefs.Preferences;
@@ -32,6 +33,8 @@ public class GamePreferences {
     private static final String KEY_ANIMATION = "Animation";
     private static final String KEY_CLAN_NAMES = "ClanNames";
     private static final String KEY_MESSAGE_COLORS = "MessageColors";
+    private static final String KEY_SCROLL_SPEED = "ScrollSpeed";
+    private static final String KEY_VSYNC = "VSync";
 
     //0x00
     public int gameSpeed = 8;
@@ -64,6 +67,11 @@ public class GamePreferences {
     //0x38
     public int messageColors;
 
+    //Java-only field for scrolling speed
+    public int scrollSpeed = 10;
+    //Java-only field for scrolling speed
+    public int vsync = 1;
+
     /**
      * Native: GamePreferences::GamePreferences @0044131D.
      * Fully ported.
@@ -81,6 +89,8 @@ public class GamePreferences {
         wimpyMode = mainWindow.pMapVisualObject.wimpyMode;
         showAllHitPoints = mainWindow.pMapVisualObject.showHitPointBars;
         showFlyingHp = mainWindow.pMapVisualObject.showFlyingHitPointBars;
+        scrollSpeed = mainWindow.scrollSpeed;
+        vsync = mainWindow.vsync;
     }
 
     /**
@@ -103,6 +113,8 @@ public class GamePreferences {
         animation = preferences.getInt(KEY_ANIMATION, animation);
         clanNames = preferences.getInt(KEY_CLAN_NAMES, clanNames);
         messageColors = preferences.getInt(KEY_MESSAGE_COLORS, messageColors);
+        scrollSpeed = preferences.getInt(KEY_SCROLL_SPEED, scrollSpeed);
+        vsync = preferences.getInt(KEY_VSYNC, vsync);
         applyRuntimeValues(mainWindow);
     }
 
@@ -127,6 +139,8 @@ public class GamePreferences {
         preferences.putInt(KEY_ANIMATION, animation);
         preferences.putInt(KEY_CLAN_NAMES, clanNames);
         preferences.putInt(KEY_MESSAGE_COLORS, messageColors);
+        preferences.putInt(KEY_SCROLL_SPEED, scrollSpeed);
+        preferences.putInt(KEY_VSYNC, vsync);
     }
 
     /**
@@ -139,5 +153,8 @@ public class GamePreferences {
         mainWindow.pMapVisualObject.wimpyMode = wimpyMode;
         mainWindow.pMapVisualObject.showHitPointBars = showAllHitPoints;
         mainWindow.pMapVisualObject.showFlyingHitPointBars = showFlyingHp;
+        mainWindow.scrollSpeed = scrollSpeed;
+        mainWindow.vsync = vsync;
+        CMainApp.setVSync(vsync);
     }
 }
