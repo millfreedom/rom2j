@@ -106,14 +106,14 @@ public class StringListVariantCVisualObject extends StringListVariantAVisualObje
      * Native support: `g_Spr_RadioButtons->xSizeOf(4)` used by StringListVariantCVisualObject::Update @004D7B31.
      */
     private static int getRadioButtonWidth() {
-        return GUI.sprRadioButtons.frames.get(RADIO_FRAME_CLEAR).xSize();
+        return GUI.sprRadioButtons.frames.get(RADIO_FRAME_CLEAR).width();
     }
 
     /**
      * Native support: `g_Spr_RadioButtons->ySizeOf(4)` used by StringListVariantCVisualObject::Update @004D7B31.
      */
     private static int getVariantRadioButtonRowHeight() {
-        return GUI.sprRadioButtons.frames.get(RADIO_FRAME_CLEAR).ySize();
+        return GUI.sprRadioButtons.frames.get(RADIO_FRAME_CLEAR).height();
     }
 
     /**

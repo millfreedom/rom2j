@@ -1,7 +1,6 @@
 package ua.millfreedom.rom2.model;
 
 import ua.millfreedom.rom2.Globals;
-import ua.millfreedom.rom2.model.color.RGB16;
 import ua.millfreedom.rom2.model.color.RGB32;
 import ua.millfreedom.rom2.model.palette.Palette256;
 
@@ -19,10 +18,11 @@ public final class CBmp256 extends CGameBitmap {
      * Fully ported.
      */
     public CBmp256(int width, int height) {
-        byte[] indices = new byte[Math.multiplyExact(width, height)];
+        int[] indices = new int[Math.multiplyExact(width, height)];
         this.palette256 = null;
+        this.frameCount = 1;
         this.frames = List.of(
-                new GameBitmapFrame(width, height, indices.length, indices)
+                GameBitmapFrame.bitmap(width, height, indices)
         );
     }
 
@@ -39,15 +39,17 @@ public final class CBmp256 extends CGameBitmap {
 
         source.position(PALETTE_START_OFFSET);
         this.palette256 = readPaletteFromBmp(source, colorsUsed);
-        byte[] indices = new byte[Math.multiplyExact(w, h)];
-        source.get(indices);
+        int[] indices = new int[Math.multiplyExact(w, h)];
+        for (int i = 0; i < indices.length; i++) {
+            indices[i] = Byte.toUnsignedInt(source.get());
+        }
 
         flipVerticalInPlace(indices, w, h);
 
         this.frameCount = 1;
         this.dataSize = 0x408L + (long) indices.length;
         this.frames = List.of(
-                new GameBitmapFrame(w, h, indices.length, indices)
+                GameBitmapFrame.bitmap(w, h, indices)
         );
     }
 
@@ -57,9 +59,9 @@ public final class CBmp256 extends CGameBitmap {
      */
     private static Palette256 readPaletteFromBmp(ByteBuffer source, int colorsUsed) {
         Palette256 palette256 = Palette256.create();
-        RGB32[] entries = palette256.data();
+        int[] entries = palette256.data();
         for (int i = 0; i < entries.length; i++) {
-            entries[i] = RGB32.from(0, 0, 0, 0);
+            entries[i] = RGB32.BLACK;
         }
 
         int colorsToRead = colorsUsed == 0 ? entries.length : colorsUsed;
@@ -67,8 +69,8 @@ public final class CBmp256 extends CGameBitmap {
             int blue = Byte.toUnsignedInt(source.get());
             int green = Byte.toUnsignedInt(source.get());
             int red = Byte.toUnsignedInt(source.get());
-            int reserved = Byte.toUnsignedInt(source.get());
-            entries[i] = RGB32.from(red, green, blue, reserved);
+            source.get();
+            entries[i] = RGB32.from(red, green, blue);
         }
         return palette256;
     }
@@ -77,15 +79,15 @@ public final class CBmp256 extends CGameBitmap {
      * Native support extracted from CBmp256::MirrorY @00425884.
      * Fully ported.
      */
-    private static void flipVerticalInPlace(byte[] pixels, int rowBytes, int height) {
-        byte[] tmp = new byte[rowBytes];
+    private static void flipVerticalInPlace(int[] pixels, int rowPixels, int height) {
+        int[] tmp = new int[rowPixels];
         for (int y = 0, half = height / 2; y < half; y++) {
-            int top = y * rowBytes;
-            int bot = (height - 1 - y) * rowBytes;
+            int top = y * rowPixels;
+            int bot = (height - 1 - y) * rowPixels;
 
-            System.arraycopy(pixels, top, tmp, 0, rowBytes);
-            System.arraycopy(pixels, bot, pixels, top, rowBytes);
-            System.arraycopy(tmp, 0, pixels, bot, rowBytes);
+            System.arraycopy(pixels, top, tmp, 0, rowPixels);
+            System.arraycopy(pixels, bot, pixels, top, rowPixels);
+            System.arraycopy(tmp, 0, pixels, bot, rowPixels);
         }
     }
 
@@ -97,8 +99,8 @@ public final class CBmp256 extends CGameBitmap {
     public void draw(int x, int y, int nFrameIndex, Object paletteOverride, boolean bFlipX) {
         int paletteIndex = (Integer) paletteOverride;
         GameBitmapFrame frame = frames.getFirst();
-        Globals.renderer.blitIndexedToScreen(x, y, 0, 0, frame.xSize(), frame.ySize(),
-                frame.data(), frame.xSize(), frame.ySize(), palette.paletteData[paletteIndex].data());
+        Globals.renderer.blitIndexedToScreen(x, y, 0, 0, frame.width(), frame.height(),
+                frame.pixels(), frame.width(), frame.height(), palette.paletteData[paletteIndex].data());
     }
 
     /**
@@ -108,7 +110,7 @@ public final class CBmp256 extends CGameBitmap {
     public void drawRect(int x, int y, int srcLeft, int srcTop, int srcRight, int srcBottom, int paletteIndex) {
         GameBitmapFrame frame = frames.getFirst();
         Globals.renderer.blitIndexedToScreen(x, y, srcLeft, srcTop, srcRight, srcBottom,
-                frame.data(), frame.xSize(), frame.ySize(), palette.paletteData[paletteIndex].data());
+                frame.pixels(), frame.width(), frame.height(), palette.paletteData[paletteIndex].data());
     }
 
     /**
@@ -118,7 +120,7 @@ public final class CBmp256 extends CGameBitmap {
     public void drawRectAdditive(int x, int y, int srcLeft, int srcTop, int srcRight, int srcBottom, int paletteIndex) {
         GameBitmapFrame frame = frames.getFirst();
         Globals.renderer.blitIndexedToScreenAdditive(x, y, srcLeft, srcTop, srcRight, srcBottom,
-                frame.data(), frame.xSize(), frame.ySize(), palette.paletteData[paletteIndex].data());
+                frame.pixels(), frame.width(), frame.height(), palette.paletteData[paletteIndex].data());
     }
 
     /**
@@ -136,7 +138,7 @@ public final class CBmp256 extends CGameBitmap {
     public void drawRectMasked(int x, int y, int srcLeft, int srcTop, int srcRight, int srcBottom) {
         GameBitmapFrame frame = frames.getFirst();
         Globals.renderer.blitIndexedToScreenMasked(x, y, srcLeft, srcTop, srcRight, srcBottom,
-                frame.data(), frame.xSize(), frame.ySize(), palette.paletteData[0].data());
+                frame.pixels(), frame.width(), frame.height(), palette.paletteData[0].data());
     }
 
     /**
@@ -146,7 +148,7 @@ public final class CBmp256 extends CGameBitmap {
     @Override
     public void mirrorY() {
         GameBitmapFrame frame = frames.getFirst();
-        flipVerticalInPlace(frame.data(), frame.xSize(), frame.ySize());
+        flipVerticalInPlace(frame.pixels(), frame.width(), frame.height());
     }
 
     /**
@@ -155,7 +157,7 @@ public final class CBmp256 extends CGameBitmap {
      */
     @Override
     public int xSizeOf(int i) {
-        return frames.getFirst().xSize();
+        return frames.getFirst().width();
     }
 
     /**
@@ -164,7 +166,7 @@ public final class CBmp256 extends CGameBitmap {
      */
     @Override
     public int ySizeOf(int i) {
-        return frames.getFirst().ySize();
+        return frames.getFirst().height();
     }
 
     /**

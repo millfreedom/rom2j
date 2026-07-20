@@ -2,7 +2,6 @@ package ua.millfreedom.rom2.model.gameobj;
 
 import ua.millfreedom.rom2.model.CBmp256;
 import ua.millfreedom.rom2.model.CBmp64k;
-import ua.millfreedom.rom2.model.color.RGB16;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -54,18 +53,16 @@ final class EquipmentPortraitCache {
     }
 
     private static final class Entry {
-        private final RGB16[] targetPixels;
-        private final byte[] targetFrameBytes;
-        private final byte[] maskBytes;
+        private final int[] targetPixels;
+        private final int[] maskCodes;
 
         /**
          * Java cache snapshot constructor.
          * not ported.
          */
-        private Entry(RGB16[] targetPixels, byte[] targetFrameBytes, byte[] maskBytes) {
+        private Entry(int[] targetPixels, int[] maskCodes) {
             this.targetPixels = targetPixels;
-            this.targetFrameBytes = targetFrameBytes;
-            this.maskBytes = maskBytes;
+            this.maskCodes = maskCodes;
         }
 
         /**
@@ -73,13 +70,12 @@ final class EquipmentPortraitCache {
          * not ported.
          */
         private static Entry capture(CBmp64k targetBitmap, CBmp256 maskBitmap) {
-            byte[] maskCopy = maskBitmap == null ? null : Arrays.copyOf(
-                    maskBitmap.frames.getFirst().data(),
-                    maskBitmap.frames.getFirst().data().length
+            int[] maskCopy = maskBitmap == null ? null : Arrays.copyOf(
+                    maskBitmap.frames.getFirst().pixels(),
+                    maskBitmap.frames.getFirst().pixels().length
             );
             return new Entry(
                     Arrays.copyOf(targetBitmap.surface.pixels(), targetBitmap.surface.pixels().length),
-                    Arrays.copyOf(targetBitmap.frames.getFirst().data(), targetBitmap.frames.getFirst().data().length),
                     maskCopy
             );
         }
@@ -90,10 +86,8 @@ final class EquipmentPortraitCache {
          */
         private void copyTo(CBmp64k targetBitmap, CBmp256 maskBitmap) {
             System.arraycopy(targetPixels, 0, targetBitmap.surface.pixels(), 0, targetPixels.length);
-            System.arraycopy(targetFrameBytes, 0, targetBitmap.frames.getFirst().data(), 0, targetFrameBytes.length);
-            if (maskBitmap != null && maskBytes != null) {
-                System.arraycopy(maskBytes, 0, maskBitmap.frames.getFirst().data(), 0, maskBytes.length);
-                CUnit.initializeEquipmentPortraitMaskPalette(maskBitmap);
+            if (maskBitmap != null && maskCodes != null) {
+                System.arraycopy(maskCodes, 0, maskBitmap.frames.getFirst().pixels(), 0, maskCodes.length);
             }
         }
     }

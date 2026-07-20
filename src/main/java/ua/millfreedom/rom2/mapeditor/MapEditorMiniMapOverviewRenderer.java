@@ -2,7 +2,6 @@ package ua.millfreedom.rom2.mapeditor;
 
 import ua.millfreedom.rom2.model.CBmp256;
 import ua.millfreedom.rom2.model.GameBitmapFrame;
-import ua.millfreedom.rom2.model.color.RGB16;
 import ua.millfreedom.rom2.model.palette.CGamePalette;
 import ua.millfreedom.rom2.model.palette.Palette16;
 import ua.millfreedom.rom2.model.world.ScenarioDescriptor;
@@ -125,7 +124,7 @@ final class MapEditorMiniMapOverviewRenderer {
         int sourceOffset = (tileWord & TERRAIN_TILE_FRAME_MASK) * TERRAIN_TILE_PIXELS
                 + sourceY * TERRAIN_TILE_SIZE
                 + sourceX;
-        if (sourceOffset < 0 || sourceOffset >= frame.data().length) {
+        if (sourceOffset < 0 || sourceOffset >= frame.pixels().length) {
             return 0;
         }
         Palette16[] palettePages = terrainPalette.paletteData;
@@ -133,11 +132,11 @@ final class MapEditorMiniMapOverviewRenderer {
             return 0;
         }
         int brightness = Math.min(MapEditorTerrainPreviewRenderer.terrainBrightnessPage(scenario), palettePages.length - 1);
-        RGB16[] colors = palettePages[brightness].data();
-        int colorIndex = Byte.toUnsignedInt(frame.data()[sourceOffset]);
-        if (colorIndex >= colors.length || colors[colorIndex] == null) {
+        int[] colors = palettePages[brightness].data();
+        int colorIndex = frame.pixels()[sourceOffset];
+        if (colorIndex >= colors.length) {
             return 0;
         }
-        return colors[colorIndex].ARGB();
+        return colors[colorIndex];
     }
 }

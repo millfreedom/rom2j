@@ -217,7 +217,7 @@ public class StringListVisualObject extends CVisualObject {
      * Fully ported.
      */
     protected static int getRadioButtonRowHeight() {
-        return GUI.sprRadioButtons.frames.get(0).ySize();
+        return GUI.sprRadioButtons.frames.get(0).height();
     }
 
     /**

@@ -914,7 +914,7 @@ public class SelectionInfoPanelVisualObject extends CVisualObject {
      * Native support extracted from SelectionInfoPanelVisualObject::Update @004AF3BF static-picture hit-map reset.
      */
     private void clearPictureHitMap() {
-        Arrays.fill(pictureHitMap0x78.frames.getFirst().data(), (byte) 0);
+        Arrays.fill(pictureHitMap0x78.frames.getFirst().pixels(), 0);
     }
 
     /**
@@ -1138,11 +1138,11 @@ public class SelectionInfoPanelVisualObject extends CVisualObject {
         }
 
         var frame = pictureHitMap0x78.frames.get(0);
-        if (localX >= frame.xSize() || localY >= frame.ySize()) {
+        if (localX >= frame.width() || localY >= frame.height()) {
             return -1;
         }
 
-        int pixel = Byte.toUnsignedInt(frame.data()[localY * frame.xSize() + localX]);
+        int pixel = frame.pixels()[localY * frame.width() + localX];
         int slotIndex = pixel - 1;
         return slotIndex >= 0 && slotIndex < EQUIPMENT_SLOT_COUNT ? slotIndex : -1;
     }
@@ -1155,8 +1155,8 @@ public class SelectionInfoPanelVisualObject extends CVisualObject {
         if (pictureHitMap0x78 == null || pictureHitMap0x78.frames == null || pictureHitMap0x78.frames.isEmpty()) {
             return false;
         }
-        for (byte pixel : pictureHitMap0x78.frames.getFirst().data()) {
-            if (Byte.toUnsignedInt(pixel) != 0) {
+        for (int pixel : pictureHitMap0x78.frames.getFirst().pixels()) {
+            if (pixel != 0) {
                 return true;
             }
         }

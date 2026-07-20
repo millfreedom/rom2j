@@ -1,6 +1,5 @@
 package ua.millfreedom.rom2.model;
 
-import ua.millfreedom.rom2.model.color.RGB16;
 import ua.millfreedom.rom2.model.color.RGB32;
 import ua.millfreedom.rom2.model.palette.Palette16;
 
@@ -22,7 +21,7 @@ public final class TooltipText {
     private static final char RGB_SPAN_OPEN_COLOR_CODE = (char) 0x10;
     private static final int RGB_PAYLOAD_HEX_LENGTH = 6;
     private static final int RGB_PALETTE_SIZE = 16;
-    private static final Map<RGB32, Palette16> RGB_PALETTE_CACHE = new HashMap<>();
+    private static final Map<Integer, Palette16> RGB_PALETTE_CACHE = new HashMap<>();
 
     /**
      * Java-only utility class guard.
@@ -94,7 +93,7 @@ public final class TooltipText {
      * Java-only formatter for coloring the next visible tooltip character with a generated RGB palette.
      * not ported.
      */
-    public static String colorNext(RGB32 color, char character) {
+    public static String colorNext(int color, char character) {
         return encodeRgbControl(RGB_NEXT_COLOR_CODE, color) + character;
     }
 
@@ -102,7 +101,7 @@ public final class TooltipText {
      * Java-only formatter for prefixing text with a next-visible-character generated RGB tooltip color code.
      * not ported.
      */
-    public static String colorNext(RGB32 color, String text) {
+    public static String colorNext(int color, String text) {
         if (text.isEmpty()) {
             return text;
         }
@@ -121,7 +120,7 @@ public final class TooltipText {
      * Java-only formatter for wrapping tooltip text in a generated RGB color span.
      * not ported.
      */
-    public static String colorSpan(RGB32 color, String text) {
+    public static String colorSpan(int color, String text) {
         return openColor(color) + text + closeColor();
     }
 
@@ -137,7 +136,7 @@ public final class TooltipText {
      * Java-only formatter for opening a generated RGB tooltip color span.
      * not ported.
      */
-    public static String openColor(RGB32 color) {
+    public static String openColor(int color) {
         return encodeRgbControl(RGB_SPAN_OPEN_COLOR_CODE, color);
     }
 
@@ -255,12 +254,12 @@ public final class TooltipText {
      * Java-only formatter for delimiter-safe RGB tooltip control payloads.
      * not ported.
      */
-    private static String encodeRgbControl(char controlCode, RGB32 color) {
+    private static String encodeRgbControl(char controlCode, int color) {
         StringBuilder builder = new StringBuilder(1 + RGB_PAYLOAD_HEX_LENGTH);
         builder.append(controlCode);
-        appendHexByte(builder, color.r());
-        appendHexByte(builder, color.g());
-        appendHexByte(builder, color.b());
+        appendHexByte(builder, RGB32.r(color));
+        appendHexByte(builder, RGB32.g(color));
+        appendHexByte(builder, RGB32.b(color));
         return builder.toString();
     }
 
@@ -285,7 +284,7 @@ public final class TooltipText {
      * Java-only parser for an RGB tooltip color control payload.
      * not ported.
      */
-    private static RGB32 parseRgbPayload(String text, int controlIndex) {
+    private static int parseRgbPayload(String text, int controlIndex) {
         if (controlIndex + RGB_PAYLOAD_HEX_LENGTH >= text.length()) {
             throw new IllegalArgumentException("Malformed RGB tooltip color control");
         }
@@ -324,7 +323,7 @@ public final class TooltipText {
      * Java-only cache lookup for generated RGB tooltip palettes.
      * not ported.
      */
-    private static Palette16 rgbPalette(RGB32 color) {
+    private static Palette16 rgbPalette(int color) {
         return RGB_PALETTE_CACHE.computeIfAbsent(color, TooltipText::buildRgbPalette);
     }
 
@@ -332,8 +331,8 @@ public final class TooltipText {
      * Java-only generator for a 16-entry black-to-RGB tooltip palette ramp.
      * not ported.
      */
-    private static Palette16 buildRgbPalette(RGB32 color) {
-        RGB16[] colors = new RGB16[RGB_PALETTE_SIZE];
+    private static Palette16 buildRgbPalette(int color) {
+        int[] colors = new int[RGB_PALETTE_SIZE];
         for (int i = 0; i < colors.length; i++) {
             colors[i] = rgbPaletteStep(color, i);
         }
@@ -344,11 +343,11 @@ public final class TooltipText {
      * Java-only generator for one black-to-RGB tooltip palette ramp step.
      * not ported.
      */
-    private static RGB16 rgbPaletteStep(RGB32 color, int step) {
-        return RGB16.from(
-                (color.r() * step) / 0x0F,
-                (color.g() * step) / 0x0F,
-                (color.b() * step) / 0x0F
+    private static int rgbPaletteStep(int color, int step) {
+        return RGB32.from(
+                (RGB32.r(color) * step) / 0x0F,
+                (RGB32.g(color) * step) / 0x0F,
+                (RGB32.b(color) * step) / 0x0F
         );
     }
 

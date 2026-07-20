@@ -3,144 +3,64 @@ package ua.millfreedom.rom2.model.color;
 import static ua.millfreedom.rom2.console.Utils.color24;
 
 /**
- * DO NOT USE constructor directly! Prefer RGB16.of(int) to reuse the same instance!
- * This class is a Java replacement for native LUT
- * The colours are INTENTIONALLY expanded further than native 565!
- *
- * @param val
+ * Stateless RGB565 conversion utilities. RGB565 values must not survive a resource-load boundary.
  */
-public record RGB16(short val) implements RGBA {
+public final class RGB16 {
 
-    private static final int CACHE_SIZE = 0x10000;
-    private static final RGB32[] cache32 = new RGB32[CACHE_SIZE];
-    private static final RGB16[] cache = initCache();
-    public static final RGB16 BLACK = cache[0]; // same af .of(0)
-    public static final RGB16 WHITE = cache[cache.length - 1]; // same af .of(0xFFFF)
-
-    // not ported.
-    private static RGB16[] initCache() {
-        RGB16[] result = new RGB16[CACHE_SIZE];
-        for (int r5 = 0; r5 < 32; r5++) {
-            for (int g6 = 0; g6 < 64; g6++) {
-                for (int b5 = 0; b5 < 32; b5++) {
-                    int packed = pack565(r5, g6, b5);
-                    RGB16 rgb16 = new RGB16((short) packed);
-                    result[packed] = rgb16;
-                    cache32[packed] = RGB32.from(rgb16.r(), rgb16.g(), rgb16.b());
-                }
-            }
-        }
-        return result;
-    }
-
-    // not ported.
-    public static RGB16 of(int v565) {
-        return getCached(v565);
-    }
-
-    // not ported.
-    public static RGB16 from888(int rgb888) {
-        return from(rgb888 >>> 16, rgb888 >>> 8, rgb888);
-    }
-
-    // not ported.
-    public static RGB16 from(int r8, int g8, int b8) {
-        return getCached(pack888(r8, g8, b8));
-    }
-
-    /**
-     * Native support extracted from Global::PackRoundedRgbToDisplayPixel @00474427 for Java's fixed RGB565 renderer.
-     * The r+4/g+2/b+4 expansion matches native rounded channel packing.
-     */
-    private static int pack888(int r8, int g8, int b8) {
-        int rr = (r8 & 0xFF) + 4;
-        int gr = (g8 & 0xFF) + 2;
-        int br = (b8 & 0xFF) + 4;
-        int r5 = (rr >>> 3) - (rr >>> 8);
-        int g6 = (gr >>> 2) - (gr >>> 8);
-        int b5 = (br >>> 3) - (br >>> 8);
-        return pack565(r5, g6, b5);
-    }
-
-    // not ported.
-    private static int pack565(int r5, int g6, int b5) {
-        return ((r5 & 0x1F) << 11) | ((g6 & 0x3F) << 5) | (b5 & 0x1F);
-    }
-
-    // not ported.
-    private static RGB16 getCached(int packed565) {
-        return cache[packed565 & 0xFFFF];
+    // not ported. Utility class.
+    private RGB16() {
     }
 
 
     /**
-     * @param level direct brightness level: 0 -> black, 16 -> this (100%)
-     * @return RGB16
-     * not ported.
+     * not ported. Expands a packed RGB565 red channel to the full 0..255 range.
      */
-    public RGB16 withBrightness(int level) {
-        if (level < 1) return BLACK;
-        if (level > 15) return this;
-
-        int r = (r() * level) >> 4;
-        int g = (g() * level) >> 4;
-        int b = (b() * level) >> 4;
-        return from(r, g, b);
+    public static int r(int packed565) {
+        int red5 = (packed565 >>> 11) & 0x1F;
+        return expand5(red5);
     }
 
     /**
-     * Native support extracted from InitLUT @0045225B native LUT shade-page semantics.
-     * Fully ported replacement for g_pColorLUT_UNUSED_IN_JAVA page lookup.
-     * this method MUST be used instead of native LUT lookup!
+     * not ported. Expands a packed RGB565 green channel to the full 0..255 range.
      */
-    public RGB16 withShade(int page) {
-        return withBrightness(16 - page);
+    public static int g(int packed565) {
+        int green6 = (packed565 >>> 5) & 0x3F;
+        return expand6(green6);
     }
 
-    @Override
-    // not ported.
-    public int r() {
-        return ((((val >>> 11) & 0x1F) * 527) + 23) >>> 6;
+    /**
+     * not ported. Expands a packed RGB565 blue channel to the full 0..255 range.
+     */
+    public static int b(int packed565) {
+        int blue5 = packed565 & 0x1F;
+        return expand5(blue5);
     }
 
-    @Override
-    // not ported.
-    public int g() {
-        return ((((val >>> 5) & 0x3F) * 259) + 33) >>> 6;
+    /**
+     * not ported. Expands one 5-bit RGB565 channel with the canonical full-range formula.
+     */
+    public static int expand5(int channel5) {
+        return (((channel5 & 0x1F) * 527) + 23) >>> 6;
     }
 
-    @Override
-    // not ported.
-    public int b() {
-        return (((val & 0x1F) * 527) + 23) >>> 6;
+    /**
+     * not ported. Expands one 6-bit RGB565 channel with the canonical full-range formula.
+     */
+    public static int expand6(int channel6) {
+        return (((channel6 & 0x3F) * 259) + 33) >>> 6;
     }
 
-    @Override
-    // not ported.
-    public int a() {
-        return 0xFF;
-    }
-
-
-    // not ported.
-    public RGB32 toRGB32() {
-        return cache32[val & 0xFFFF];
-    }
-
-    // not ported.
-    public int ARGB() {
-        return RGB32.ARGB(r(), g(), b(), 0xFF);
-    }
-
-    // not ported.
-    public int ABGR() {
-        return RGB32.ABGR(r(), g(), b(), 0xFF);
-    }
-
-    @Override
-    // not ported.
-    public String toString() {
-        return color24(r(), g(), b()) + '█';
+    /**
+     * Native support extracted from Global::PackRoundedRgbToDisplayPixel @00474427.
+     */
+    public static short from(int red, int green, int blue) {
+        int roundedRed = (red & 0xFF) + 4;
+        int roundedGreen = (green & 0xFF) + 2;
+        int roundedBlue = (blue & 0xFF) + 4;
+        int red5 = (roundedRed >>> 3) - (roundedRed >>> 8);
+        int green6 = (roundedGreen >>> 2) - (roundedGreen >>> 8);
+        int blue5 = (roundedBlue >>> 3) - (roundedBlue >>> 8);
+        return (short) (((red5 & 0x1F) << 11) | ((green6 & 0x3F) << 5) | (blue5 & 0x1F));
     }
 
 }

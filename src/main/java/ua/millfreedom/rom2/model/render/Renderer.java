@@ -1,6 +1,6 @@
 package ua.millfreedom.rom2.model.render;
 
-import ua.millfreedom.rom2.model.color.RGB16;
+import ua.millfreedom.rom2.model.GameBitmapFrame;
 import ua.millfreedom.rom2.model.palette.Palette16;
 
 public interface Renderer {
@@ -30,7 +30,7 @@ public interface Renderer {
      * port can render the map into a fixed logical tile surface and scale that surface into the current screen viewport.
      * not ported.
      */
-    void pushJavaRenderTarget(byte[] surfaceBgra, int width, int height);
+    void pushJavaRenderTarget(int[] surfaceArgb, int width, int height);
 
     /**
      * Java-only counterpart to pushJavaRenderTarget. This is not native behavior and must stay treated as Java
@@ -53,7 +53,7 @@ public interface Renderer {
      * Native: DrawRect @004569A3.
      * Fully ported.
      */
-    void drawRect(int left, int top, int right, int bottom, short color);
+    void drawRect(int left, int top, int right, int bottom, int color);
 
     /**
      * Native support: ApplyShadeToRect @004564DF.
@@ -63,7 +63,7 @@ public interface Renderer {
     /**
      * Native support: AddColorToRect @00456416.
      */
-    void addColorToRect(int left, int top, int right, int bottom, short color565);
+    void addColorToRect(int left, int top, int right, int bottom, int color);
 
     /**
      * Native support: ApplyShadeAdditiveToRect @004565CD.
@@ -74,90 +74,50 @@ public interface Renderer {
      * Native: DrawLine @0045673C.
      * Fully ported.
      */
-    void drawLine(int x, int y, int cx, int cy, short color565);
+    void drawLine(int x, int y, int cx, int cy, int color);
 
     /**
      * Native: FillScreenRect @00456348.
      * Fully ported.
      */
-    void fillScreenRect(int left, int top, int right, int bottom, short color565);
+    void fillScreenRect(int left, int top, int right, int bottom, int color);
 
     /**
-     * Native: DrawSprite_RLE4_to_16 @004540D1.
-     * Fully ported at the Java 32bpp render-target boundary.
+     * Java decoded-frame boundary for normal palette-indexed sprite rendering.
+     * not ported.
      */
-    void drawSpriteRLE4(int nX, int nY, int nWidth, int nHeight, byte[] rleData, RGB16[] palette16);
+    void drawIndexedSprite(int x, int y, GameBitmapFrame frame, int[] palette, boolean flipX);
 
     /**
-     * Native: DrawSprite_A16 @0045889B.
-     * Fully ported at the Java 32bpp render-target boundary.
+     * Java decoded-frame boundary for native fixed-half sprite blending.
+     * not ported.
      */
-    void drawSpriteA16(int nX, int nY, int nWidth, int nHeight, byte[] pA16Data, Palette16[] palettePages);
+    void drawIndexedSpriteBlend(int x, int y, GameBitmapFrame frame, int[] palette, boolean flipX);
 
     /**
-     * Native: DrawSprite_A16_FlipX @00458C10.
-     * Fully ported at the Java 32bpp render-target boundary.
+     * Java decoded-frame boundary that uses decoded RLE coverage for native shade-page semantics.
+     * not ported.
      */
-    void drawSpriteA16FlipX(int nX, int nY, int nWidth, int nHeight, byte[] pA16Data, Palette16[] palettePages);
+    void drawIndexedSpriteShade(int x, int y, GameBitmapFrame frame, int shadePage, boolean flipX);
 
     /**
-     * Native support extracted from CA16Font::DrawTextInternal @0045E8FD explicit color-table dispatch.
+     * Java decoded-frame boundary for sheared destination shade-page semantics using decoded RLE coverage.
+     * not ported.
      */
-    void drawSpriteA16WithBasePalette(int nX, int nY, int nWidth, int nHeight, byte[] pA16Data, RGB16[] palette16, boolean bFlipX);
+    void drawIndexedSpriteShearedShade(int x, int y, GameBitmapFrame frame,
+                                       int shadePage, int slope, boolean flipX);
 
     /**
-     * Native: DrawSprite_RLE8_to_16 @00454344.
-     * Fully ported at the Java 32bpp render-target boundary.
+     * Java decoded-frame boundary that fills decoded RLE coverage with one straight-ARGB color.
+     * not ported.
      */
-    void drawSpriteRLE8(int nX, int nY, int nWidth, int nHeight, byte[] pRLEData, RGB16[] pPalette);
+    void drawIndexedSpriteSolid(int x, int y, GameBitmapFrame frame, int fillColor, boolean flipX);
 
     /**
-     * Native: DrawSprite_RLE8_to_16_FlipX @0045537D.
-     * Fully ported at the Java 32bpp render-target boundary.
+     * Java decoded-frame boundary for packed A16 codes and one compact palette-generation lookup.
+     * not ported.
      */
-    void drawSpriteRLE8FlipX(int nX, int nY, int nWidth, int nHeight, byte[] pRLEData, RGB16[] pPalette);
-
-    /**
-     * Native: DrawSprite_RLE8_SolidIndexed8 @004545C5.
-     * Java 32bpp render-target boundary for native solid RLE8 sprite coverage.
-     */
-    void drawSpriteRLE8Solid(int nX, int nY, int nWidth, int nHeight, byte[] pRLEData, RGB16 fillColor);
-
-    /**
-     * Native: drawSpriteRLE8To16Blend @00454656.
-     * Fully ported at the Java 32bpp render-target boundary.
-     */
-    void drawSpriteRLE8Blend(int nX, int nY, int nWidth, int nHeight, byte[] pRLEData, RGB16[] pPalette);
-
-    /**
-     * Native: drawSpriteRLE8To16BlendFlipX @00455617.
-     * Fully ported at the Java 32bpp render-target boundary.
-     */
-    void drawSpriteRLE8BlendFlipX(int nX, int nY, int nWidth, int nHeight, byte[] pRLEData, RGB16[] pPalette);
-
-    /**
-     * Native: DrawSprite_RLE8_AlphaBlend @00454ABC.
-     * Fully ported at the Java 32bpp render-target boundary.
-     */
-    void drawSpriteRLE8AlphaBlend(int nX, int nY, int nWidth, int nHeight, byte[] pRLEData, int shadePage);
-
-    /**
-     * Native: DrawSprite_RLE8_AlphaBlend_FlipX @00455AB1.
-     * Fully ported at the Java 32bpp render-target boundary.
-     */
-    void drawSpriteRLE8AlphaBlendFlipX(int nX, int nY, int nWidth, int nHeight, byte[] pRLEData, int shadePage);
-
-    /**
-     * Native: DrawSpriteRLE8To16Lut @0045506F.
-     * Fully ported at the Java 32bpp render-target boundary.
-     */
-    void drawSpriteRLE8To16Lut(int nX, int nY, int nWidth, int nHeight, byte[] pRLEData, int lutIndex, int slope);
-
-    /**
-     * Native: DrawSpriteRLE8To16LutFlipX @00456021.
-     * Fully ported at the Java 32bpp render-target boundary.
-     */
-    void drawSpriteRLE8To16LutFlipX(int nX, int nY, int nWidth, int nHeight, byte[] pRLEData, int lutIndex, int slope);
+    void drawA16Sprite(int x, int y, GameBitmapFrame frame, A16PaletteLookup paletteLookup, boolean flipX);
 
     /**
      * Native: DrawSoftDot @0045724A.
@@ -169,31 +129,31 @@ public interface Renderer {
      * Native: BlitToScreen @004538DD.
      * Fully ported at the Java 32bpp render-target boundary.
      */
-    void blitToScreen(int dstX, int dstY, int srcLeft, int srcTop, int srcRight, int srcBottom, RGB16[] srcData, int srcWidth, int srcHeight);
+    void blitToScreen(int dstX, int dstY, int srcLeft, int srcTop, int srcRight, int srcBottom, int[] srcData, int srcWidth, int srcHeight);
 
     /**
      * Native: BlitToScreenMasked @00453BCA.
      * Fully ported at the Java 32bpp render-target boundary.
      */
-    void blitToScreenMasked(int dstX, int dstY, int srcLeft, int srcTop, int srcRight, int srcBottom, RGB16[] srcData, int srcWidth, int srcHeight);
+    void blitToScreenMasked(int dstX, int dstY, int srcLeft, int srcTop, int srcRight, int srcBottom, int[] srcData, int srcWidth, int srcHeight);
 
     /**
      * Native: BlitToScreenAdditive @00453A58.
      */
-    void blitToScreenAdditive(int dstX, int dstY, int srcLeft, int srcTop, int srcRight, int srcBottom, RGB16[] srcData, int srcWidth, int srcHeight);
+    void blitToScreenAdditive(int dstX, int dstY, int srcLeft, int srcTop, int srcRight, int srcBottom, int[] srcData, int srcWidth, int srcHeight);
 
     /**
      * Native: BlitIndexedToScreen @00453D4B.
      * Fully ported at the Java 32bpp render-target boundary.
      */
     void blitIndexedToScreen(int dstX, int dstY, int srcLeft, int srcTop, int srcRight, int srcBottom,
-                             byte[] srcData, int srcWidth, int srcHeight, RGB16[] palette16);
+                              int[] srcData, int srcWidth, int srcHeight, int[] palette);
 
     /**
      * Native: BlitIndexedToScreenAdditive @00453F69.
      */
     void blitIndexedToScreenAdditive(int dstX, int dstY, int srcLeft, int srcTop, int srcRight, int srcBottom,
-                                     byte[] srcData, int srcWidth, int srcHeight, RGB16[] palette16);
+                                      int[] srcData, int srcWidth, int srcHeight, int[] palette);
 
     /**
      * Native: DrawFlatTerrainTileToScreen @00457487.
@@ -202,7 +162,7 @@ public interface Renderer {
     void drawFlatTerrainTile(int dstX, int topY,
                              int topLeftBrightness, int topRightBrightness,
                              int bottomLeftBrightness, int bottomRightBrightness,
-                             byte[] sourcePixels, int sourceOffset, Palette16[] palettePages);
+                              int[] sourcePixels, int sourceOffset, Palette16[] palettePages);
 
     /**
      * Native: DrawSkewedTerrainTileToScreen @004575FE.
@@ -213,7 +173,14 @@ public interface Renderer {
                                int bottomLeftY, int bottomRightY,
                                int topLeftBrightness, int topRightBrightness,
                                int bottomLeftBrightness, int bottomRightBrightness,
-                               byte[] sourcePixels, int sourceOffset, Palette16[] palettePages);
+                                int[] sourcePixels, int sourceOffset, Palette16[] palettePages);
+
+    /**
+     * Java-only terrain-cache clipping support. Clears pixels above the first cached viewport terrain edge so terrain
+     * protruding from the preceding world row cannot leak into the copied logical frame.
+     * not ported.
+     */
+    void clearRowsAboveTerrainEdge(int leftX, int topLeftY, int topRightY, int color);
 
     /**
      * Native: ClearFlatTerrainSlopeMask @00457944.
@@ -266,20 +233,23 @@ public interface Renderer {
      * not ported.
      */
     void blitIndexedToScreenMasked(int dstX, int dstY, int srcLeft, int srcTop, int srcRight, int srcBottom,
-                                   byte[] srcData, int srcWidth, int srcHeight, RGB16[] palette16);
+                                    int[] srcData, int srcWidth, int srcHeight, int[] palette);
 
     /**
-     * Blits 16-bit source pixels into the screen surface.
+     * Blits known-opaque straight-ARGB pixels into the screen surface with nearest-neighbor scaling.
      * not ported.
      */
-    void blitPixels(int destX, int destY, int width, int height, int srcPitchPixels, int srcHeight, byte[] pSrcPointer);
+    void blitOpaqueArgbScaled(int[] sourceArgb, int sourceWidth, int sourceHeight,
+                              int destX, int destY, int destWidth, int destHeight);
 
     /**
-     * Blits BGRA pixels into the screen surface with nearest-neighbor scaling.
+     * Blits opaque palette colors resolved directly from a canonical integer selector plane, with source cropping and
+     * nearest-neighbor scaling.
      * not ported.
      */
-    void blitBgraScaled(byte[] sourceBgra, int sourceWidth, int sourceHeight,
-                        int destX, int destY, int destWidth, int destHeight);
+    void blitOpaqueIndexedScaled(int[] sourceSelectors, int sourceWidth, int sourceHeight,
+                                 int sourceX, int sourceY, int sourceRectWidth, int sourceRectHeight,
+                                 int[] palette, int destX, int destY, int destWidth, int destHeight);
 
     /**
      * Clears the software-backed render surface before a new frame.

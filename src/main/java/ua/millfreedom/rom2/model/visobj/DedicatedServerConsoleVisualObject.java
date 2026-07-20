@@ -8,6 +8,7 @@ import ua.millfreedom.rom2.model.CRect;
 import ua.millfreedom.rom2.model.CServerApp;
 import ua.millfreedom.rom2.model.Player;
 import ua.millfreedom.rom2.model.action.ChatTextAction;
+import ua.millfreedom.rom2.model.color.RGB32;
 import ua.millfreedom.rom2.model.control.CGameListControl;
 import ua.millfreedom.rom2.model.enums.MessageCodes;
 import ua.millfreedom.rom2.model.enums.TextAlign;
@@ -50,8 +51,6 @@ public class DedicatedServerConsoleVisualObject extends HandlerVisualObject {
     private static final int CHANGE_MAP_BUTTON_ID = 100;
     private static final int KEEP_SAVED_CHARACTERS_LIST_ID = 101;
     private static final int CONSOLE_INPUT_ID = 104;
-    private static final short BLACK_565 = 0;
-    private static final short WHITE_565 = (short) 0xFFFF;
     private static final int SERVER_TABLE_TOP = 0x10;
     private static final int SERVER_TABLE_HEADER_Y = 0x14;
     private static final int SERVER_TABLE_BOTTOM = 200;
@@ -188,7 +187,7 @@ public class DedicatedServerConsoleVisualObject extends HandlerVisualObject {
                     0,
                     Globals.screenRect.right,
                     Globals.screenRect.bottom,
-                    BLACK_565
+                    RGB32.BLACK
             );
             super.update();
             Globals.fonts.font2.drawTextShadowed(
@@ -212,7 +211,7 @@ public class DedicatedServerConsoleVisualObject extends HandlerVisualObject {
      */
     @Override
     public void renderSelf(CRect clipRect) {
-        Globals.renderer.fillScreenRect(clipRect.left, clipRect.top, clipRect.right, clipRect.bottom, BLACK_565);
+        Globals.renderer.fillScreenRect(clipRect.left, clipRect.top, clipRect.right, clipRect.bottom, RGB32.BLACK);
     }
 
     /**
@@ -339,10 +338,10 @@ public class DedicatedServerConsoleVisualObject extends HandlerVisualObject {
      * Fully ported.
      */
     private void drawServerTableSeparators() {
-        Globals.renderer.fillScreenRect(0, SERVER_TABLE_TOP, cRect.right, SERVER_TABLE_TOP + 1, WHITE_565);
-        Globals.renderer.fillScreenRect(0, 0x20, cRect.right, 0x21, WHITE_565);
-        Globals.renderer.fillScreenRect(0, SERVER_TABLE_BOTTOM, cRect.right, SERVER_TABLE_BOTTOM + 1, WHITE_565);
-        Globals.renderer.fillScreenRect(0, 0xD8, cRect.right, 0xD9, WHITE_565);
+        Globals.renderer.fillScreenRect(0, SERVER_TABLE_TOP, cRect.right, SERVER_TABLE_TOP + 1, RGB32.WHITE);
+        Globals.renderer.fillScreenRect(0, 0x20, cRect.right, 0x21, RGB32.WHITE);
+        Globals.renderer.fillScreenRect(0, SERVER_TABLE_BOTTOM, cRect.right, SERVER_TABLE_BOTTOM + 1, RGB32.WHITE);
+        Globals.renderer.fillScreenRect(0, 0xD8, cRect.right, 0xD9, RGB32.WHITE);
     }
 
     /**
@@ -351,10 +350,10 @@ public class DedicatedServerConsoleVisualObject extends HandlerVisualObject {
      */
     private void drawServerTableVerticalLines() {
         for (int x : SERVER_TABLE_VERTICAL_LINES) {
-            Globals.renderer.drawLine(x, SERVER_TABLE_TOP, x, SERVER_TABLE_BOTTOM, WHITE_565);
+            Globals.renderer.drawLine(x, SERVER_TABLE_TOP, x, SERVER_TABLE_BOTTOM, RGB32.WHITE);
         }
         int rightBorderX = cRect.right - 1;
-        Globals.renderer.drawLine(rightBorderX, SERVER_TABLE_TOP, rightBorderX, SERVER_TABLE_BOTTOM, WHITE_565);
+        Globals.renderer.drawLine(rightBorderX, SERVER_TABLE_TOP, rightBorderX, SERVER_TABLE_BOTTOM, RGB32.WHITE);
     }
 
     /**

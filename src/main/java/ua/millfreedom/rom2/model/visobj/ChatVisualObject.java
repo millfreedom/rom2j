@@ -5,7 +5,7 @@ import ua.millfreedom.rom2.model.CBitmapFont;
 import ua.millfreedom.rom2.model.CCursor;
 import ua.millfreedom.rom2.model.CMousePointer;
 import ua.millfreedom.rom2.model.CRect;
-import ua.millfreedom.rom2.model.color.RGB16;
+import ua.millfreedom.rom2.model.color.RGB32;
 import ua.millfreedom.rom2.model.control.CGameListControl;
 import ua.millfreedom.rom2.model.enums.MessageCodes;
 import ua.millfreedom.rom2.model.palette.Palettes;
@@ -15,9 +15,7 @@ import java.util.Arrays;
 
 import static ua.millfreedom.rom2.model.enums.MessageCodes.DIALOG_OK;
 import static ua.millfreedom.rom2.model.enums.MessageCodes.RETURN_TO_GAME;
-import static ua.millfreedom.rom2.model.visobj.VirtualKeyCodes.VK_ESCAPE;
-import static ua.millfreedom.rom2.model.visobj.VirtualKeyCodes.VK_RETURN;
-import static ua.millfreedom.rom2.model.visobj.VirtualKeyCodes.VK_UP;
+import static ua.millfreedom.rom2.model.visobj.VirtualKeyCodes.*;
 
 /**
  * Native class: ChatVisualObject.
@@ -60,10 +58,10 @@ public class ChatVisualObject extends HandlerVisualObject {
     private static final int DEFAULT_HISTORY_LINES = 8;
 
     // not ported. Java-only expanded panel border color.
-    private static final short BORDER_COLOR = (short)0xA3E0;
+    private static final int BORDER_COLOR = RGB32.from(164, 125, 0);
 
     // not ported. Java-only separator color between retained history and input.
-    private static final short SEPARATOR_COLOR = (short)0xA3E0;
+    private static final int SEPARATOR_COLOR = BORDER_COLOR;
 
     //0x68 Native 0x100-byte owner buffer cleared when the banner input opens.
     public final byte[] dialogInputResetBuffer = new byte[0x100];

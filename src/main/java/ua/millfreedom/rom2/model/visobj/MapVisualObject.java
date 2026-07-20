@@ -8,7 +8,7 @@ import ua.millfreedom.rom2.Utils;
 import ua.millfreedom.rom2.model.*;
 import ua.millfreedom.rom2.model.action.*;
 import ua.millfreedom.rom2.model.actiondata.ActionPayloads;
-import ua.millfreedom.rom2.model.color.RGB16;
+import ua.millfreedom.rom2.model.color.RGB32;
 import ua.millfreedom.rom2.model.container.CustomList;
 import ua.millfreedom.rom2.model.container.MfcShortKeyMap;
 import ua.millfreedom.rom2.model.control.CGameListControl;
@@ -226,14 +226,35 @@ public final class MapVisualObject extends CVisualObject {
     // not ported. Java-only max-zoom allocation height; render grids are sized for this, not for the current zoom.
     private int allocatedGridHeight;
 
-    // not ported. Java-only logical BGRA framebuffer used to draw 32-pixel map cells before scaling to the screen.
-    private byte[] javaZoomMapFrameBgra = new byte[0];
+    // not ported. Java-only logical straight-ARGB framebuffer used to draw 32-pixel map cells before scaling.
+    private int[] javaZoomMapFrameArgb = new int[0];
 
-    // not ported. Java-only width of javaZoomMapFrameBgra in pixels.
+    // not ported. Java-only width of javaZoomMapFrameArgb in pixels.
     private int javaZoomMapFrameWidth;
 
-    // not ported. Java-only height of javaZoomMapFrameBgra in pixels.
+    // not ported. Java-only height of javaZoomMapFrameArgb in pixels.
     private int javaZoomMapFrameHeight;
+
+    // not ported. Java-only world-aligned straight-ARGB terrain cache.
+    private int[] terrainFrameCacheArgb = new int[0];
+
+    // not ported. Java-only generation stamp for each cached map cell's static terrain inputs.
+    private int[] terrainFrameCacheCellGenerations = new int[0];
+
+    // not ported. Java-only animation stamp for each cached map cell.
+    private int[] terrainFrameCacheAnimationStamps = new int[0];
+
+    // not ported. Java-only terrain cache width in pixels.
+    private int terrainFrameCacheWidth;
+
+    // not ported. Java-only terrain cache height in pixels.
+    private int terrainFrameCacheHeight;
+
+    // not ported. Java-only current static terrain generation.
+    private int terrainFrameCacheGeneration = 1;
+
+    // not ported. Java-only descriptor identity that owns the terrain cache allocation.
+    private MapDescriptor terrainFrameCacheDescriptor;
 
     // MapVisualObject_Base +0x68 / MapVisualObject +0x6C.
     public int objectLayerGridBytes;
@@ -1475,6 +1496,7 @@ public final class MapVisualObject extends CVisualObject {
         floatingUnitTexts.clear();
         removeExtraNetworkPlayersForLobbyReturn();
         terrainLightOverrideCells.clear();
+        discardTerrainFrameCache();
         mapDescriptor = null;
         cachedMapWidth = 0;
         cachedMapHeight = 0;
@@ -2192,7 +2214,6 @@ public final class MapVisualObject extends CVisualObject {
 
         CBmp64k sourcePortrait = createRoleDialogPortraitSource(unit);
         compositeRoleDialogPortrait(roleDialogPortrait, sourcePortrait, unit.type);
-        roleDialogPortrait.syncFrameBytesFromSurface();
         return roleDialogPortrait;
     }
 
@@ -2512,6 +2533,7 @@ public final class MapVisualObject extends CVisualObject {
             removeExtraNetworkPlayersForLobbyReturn();
         }
         terrainLightOverrideCells.clear();
+        discardTerrainFrameCache();
         mapDescriptor = null;
         drainRemoteGameActions();
         stopGameplayAudioForSessionTeardown();
@@ -2540,6 +2562,7 @@ public final class MapVisualObject extends CVisualObject {
         pCUnit.setSelected(true);
         transientObjects.clear();
         floatingUnitTexts.clear();
+        discardTerrainFrameCache();
         mapDescriptor = null;
         removeExtraNetworkPlayersForCompletedMissionReturn();
         terrainLightOverrideCells.clear();
@@ -2817,7 +2840,7 @@ public final class MapVisualObject extends CVisualObject {
                 screenRect.top,
                 screenRect.right - 0x1E,
                 screenRect.top + 0x18,
-                RGB16.from(8, 8, 8).val()
+                RGB32.from(8, 8, 8)
         );
         Globals.fonts.font1.drawTextShadowed(
                 screenRect.right - 0x26,
@@ -2857,7 +2880,7 @@ public final class MapVisualObject extends CVisualObject {
                 screenRect.top + 0x1E,
                 screenRect.right - 0x1E,
                 screenRect.top + 0x69,
-                RGB16.from(8, 8, 8).val()
+                RGB32.from(8, 8, 8)
         );
         Globals.fonts.font1.drawTextShadowed(
                 screenRect.right - 0x69,
@@ -3364,7 +3387,7 @@ public final class MapVisualObject extends CVisualObject {
     /**
      * Native support extracted from MapVisualObject::RenderFrame @00406F43.
      * Java-only zoom addition: the native draw sequence still runs in 32-pixel logical map coordinates, but it now draws
-     * into a private BGRA target and scales that target into the physical screen rectangle. This is intentional
+     * into a private straight-ARGB target and scales that target into the physical screen rectangle. This is intentional
      * non-native behavior and must not be removed merely because native code drew directly to the screen surface.
      */
     private void drawModeledMapFrame(CRect screenRect) {
@@ -3373,11 +3396,12 @@ public final class MapVisualObject extends CVisualObject {
 
         Globals.renderer.lockSurface();
         try {
-            Globals.renderer.pushJavaRenderTarget(javaZoomMapFrameBgra, javaZoomMapFrameWidth, javaZoomMapFrameHeight);
+            Globals.renderer.pushJavaRenderTarget(javaZoomMapFrameArgb, javaZoomMapFrameWidth, javaZoomMapFrameHeight);
             try {
                 Globals.renderer.pushClip(0, 0, javaZoomMapFrameWidth, javaZoomMapFrameHeight);
                 try {
                     drawFullTerrainFrame();
+                    drawTerrainDebugGridLinePass();
                     if (dynamicLightCellCount != 0
                             && (TerrainGraphics.terrainGraphicsFlags & 0x2) == 0
                             && Globals.gamePreferences.lighting != 0) {
@@ -3400,10 +3424,10 @@ public final class MapVisualObject extends CVisualObject {
                         screenRect.top,
                         screenRect.right,
                         screenRect.bottom,
-                        RGB16.BLACK.val()
+                        RGB32.BLACK
                 );
-                Globals.renderer.blitBgraScaled(
-                        javaZoomMapFrameBgra,
+                Globals.renderer.blitOpaqueArgbScaled(
+                        javaZoomMapFrameArgb,
                         javaZoomMapFrameWidth,
                         javaZoomMapFrameHeight,
                         scaledMapRect.left,
@@ -3422,9 +3446,122 @@ public final class MapVisualObject extends CVisualObject {
 
     /**
      * Native: MapVisualObject::DrawFullTerrainFrame @00404E0E.
-     * Fully ported.
+     * Fully ported. Java materializes the native base-terrain result into a world-aligned CPU cache and copies the
+     * current viewport into the logical framebuffer; dynamic terrain lights and later layers retain native ordering.
      */
     private void drawFullTerrainFrame() {
+        ensureTerrainFrameCache();
+        materializeTerrainFrameCacheViewport();
+        copyTerrainFrameCacheViewport();
+        clearTerrainFrameCacheTopOverdraw();
+    }
+
+    /**
+     * Java-only terrain-cache allocation and scenario ownership boundary.
+     * not ported.
+     */
+    private void ensureTerrainFrameCache() {
+        int width = Math.multiplyExact(cachedMapWidth, TILE_SCREEN_SIZE);
+        int height = Math.multiplyExact(cachedMapHeight, TILE_SCREEN_SIZE);
+        if (terrainFrameCacheDescriptor == mapDescriptor
+                && terrainFrameCacheWidth == width
+                && terrainFrameCacheHeight == height) {
+            return;
+        }
+
+        discardTerrainFrameCache();
+        terrainFrameCacheDescriptor = mapDescriptor;
+        terrainFrameCacheWidth = width;
+        terrainFrameCacheHeight = height;
+        terrainFrameCacheArgb = new int[Math.multiplyExact(width, height)];
+        Arrays.fill(terrainFrameCacheArgb, RGB32.BLACK);
+        int cellCount = Math.multiplyExact(cachedMapWidth, cachedMapHeight);
+        terrainFrameCacheCellGenerations = new int[cellCount];
+        terrainFrameCacheAnimationStamps = new int[cellCount];
+        Arrays.fill(terrainFrameCacheAnimationStamps, Integer.MIN_VALUE);
+    }
+
+    /**
+     * Java-only terrain-cache lifecycle cleanup for scenario/session changes.
+     * not ported.
+     */
+    private void discardTerrainFrameCache() {
+        terrainFrameCacheArgb = new int[0];
+        terrainFrameCacheCellGenerations = new int[0];
+        terrainFrameCacheAnimationStamps = new int[0];
+        terrainFrameCacheWidth = 0;
+        terrainFrameCacheHeight = 0;
+        terrainFrameCacheGeneration = 1;
+        terrainFrameCacheDescriptor = null;
+    }
+
+    /**
+     * Java-only terrain-cache invalidation for static terrain, lighting, and palette changes.
+     * not ported.
+     */
+    private void invalidateTerrainFrameCache() {
+        if (terrainFrameCacheGeneration == Integer.MAX_VALUE) {
+            Arrays.fill(terrainFrameCacheCellGenerations, 0);
+            terrainFrameCacheGeneration = 1;
+            return;
+        }
+        terrainFrameCacheGeneration++;
+    }
+
+    /**
+     * Java-only terrain-cache materialization. The first exposure of a static generation redraws the complete visible
+     * terrain plus the native four-row bottom halo; later animation changes refresh only affected cached cells.
+     * not ported.
+     */
+    private void materializeTerrainFrameCacheViewport() {
+        boolean staticTerrainStale = hasStaleStaticTerrainCacheCell();
+        int animationStamp = terrainFrameCacheAnimationStamp();
+        if (!staticTerrainStale && !hasStaleAnimatedTerrainCacheCell(animationStamp)) {
+            return;
+        }
+
+        Globals.renderer.pushJavaRenderTarget(
+                terrainFrameCacheArgb,
+                terrainFrameCacheWidth,
+                terrainFrameCacheHeight
+        );
+        try {
+            Globals.renderer.pushClip(0, 0, terrainFrameCacheWidth, terrainFrameCacheHeight);
+            try {
+                for (int row = 0; row < gridHeight + 4; row++) {
+                    for (int col = gridWidth - 1; col >= 0; col--) {
+                        if (!isMapTerrainCell(col, row)) {
+                            continue;
+                        }
+                        int worldX = col + view.x;
+                        int worldY = row + view.y;
+                        int cellIndex = mapDescriptor.tileIndex(worldX, worldY);
+                        int baseTileId = terrainTileId(mapDescriptor.tileWordAt(worldX, worldY));
+                        if (!staticTerrainStale
+                                && (!isAnimatedTerrainTile(baseTileId)
+                                || terrainFrameCacheAnimationStamps[cellIndex] == animationStamp)) {
+                            continue;
+                        }
+                        drawTerrainCellToCache(worldX, worldY, baseTileId);
+                        terrainFrameCacheCellGenerations[cellIndex] = terrainFrameCacheGeneration;
+                        if (isAnimatedTerrainTile(baseTileId)) {
+                            terrainFrameCacheAnimationStamps[cellIndex] = animationStamp;
+                        }
+                    }
+                }
+            } finally {
+                Globals.renderer.popClip();
+            }
+        } finally {
+            Globals.renderer.popJavaRenderTarget();
+        }
+    }
+
+    /**
+     * Java-only terrain-cache static-generation check over the copied viewport and native bottom halo.
+     * not ported.
+     */
+    private boolean hasStaleStaticTerrainCacheCell() {
         for (int row = 0; row < gridHeight + 4; row++) {
             for (int col = gridWidth - 1; col >= 0; col--) {
                 if (!isMapTerrainCell(col, row)) {
@@ -3432,19 +3569,148 @@ public final class MapVisualObject extends CVisualObject {
                 }
                 int worldX = col + view.x;
                 int worldY = row + view.y;
-                drawTerrainCell(
-                        col,
-                        row,
-                        mapDescriptor.terrainLightAt(worldX, worldY),
-                        mapDescriptor.terrainLightAt(worldX + 1, worldY),
-                        mapDescriptor.terrainLightAt(worldX, worldY + 1),
-                        mapDescriptor.terrainLightAt(worldX + 1, worldY + 1),
-                        col,
-                        0,
-                        false,
-                        false,
+                if (terrainFrameCacheCellGenerations[mapDescriptor.tileIndex(worldX, worldY)]
+                        != terrainFrameCacheGeneration) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Java-only terrain-cache animation check over the copied viewport and native bottom halo.
+     * not ported.
+     */
+    private boolean hasStaleAnimatedTerrainCacheCell(int animationStamp) {
+        for (int row = 0; row < gridHeight + 4; row++) {
+            for (int col = gridWidth - 1; col >= 0; col--) {
+                if (!isMapTerrainCell(col, row)) {
+                    continue;
+                }
+                int worldX = col + view.x;
+                int worldY = row + view.y;
+                int baseTileId = terrainTileId(mapDescriptor.tileWordAt(worldX, worldY));
+                if (isAnimatedTerrainTile(baseTileId)
+                        && terrainFrameCacheAnimationStamps[mapDescriptor.tileIndex(worldX, worldY)] != animationStamp) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Java-only effective animation stamp for cached terrain IDs 8..11.
+     * not ported.
+     */
+    private int terrainFrameCacheAnimationStamp() {
+        return Globals.gamePreferences.animation == 0 ? -1 : mapAnimationTick >> 2;
+    }
+
+    /**
+     * Java-only terrain-cache cell materialization using the native DrawFullTerrainFrame @00404E0E tile selection,
+     * brightness, dirt, and world-height projection inputs.
+     * not ported.
+     */
+    private void drawTerrainCellToCache(int worldX, int worldY, int baseTileId) {
+        int tileWord = mapDescriptor.tileWordAt(worldX, worldY);
+        int tileId = resolveTerrainTileId(baseTileId, worldX, worldY);
+        int topLeftY = worldY * TILE_SCREEN_SIZE - mapHeightAt(worldX, worldY);
+        int topRightY = worldY * TILE_SCREEN_SIZE - mapHeightAt(worldX + 1, worldY);
+        int bottomLeftY = (worldY + 1) * TILE_SCREEN_SIZE - mapHeightAt(worldX, worldY + 1);
+        int bottomRightY = (worldY + 1) * TILE_SCREEN_SIZE - mapHeightAt(worldX + 1, worldY + 1);
+        drawTerrainCellPixels(
+                worldX,
+                worldY,
+                tileWord,
+                baseTileId,
+                tileId,
+                worldX * TILE_SCREEN_SIZE,
+                (worldX + 1) * TILE_SCREEN_SIZE,
+                topLeftY,
+                topRightY,
+                bottomLeftY,
+                bottomRightY,
+                mapDescriptor.terrainLightAt(worldX, worldY),
+                mapDescriptor.terrainLightAt(worldX + 1, worldY),
+                mapDescriptor.terrainLightAt(worldX, worldY + 1),
+                mapDescriptor.terrainLightAt(worldX + 1, worldY + 1),
+                false,
+                true
+        );
+    }
+
+    /**
+     * Java-only terrain-cache viewport transfer. Each scanline is one contiguous intrinsic array copy.
+     * not ported.
+     */
+    private void copyTerrainFrameCacheViewport() {
+        int sourceX = view.x * TILE_SCREEN_SIZE;
+        int sourceY = view.y * TILE_SCREEN_SIZE;
+        int destinationLeft = Math.max(0, -sourceX);
+        int destinationTop = Math.max(0, -sourceY);
+        int destinationRight = Math.min(javaZoomMapFrameWidth, terrainFrameCacheWidth - sourceX);
+        int destinationBottom = Math.min(javaZoomMapFrameHeight, terrainFrameCacheHeight - sourceY);
+        if (destinationLeft >= destinationRight || destinationTop >= destinationBottom) {
+            return;
+        }
+        int copyWidth = destinationRight - destinationLeft;
+        for (int row = destinationTop; row < destinationBottom; row++) {
+            int sourceOffset = (sourceY + row) * terrainFrameCacheWidth + sourceX;
+            sourceOffset += destinationLeft;
+            int destinationOffset = row * javaZoomMapFrameWidth + destinationLeft;
+            System.arraycopy(
+                    terrainFrameCacheArgb,
+                    sourceOffset,
+                    javaZoomMapFrameArgb,
+                    destinationOffset,
+                    copyWidth
+            );
+        }
+    }
+
+    /**
+     * Java-only terrain-cache clipping. The world cache contains the preceding row, whereas native
+     * DrawFullTerrainFrame @00404E0E begins at local row zero and leaves pixels above that first edge black.
+     * not ported.
+     */
+    private void clearTerrainFrameCacheTopOverdraw() {
+        for (int col = 0; col < gridWidth; col++) {
+            int vertexGridX = terrainVertexGridX(col);
+            int vertexGridY = terrainVertexGridY(0);
+            Globals.renderer.clearRowsAboveTerrainEdge(
+                    col * TILE_SCREEN_SIZE,
+                    screenYVertexGrid[vertexGridX][vertexGridY],
+                    screenYVertexGrid[vertexGridX + 1][vertexGridY],
+                    RGB32.BLACK
+            );
+        }
+    }
+
+    /**
+     * Java-only cache scheduling for native terrain debug edges from DrawFullTerrainFrame @00404E0E. Debug lines stay
+     * outside cached pixels so cache validity does not depend on the debug global.
+     * not ported.
+     */
+    private void drawTerrainDebugGridLinePass() {
+        if (terrainDebugGridLines == 0) {
+            return;
+        }
+        for (int row = 0; row < gridHeight + 4; row++) {
+            for (int col = gridWidth - 1; col >= 0; col--) {
+                if (!isMapTerrainCell(col, row)) {
+                    continue;
+                }
+                int vertexGridX = terrainVertexGridX(col);
+                int vertexGridY = terrainVertexGridY(row);
+                drawTerrainDebugGridLines(
                         true,
-                        true
+                        col * TILE_SCREEN_SIZE,
+                        (col + 1) * TILE_SCREEN_SIZE,
+                        screenYVertexGrid[vertexGridX][vertexGridY],
+                        screenYVertexGrid[vertexGridX + 1][vertexGridY],
+                        screenYVertexGrid[vertexGridX][vertexGridY + 1]
                 );
             }
         }
@@ -3597,17 +3863,6 @@ public final class MapVisualObject extends CVisualObject {
         int tileId = animatedRingPhase
                 ? resolveAnimatedRingTerrainTileId(baseTileId, worldX, worldY)
                 : resolveTerrainTileId(baseTileId, worldX, worldY);
-        int variant = (tileWord >>> TERRAIN_TILE_VARIANT_SHIFT) & TERRAIN_TILE_VARIANT_MASK;
-        CBmp256 tileBitmap = TerrainGraphics.terrainTileSet[tileId][variant];
-        Palette16[] palettePages = TerrainGraphics.terrainTilePalettes[tileId].paletteData;
-        GameBitmapFrame frame = tileBitmap.frames.getFirst();
-        byte[] sourcePixels = frame.data();
-        int sourceOffset = (tileWord & TERRAIN_TILE_FRAME_MASK) * TERRAIN_TILE_PIXELS;
-        if (allowDirtOverlay && (tileWord & TERRAIN_DIRT_OVERLAY_MASK) != 0 && !isAnimatedTerrainTile(baseTileId)) {
-            sourcePixels = copyTerrainTileWithDirtOverlay(sourcePixels, sourceOffset, worldX, worldY);
-            sourceOffset = 0;
-        }
-
         int vertexGridX = terrainVertexGridX(col);
         int vertexGridY = terrainVertexGridY(row);
         int topLeftY = screenYVertexGrid[vertexGridX][vertexGridY] + yPixelOffset;
@@ -3616,6 +3871,63 @@ public final class MapVisualObject extends CVisualObject {
         int bottomRightY = screenYVertexGrid[vertexGridX + 1][vertexGridY + 1] + yPixelOffset;
         int leftX = screenCol * TILE_SCREEN_SIZE;
         int rightX = (screenCol + 1) * TILE_SCREEN_SIZE;
+        drawTerrainCellPixels(
+                worldX,
+                worldY,
+                tileWord,
+                baseTileId,
+                tileId,
+                leftX,
+                rightX,
+                topLeftY,
+                topRightY,
+                bottomLeftY,
+                bottomRightY,
+                topLeftBrightness,
+                topRightBrightness,
+                bottomLeftBrightness,
+                bottomRightBrightness,
+                drawDebugGridLines,
+                allowDirtOverlay
+        );
+    }
+
+    /**
+     * Native support extracted from MapVisualObject::DrawFullTerrainFrame @00404E0E,
+     * MapVisualObject::DrawDynamicLightTerrainCells @00405CF4,
+     * MapVisualObject::DrawAnimatedTerrainRingSegment @0040538D, and
+     * MapVisualObject::DrawScrolledTerrainSegment @00405861.
+     */
+    private void drawTerrainCellPixels(
+            int worldX,
+            int worldY,
+            int tileWord,
+            int baseTileId,
+            int tileId,
+            int leftX,
+            int rightX,
+            int topLeftY,
+            int topRightY,
+            int bottomLeftY,
+            int bottomRightY,
+            int topLeftBrightness,
+            int topRightBrightness,
+            int bottomLeftBrightness,
+            int bottomRightBrightness,
+            boolean drawDebugGridLines,
+            boolean allowDirtOverlay
+    ) {
+        int variant = (tileWord >>> TERRAIN_TILE_VARIANT_SHIFT) & TERRAIN_TILE_VARIANT_MASK;
+        CBmp256 tileBitmap = TerrainGraphics.terrainTileSet[tileId][variant];
+        Palette16[] palettePages = TerrainGraphics.terrainTilePalettes[tileId].paletteData;
+        GameBitmapFrame frame = tileBitmap.frames.getFirst();
+        int[] sourcePixels = frame.pixels();
+        int sourceOffset = (tileWord & TERRAIN_TILE_FRAME_MASK) * TERRAIN_TILE_PIXELS;
+        if (allowDirtOverlay && (tileWord & TERRAIN_DIRT_OVERLAY_MASK) != 0 && !isAnimatedTerrainTile(baseTileId)) {
+            sourcePixels = copyTerrainTileWithDirtOverlay(sourcePixels, sourceOffset, worldX, worldY);
+            sourceOffset = 0;
+        }
+
         if (topLeftY == topRightY && bottomLeftY == bottomRightY && topLeftY + TILE_SCREEN_SIZE == bottomLeftY) {
             Globals.renderer.drawFlatTerrainTile(
                     leftX,
@@ -3665,8 +3977,8 @@ public final class MapVisualObject extends CVisualObject {
         if (!enabledForNativeCaller || terrainDebugGridLines == 0) {
             return;
         }
-        Globals.renderer.drawLine(leftX, topLeftY, rightX, topRightY, RGB16.BLACK.val());
-        Globals.renderer.drawLine(leftX, topLeftY, leftX, bottomLeftY, RGB16.BLACK.val());
+        Globals.renderer.drawLine(leftX, topLeftY, rightX, topRightY, RGB32.BLACK);
+        Globals.renderer.drawLine(leftX, topLeftY, leftX, bottomLeftY, RGB32.BLACK);
     }
 
     /**
@@ -3713,12 +4025,12 @@ public final class MapVisualObject extends CVisualObject {
      * Native support extracted from MapVisualObject::DrawFullTerrainFrame @00404E0E and
      * OverlayNonZeroIndexedPixels @00452BBD.
      */
-    private byte[] copyTerrainTileWithDirtOverlay(byte[] sourcePixels, int sourceOffset, int worldX, int worldY) {
-        byte[] combinedPixels = m_CBmp256.frames.getFirst().data();
+    private int[] copyTerrainTileWithDirtOverlay(int[] sourcePixels, int sourceOffset, int worldX, int worldY) {
+        int[] combinedPixels = m_CBmp256.frames.getFirst().pixels();
         System.arraycopy(sourcePixels, sourceOffset, combinedPixels, 0, TERRAIN_TILE_PIXELS);
         GameBitmapFrame dirtFrame = Objects.requireNonNull(TerrainGraphics.terrainDirtBitmap).frames.getFirst();
         int dirtOffset = ((worldX + worldY * 5) & TERRAIN_TILE_VARIANT_MASK) * TERRAIN_TILE_PIXELS;
-        overlayNonZeroIndexedPixels(combinedPixels, 0, dirtFrame.data(), dirtOffset, TERRAIN_TILE_PIXELS);
+        overlayNonZeroIndexedPixels(combinedPixels, 0, dirtFrame.pixels(), dirtOffset, TERRAIN_TILE_PIXELS);
         return combinedPixels;
     }
 
@@ -3726,10 +4038,10 @@ public final class MapVisualObject extends CVisualObject {
      * Native support extracted from OverlayNonZeroIndexedPixels @00452BBD.
      * Fully ported.
      */
-    private static void overlayNonZeroIndexedPixels(byte[] destinationPixels, int destinationOffset,
-                                                    byte[] sourcePixels, int sourceOffset, int byteCount) {
-        for (int i = 0; i < byteCount; i++) {
-            byte value = sourcePixels[sourceOffset + i];
+    private static void overlayNonZeroIndexedPixels(int[] destinationPixels, int destinationOffset,
+                                                    int[] sourcePixels, int sourceOffset, int pixelCount) {
+        for (int i = 0; i < pixelCount; i++) {
+            int value = sourcePixels[sourceOffset + i];
             if (value != 0) {
                 destinationPixels[destinationOffset + i] = value;
             }
@@ -6656,9 +6968,9 @@ public final class MapVisualObject extends CVisualObject {
     private void ensureJavaZoomMapFrameBuffer() {
         int width = javaZoomLogicalMapFrameWidth();
         int height = javaZoomLogicalMapFrameHeight();
-        int length = Math.multiplyExact(Math.multiplyExact(width, height), 4);
-        if (javaZoomMapFrameBgra.length != length) {
-            javaZoomMapFrameBgra = new byte[length];
+        int length = Math.multiplyExact(width, height);
+        if (javaZoomMapFrameArgb.length != length) {
+            javaZoomMapFrameArgb = new int[length];
         }
         javaZoomMapFrameWidth = width;
         javaZoomMapFrameHeight = height;
@@ -6778,10 +7090,7 @@ public final class MapVisualObject extends CVisualObject {
      * not ported.
      */
     private void clearJavaZoomMapFrameBuffer() {
-        Arrays.fill(javaZoomMapFrameBgra, (byte) 0);
-        for (int alphaOffset = 3; alphaOffset < javaZoomMapFrameBgra.length; alphaOffset += 4) {
-            javaZoomMapFrameBgra[alphaOffset] = (byte) 0xFF;
-        }
+        Arrays.fill(javaZoomMapFrameArgb, RGB32.BLACK);
     }
 
     /**
@@ -7663,6 +7972,7 @@ public final class MapVisualObject extends CVisualObject {
      * Fully ported.
      */
     public void loadScenarioMap(String scenarioName) {
+        discardTerrainFrameCache();
         mapDescriptor = null;
         dedicatedMapTransferBuildingTokens.clear();
         cachedMapWidth = 0;
@@ -7686,6 +7996,7 @@ public final class MapVisualObject extends CVisualObject {
      * metrics so the max-zoom allocation can be clamped to the actual map size before the first rendered frame.
      */
     public void setMapDescriptor(MapDescriptor mapDescriptor) {
+        discardTerrainFrameCache();
         this.mapDescriptor = mapDescriptor;
         cachedMapWidth = mapDescriptor.getWidth();
         cachedMapHeight = mapDescriptor.getHeight();
@@ -7702,7 +8013,8 @@ public final class MapVisualObject extends CVisualObject {
     /**
      * Native: MapVisualObject::RefreshTimeFlowLighting @0041D3B9.
      * Java refreshes every game minute so CGameLighting can expose smooth per-minute samples instead of native
-     * 20-minute interval jumps.
+     * 20-minute interval jumps. Palette materialization is repeated only when the effective tint changes or a caller
+     * explicitly forces refresh; sun-angle-only samples do not change palette output.
      */
     public void refreshTimeFlowLighting(boolean forceRefresh) {
         if (GAMEPLAY.isUnsetIn(Globals.mainWindow.dialogsMask)) {
@@ -7719,10 +8031,19 @@ public final class MapVisualObject extends CVisualObject {
         }
 
         lastTimeFlowLightingTimeValue = timeValue;
+        int previousTintRed = Globals.lighting.tintR;
+        int previousTintGreen = Globals.lighting.tintG;
+        int previousTintBlue = Globals.lighting.tintB;
         CGameLighting.UpdateGlobalLighting(timeValue);
         mapDescriptor.recalculateTerrainLighting(1, 1, 0, 0);
         applyTerrainLightOverrides();
-        refreshGamePalettesAfterLighting();
+        if (forceRefresh
+                || previousTintRed != Globals.lighting.tintR
+                || previousTintGreen != Globals.lighting.tintG
+                || previousTintBlue != Globals.lighting.tintB) {
+            refreshGamePalettesAfterLighting();
+        }
+        invalidateTerrainFrameCache();
         mapOccupancyDirty = 1;
         renderFrameDirty = 1;
         Globals.mainWindow.pMinimapVisualObject.onMessage(REBUILD_MINIMAP_BITMAPS, 0, 0);
@@ -8067,6 +8388,7 @@ public final class MapVisualObject extends CVisualObject {
             }
             tileMask ^= TERRAIN_DEAD_VISUAL_OBJECT_MASK;
         }
+        invalidateTerrainFrameCache();
     }
 
     /**
@@ -8097,6 +8419,9 @@ public final class MapVisualObject extends CVisualObject {
                 applyAreaEffectFootprintCell(terrainLight, tileX, tileY, flagMask, effectFlagIndex, applyFlag);
                 renderFrameDirty = 1;
             }
+        }
+        if (effectFlagIndex == 3 || effectFlagIndex == 0x0E || effectFlagIndex == 0x0F) {
+            invalidateTerrainFrameCache();
         }
     }
 

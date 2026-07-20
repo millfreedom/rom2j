@@ -3,7 +3,7 @@ package ua.millfreedom.rom2.model.visobj;
 import ua.millfreedom.rom2.Globals;
 import ua.millfreedom.rom2.model.CBitmapFont;
 import ua.millfreedom.rom2.model.CRect;
-import ua.millfreedom.rom2.model.color.RGB16;
+import ua.millfreedom.rom2.model.color.RGB32;
 import ua.millfreedom.rom2.model.enums.MessageCodes;
 import ua.millfreedom.rom2.model.enums.TextAlign;
 import ua.millfreedom.rom2.model.palette.Palette16;
@@ -20,9 +20,9 @@ public class StaticTextVisualObject extends CVisualObject {
     private static final int MK_LBUTTON = 0x1;
     private static final int CARET_BLINK_INTERVAL_MS = 500;
     private static final int TEXT_LEFT_PADDING = 4;
-    private static final int LIGHT_BORDER_COLOR_565 = RGB16.from(0x08, 0x08, 0x08).val() & 0xFFFF;
-    private static final int DARK_BORDER_COLOR_565 = RGB16.from(0x5E, 0x73, 0x65).val() & 0xFFFF;
-    private static final int CARET_COLOR_565 = RGB16.from(0xFF, 0xFF, 0xFF).val() & 0xFFFF;
+    private static final int LIGHT_BORDER_COLOR = RGB32.from(0x08, 0x08, 0x08);
+    private static final int DARK_BORDER_COLOR = RGB32.from(0x5E, 0x73, 0x65);
+    private static final int CARET_COLOR = RGB32.WHITE;
 
     //0x5C
     public String text = "";
@@ -512,28 +512,28 @@ public class StaticTextVisualObject extends CVisualObject {
                 screenRect.top,
                 screenRect.right - 1,
                 screenRect.top,
-                (short) LIGHT_BORDER_COLOR_565
+                LIGHT_BORDER_COLOR
         );
         Globals.renderer.drawLine(
                 screenRect.left,
                 screenRect.top + 1,
                 screenRect.left,
                 screenRect.bottom - 1,
-                (short) LIGHT_BORDER_COLOR_565
+                LIGHT_BORDER_COLOR
         );
         Globals.renderer.drawLine(
                 screenRect.right,
                 screenRect.top + 1,
                 screenRect.right,
                 screenRect.bottom - 1,
-                (short) DARK_BORDER_COLOR_565
+                DARK_BORDER_COLOR
         );
         Globals.renderer.drawLine(
                 screenRect.left + 1,
                 screenRect.bottom,
                 screenRect.right - 1,
                 screenRect.bottom,
-                (short) DARK_BORDER_COLOR_565
+                DARK_BORDER_COLOR
         );
     }
 
@@ -570,7 +570,7 @@ public class StaticTextVisualObject extends CVisualObject {
         String caretPrefix = leftText(text, caretIndex);
         int caretLeft = screenRect.left + TEXT_LEFT_PADDING + getTextWidth(caretPrefix);
         int caretRight = screenRect.left + TEXT_LEFT_PADDING + 2 + getTextWidth(caretPrefix);
-        Globals.renderer.fillScreenRect(caretLeft, screenRect.top + 2, caretRight, screenRect.bottom - 2, (short) CARET_COLOR_565);
+        Globals.renderer.fillScreenRect(caretLeft, screenRect.top + 2, caretRight, screenRect.bottom - 2, CARET_COLOR);
     }
 
     /**

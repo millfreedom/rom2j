@@ -1,46 +1,34 @@
 package ua.millfreedom.rom2.model;
 
 import ua.millfreedom.rom2.Globals;
-import ua.millfreedom.rom2.model.color.RGB16;
+import ua.millfreedom.rom2.model.color.RGB32;
 import ua.millfreedom.rom2.model.palette.CGamePalette;
-import ua.millfreedom.rom2.model.palette.Palette256;
-import ua.millfreedom.rom2.model.render.Rle8RunWriter;
-import ua.millfreedom.rom2.model.render.Rle8SpriteDecoder;
-
-import static ua.millfreedom.rom2.Globals.gameFileManager;
 
 /**
- * CSprite256 : CGameBitmap (no new members)
+ * CSprite256 : CGameBitmap (no native members).
  */
 public class CSprite256 extends CGameBitmap {
+    /**
+     * Java support constructor for decoded descendants such as CA16.
+     * not ported.
+     */
+    protected CSprite256() {
+    }
 
     /**
      * Native: CSprite256::CSprite256 @00424559.
      */
     public CSprite256(String name) {
-
-        buf = gameFileManager.get(name);
-        int fileLen = buf.limit();
-        int rawFrameCount = buf.getInt(fileLen - 4);
-
-        boolean hasPalette = (rawFrameCount & 0x8000_0000) != 0;
-        this.frameCount = rawFrameCount & 0x7FFF_FFFF;
-        this.dataSize = hasPalette ? (fileLen - 0x400L) : fileLen;
-
-        if (hasPalette) {
-            this.palette256 = Palette256.read(buf);
-        } else {
-            this.palette256 = null;
-        }
-
-        this.frames = getFrames(buf, frameCount);
-        this.surface = null;
-
+        IndexedSpriteResource.DecodedSprite decoded = IndexedSpriteResource.loadRle8(name);
+        palette256 = decoded.embeddedPalette();
+        dataSize = palette256 == null ? decoded.resourceSize() : decoded.resourceSize() - 0x400L;
+        setFrames(decoded.frames());
+        surface = null;
     }
 
     /**
      * Native: CSprite256::CSprite256 @0042479F.
-     * Fully ported.
+     * Fully ported without restoring source RLE bytes.
      */
     public CSprite256(CSprite256 source) {
         super(source);
@@ -54,16 +42,13 @@ public class CSprite256 extends CGameBitmap {
         if (!(nPaletteIndex instanceof Integer paletteIndex)) {
             throw new IllegalArgumentException("nPaletteIndex expected to be an integer in this override");
         }
-        GameBitmapFrame gbf = frames.get(nFrameIndex);
-        // CGamePalette::GetAt(..., nPaletteIndex) -> returns Palette16 (256 entries)
-        RGB16[] palData = palette.paletteData[paletteIndex].data();
-
-        if (!bFlipX) {
-            Globals.renderer.drawSpriteRLE8(x, y, gbf.xSize(), gbf.ySize(), gbf.data(), palData);
-        } else {
-            Globals.renderer.drawSpriteRLE8FlipX(x, y, gbf.xSize(), gbf.ySize(), gbf.data(), palData);
-        }
-
+        Globals.renderer.drawIndexedSprite(
+                x,
+                y,
+                frame(nFrameIndex),
+                palette.paletteData[paletteIndex].data(),
+                bFlipX
+        );
     }
 
     /**
@@ -71,92 +56,75 @@ public class CSprite256 extends CGameBitmap {
      * CBmp64k destination has been selected by CGameBitmap::SetAsActiveRenderTarget @00424437.
      */
     public void drawInto(CBmp64k target, int x, int y, int nFrameIndex, int nPaletteIndex, boolean bFlipX) {
-        GameBitmapFrame frame = frames.get(nFrameIndex);
-        RGB16[] palData = palette.paletteData[nPaletteIndex].data();
+        GameBitmapFrame frame = frame(nFrameIndex);
+        int[] sourcePixels = frame.pixels();
+        int sourceWidth = frame.width();
+        int sourceHeight = frame.height();
+        int[] paletteColors = palette.paletteData[nPaletteIndex].data();
+        int[] targetPixels = target.surface.pixels();
         int targetWidth = target.surface.width();
         int targetHeight = target.surface.height();
-        RGB16[] targetPixels = target.surface.pixels();
 
-        Rle8RunWriter writer = (runX, runY, paletteIndices, offset, count, stepX) -> {
-            int dest = runY * targetWidth + runX;
-            for (int i = 0; i < count; i++) {
-                targetPixels[dest] = palData[Byte.toUnsignedInt(paletteIndices[offset + i])];
-                dest += stepX;
+        for (int sourceY = 0; sourceY < sourceHeight; sourceY++) {
+            int targetY = y + sourceY;
+            if (targetY < 0 || targetY >= targetHeight) {
+                continue;
             }
-        };
-
-        if (!bFlipX) {
-            Rle8SpriteDecoder.decodeClipped(
-                    x,
-                    y,
-                    frame.xSize(),
-                    frame.ySize(),
-                    frame.data(),
-                    0,
-                    0,
-                    targetWidth,
-                    targetHeight,
-                    writer
-            );
-        } else {
-            Rle8SpriteDecoder.decodeClippedFlipX(
-                    x,
-                    y,
-                    frame.xSize(),
-                    frame.ySize(),
-                    frame.data(),
-                    0,
-                    0,
-                    targetWidth,
-                    targetHeight,
-                    writer
-            );
+            for (int drawX = 0; drawX < sourceWidth; drawX++) {
+                int targetX = x + drawX;
+                if (targetX < 0 || targetX >= targetWidth) {
+                    continue;
+                }
+                int sourceX = bFlipX ? sourceWidth - 1 - drawX : drawX;
+                int paletteIndex = sourcePixels[sourceY * sourceWidth + sourceX];
+                if (paletteIndex != GameBitmapFrame.TRANSPARENT_INDEX) {
+                    targetPixels[targetY * targetWidth + targetX] = paletteColors[paletteIndex];
+                }
+            }
         }
     }
 
     /**
      * vtbl +0x34: CSprite256::DrawFrame_ClippedY @00424980.
      */
-    public void drawFrameClippedY(int x, int y, int nFrameIndex, int nPaletteIndex, CGamePalette paletteOverride, boolean bFlipX) {
-        GameBitmapFrame gbf = this.frames.get(nFrameIndex);
-        RGB16[] palData = paletteOverride.paletteData[nPaletteIndex].data();
-
-        if (!bFlipX) {
-            Globals.renderer.drawSpriteRLE8Blend(x, y, gbf.xSize(), gbf.ySize(), gbf.data(), palData);
-        } else {
-            Globals.renderer.drawSpriteRLE8BlendFlipX(x, y, gbf.xSize(), gbf.ySize(), gbf.data(), palData);
-        }
+    public void drawFrameClippedY(int x, int y, int nFrameIndex, int nPaletteIndex,
+                                  CGamePalette paletteOverride, boolean bFlipX) {
+        Globals.renderer.drawIndexedSpriteBlend(
+                x,
+                y,
+                frame(nFrameIndex),
+                paletteOverride.paletteData[nPaletteIndex].data(),
+                bFlipX
+        );
     }
 
     /**
      * vtbl +0x38: CSprite256::DrawBlend @0042485A.
      */
     public void drawBlend(int x, int y, int nFrameIndex, int nPaletteIndex, boolean bFlipX) {
-        GameBitmapFrame gbf = this.frames.get(nFrameIndex);
-        // CGamePalette::GetAt(..., nPaletteIndex) -> returns Palette16 (256 entries)
-        RGB16[] palData = this.palette.paletteData[nPaletteIndex].data();
-
-        if (!bFlipX) {
-            Globals.renderer.drawSpriteRLE8Blend(x, y, gbf.xSize(), gbf.ySize(), gbf.data(), palData);
-        } else {
-            Globals.renderer.drawSpriteRLE8BlendFlipX(x, y, gbf.xSize(), gbf.ySize(), gbf.data(), palData);
-        }
+        Globals.renderer.drawIndexedSpriteBlend(
+                x,
+                y,
+                frame(nFrameIndex),
+                palette.paletteData[nPaletteIndex].data(),
+                bFlipX
+        );
     }
 
     /**
      * vtbl +0x14: CSprite256::DrawWithPalette @004248F0.
-     * Full port. Native draws with an explicit `CGamePalette` override and the requested page index.
+     * Full port. Native draws with an explicit CGamePalette override and the requested page index.
      */
     @Override
-    public void drawWithPalette(int x, int y, int nFrameIndex, int nPaletteIndex, CGamePalette paletteOverride, boolean bFlipX) {
-        GameBitmapFrame gbf = this.frames.get(nFrameIndex);
-        RGB16[] palData = paletteOverride.paletteData[nPaletteIndex].data();
-
-        if (!bFlipX) {
-            Globals.renderer.drawSpriteRLE8(x, y, gbf.xSize(), gbf.ySize(), gbf.data(), palData);
-        } else {
-            Globals.renderer.drawSpriteRLE8FlipX(x, y, gbf.xSize(), gbf.ySize(), gbf.data(), palData);
-        }
+    public void drawWithPalette(int x, int y, int nFrameIndex, int nPaletteIndex,
+                                CGamePalette paletteOverride, boolean bFlipX) {
+        Globals.renderer.drawIndexedSprite(
+                x,
+                y,
+                frame(nFrameIndex),
+                paletteOverride.paletteData[nPaletteIndex].data(),
+                bFlipX
+        );
     }
 
     /**
@@ -165,46 +133,23 @@ public class CSprite256 extends CGameBitmap {
      */
     @Override
     public void drawAlpha(int x, int y, int nFrameIndex, int brightness, boolean bFlipX) {
-        GameBitmapFrame gbf = this.frames.get(nFrameIndex);
-
-        if (!bFlipX) {
-            Globals.renderer.drawSpriteRLE8AlphaBlend(x, y, gbf.xSize(), gbf.ySize(), gbf.data(), brightness);
-        } else {
-            Globals.renderer.drawSpriteRLE8AlphaBlendFlipX(x, y, gbf.xSize(), gbf.ySize(), gbf.data(), brightness);
-        }
+        Globals.renderer.drawIndexedSpriteShade(x, y, frame(nFrameIndex), brightness, bFlipX);
     }
 
     /**
      * vtbl +0x3C: CSprite256::DrawWithRenderEffect @00424AF4.
-     * Full port for the normal-memory path. Native low-memory fallback is unused because g_IsLowMemory_ALWAYS_ZERO is always zero.
+     * Full port for the normal-memory path.
      */
     public void drawWithRenderEffect(int x, int y, int nFrameIndex, int brightness, int slope, boolean bFlipX) {
-        GameBitmapFrame gbf = this.frames.get(nFrameIndex);
-
-        if (!bFlipX) {
-            Globals.renderer.drawSpriteRLE8To16Lut(x, y, gbf.xSize(), gbf.ySize(), gbf.data(), brightness, slope);
-        } else {
-            Globals.renderer.drawSpriteRLE8To16LutFlipX(x, y, gbf.xSize(), gbf.ySize(), gbf.data(), brightness, slope);
-        }
+        Globals.renderer.drawIndexedSpriteShearedShade(x, y, frame(nFrameIndex), brightness, slope, bFlipX);
     }
 
     /**
      * vtbl +0x40: CSprite256::DrawWithColor @00424BE8.
-     * Native writes sprite coverage through DrawSprite_RLE8_SolidIndexed8 @004545C5 into the active 8bpp render
-     * target; Java preserves the same solid coverage on the clipped 32bpp render target.
      */
     public void drawWithColor(int destX, int destY, int frameIndex, byte fillColor) {
-        GameBitmapFrame frame = frames.get(frameIndex);
         int fillIntensity = Byte.toUnsignedInt(fillColor);
-        Globals.renderer.drawSpriteRLE8Solid(
-                destX,
-                destY,
-                frame.xSize(),
-                frame.ySize(),
-                frame.data(),
-                RGB16.from(fillIntensity, fillIntensity, fillIntensity)
-        );
+        int argbFill = RGB32.from(fillIntensity, fillIntensity, fillIntensity);
+        Globals.renderer.drawIndexedSpriteSolid(destX, destY, frame(frameIndex), argbFill, false);
     }
-
-
 }

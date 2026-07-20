@@ -29,11 +29,6 @@ public class Consts {
      */
     public static final byte[][] RENDER_EFFECT_TABLE = new byte[0x80][0x80];
 
-    /**
-     * Native support extracted from InitLUT @0045225B g_midGray565 initialization.
-     */
-    public static final short MIDGRAY565 = 0x7BEF;
-
     static {
         if (!(RBITMASK > 0 && GBITMASK > 0 && BBITMASK > 0)) {
             throw new RuntimeException("You'd better fix this!");

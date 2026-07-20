@@ -14,12 +14,12 @@ import ua.millfreedom.rom2.model.CSprite256;
 import ua.millfreedom.rom2.model.CUnitInfo;
 import ua.millfreedom.rom2.model.CMousePointer;
 import ua.millfreedom.rom2.model.GraphicsUnitsFile;
+import ua.millfreedom.rom2.model.GameBitmapFrame;
 import ua.millfreedom.rom2.model.Projectiles;
 import ua.millfreedom.rom2.model.TokenEntry;
 import ua.millfreedom.rom2.model.UnitRenderState;
 import ua.millfreedom.rom2.model.UnitTypes;
 import ua.millfreedom.rom2.model.action.ItemListAction;
-import ua.millfreedom.rom2.model.color.RGB16;
 import ua.millfreedom.rom2.model.color.RGB32;
 import ua.millfreedom.rom2.model.enums.MessageCodes;
 import ua.millfreedom.rom2.model.enums.TextAlign;
@@ -27,7 +27,6 @@ import ua.millfreedom.rom2.model.palette.CGamePalette;
 import ua.millfreedom.rom2.model.palette.Palette16;
 import ua.millfreedom.rom2.model.palette.Palette256;
 import ua.millfreedom.rom2.model.palette.Palettes;
-import ua.millfreedom.rom2.model.render.Rle8SpriteDecoder;
 import ua.millfreedom.rom2.model.quest.Quest;
 import ua.millfreedom.rom2.model.sound.Sound;
 import ua.millfreedom.rom2.model.sound.SoundManager;
@@ -50,7 +49,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static ua.millfreedom.rom2.model.color.Consts.MIDGRAY565;
 import static ua.millfreedom.rom2.res.Constants.GRAPHICS;
 import static ua.millfreedom.rom2.text.GameTexts.get;
 import static ua.millfreedom.rom2.text.StringTableIndex.*;
@@ -1043,9 +1041,9 @@ public class CUnit extends CGameObject {
         if (hpFillWidth == 0 && HP != 0) {
             hpFillWidth = 1;
         }
-        short hpLightColor = resolveHealthLightColor(hp, maxHp);
-        short hpMediumColor = resolveHealthMediumColor(hp, maxHp);
-        short hpDarkColor = resolveHealthDarkColor(hp, maxHp);
+        int hpLightColor = resolveHealthLightColor(hp, maxHp);
+        int hpMediumColor = resolveHealthMediumColor(hp, maxHp);
+        int hpDarkColor = resolveHealthDarkColor(hp, maxHp);
         if (shouldDimSelectionHighlightColors()) {
             hpLightColor = dimSelectionBarColorForShowAll(hpLightColor);
             hpMediumColor = dimSelectionBarColorForShowAll(hpMediumColor);
@@ -1071,9 +1069,9 @@ public class CUnit extends CGameObject {
             }
             GUI.ball.drawRectMasked(left, top - 2, 0, 0, 4, 4);
             GUI.ball.drawRectMasked(right - 4, top - 2, 0, 0, 4, 4);
-            short mpLightColor = RGB16.from(0, 0, 0xFF).val();
-            short mpMediumColor = RGB16.from(0, 0, 0xC0).val();
-            short mpDarkColor = RGB16.from(0, 0, 0x80).val();
+            int mpLightColor = RGB32.from(0, 0, 0xFF);
+            int mpMediumColor = RGB32.from(0, 0, 0xC0);
+            int mpDarkColor = RGB32.from(0, 0, 0x80);
             if (shouldDimSelectionHighlightColors()) {
                 mpLightColor = dimSelectionBarColorForShowAll(mpLightColor);
                 mpMediumColor = dimSelectionBarColorForShowAll(mpMediumColor);
@@ -1138,7 +1136,7 @@ public class CUnit extends CGameObject {
 
         int markerLeft = param1 + minimapX;
         int markerTop = param2 + minimapY;
-        short markerColor = resolveMinimapMarkerColor();
+        int markerColor = resolveMinimapMarkerColor();
         Globals.renderer.fillScreenRect(
                 markerLeft,
                 markerTop,
@@ -1661,9 +1659,7 @@ public class CUnit extends CGameObject {
                 palette = Palettes.unitGamePalettes.get(0x10);
             } else {
                 Palette256 rawPalette = renderInfo.getRawPalette(0);
-                CGamePalette grayPalette = new CGamePalette();
-                grayPalette.init(rawPalette, 0x10, 5, 0);
-                palette = grayPalette;
+                palette = Palettes.unitGrayscalePalette(rawPalette);
             }
         }
 
@@ -1680,9 +1676,9 @@ public class CUnit extends CGameObject {
             int right,
             int top,
             int fillWidth,
-            short colorOuter,
-            short colorMiddle,
-            short colorInner
+            int colorOuter,
+            int colorMiddle,
+            int colorInner
     ) {
         int barLeft = left + 4;
         int fillRight = left + fillWidth + 4;
@@ -1696,9 +1692,9 @@ public class CUnit extends CGameObject {
         }
 
         int barRight = right - 4;
-        Globals.renderer.fillScreenRect(barLeft, top - 2, barRight, top + 2, RGB16.from(0x40, 0x40, 0x40).val());
-        Globals.renderer.fillScreenRect(barLeft, top - 1, barRight, top, RGB16.from(0x80, 0x80, 0x80).val());
-        Globals.renderer.fillScreenRect(barLeft, top, barRight, top + 1, RGB16.from(0x60, 0x60, 0x60).val());
+        Globals.renderer.fillScreenRect(barLeft, top - 2, barRight, top + 2, RGB32.from(0x40, 0x40, 0x40));
+        Globals.renderer.fillScreenRect(barLeft, top - 1, barRight, top, RGB32.from(0x80, 0x80, 0x80));
+        Globals.renderer.fillScreenRect(barLeft, top, barRight, top + 1, RGB32.from(0x60, 0x60, 0x60));
         Globals.renderer.fillScreenRect(barLeft, top - 2, fillRight, top + 2, colorInner);
         Globals.renderer.fillScreenRect(barLeft, top - 1, fillRight, top, colorOuter);
         Globals.renderer.fillScreenRect(barLeft, top, fillRight, top + 1, colorMiddle);
@@ -1708,42 +1704,42 @@ public class CUnit extends CGameObject {
      * Native support extracted from CUnit::DrawSelectionOverlay @004653A5 health-color branch.
      * Fully ported.
      */
-    protected final short resolveHealthLightColor(int hp, int maxHp) {
+    protected final int resolveHealthLightColor(int hp, int maxHp) {
         if (hp < (maxHp + ((maxHp >> 31) & 3)) >> 2) {
-            return RGB16.from(0xFF, 0, 0).val();
+            return RGB32.from(0xFF, 0, 0);
         }
         if (hp < maxHp / 2) {
-            return RGB16.from(0xFF, 0xFF, 0).val();
+            return RGB32.from(0xFF, 0xFF, 0);
         }
-        return RGB16.from(0, 0xFF, 0).val();
+        return RGB32.from(0, 0xFF, 0);
     }
 
     /**
      * Native support extracted from CUnit::DrawSelectionOverlay @004653A5 health-color branch.
      * Fully ported.
      */
-    protected final short resolveHealthMediumColor(int hp, int maxHp) {
+    protected final int resolveHealthMediumColor(int hp, int maxHp) {
         if (hp < (maxHp + ((maxHp >> 31) & 3)) >> 2) {
-            return RGB16.from(0xC0, 0, 0).val();
+            return RGB32.from(0xC0, 0, 0);
         }
         if (hp < maxHp / 2) {
-            return RGB16.from(0xC0, 0xC0, 0).val();
+            return RGB32.from(0xC0, 0xC0, 0);
         }
-        return RGB16.from(0, 0xC0, 0).val();
+        return RGB32.from(0, 0xC0, 0);
     }
 
     /**
      * Native support extracted from CUnit::DrawSelectionOverlay @004653A5 health-color branch.
      * Fully ported.
      */
-    protected final short resolveHealthDarkColor(int hp, int maxHp) {
+    protected final int resolveHealthDarkColor(int hp, int maxHp) {
         if (hp < (maxHp + ((maxHp >> 31) & 3)) >> 2) {
-            return RGB16.from(0x80, 0, 0).val();
+            return RGB32.from(0x80, 0, 0);
         }
         if (hp < maxHp / 2) {
-            return RGB16.from(0x80, 0x80, 0).val();
+            return RGB32.from(0x80, 0x80, 0);
         }
-        return RGB16.from(0, 0x80, 0).val();
+        return RGB32.from(0, 0x80, 0);
     }
 
     /**
@@ -1757,8 +1753,8 @@ public class CUnit extends CGameObject {
      * Native support extracted from CUnit::DrawSelectionOverlay @004653A5 and
      * CStructure::DrawSelectionOverlay @00461B2B show-all HP/MP color dimming.
      */
-    static short dimSelectionBarColorForShowAll(short color) {
-        return (short) (((color & 0xFFFF) >>> 1) & MIDGRAY565);
+    static int dimSelectionBarColorForShowAll(int color) {
+        return RGB32.withBrightness(color, 8);
     }
 
     /**
@@ -2286,8 +2282,10 @@ public class CUnit extends CGameObject {
     /**
      * vtbl +0x88: CUnit::RenderEquipmentPortrait @004688F7.
      * Fully ported at the modeled bitmap-surface boundary. Java preserves the native composition order, optional
-     * mirror, mask palette pointer install, dirty-flag clear, and attack/spell action reset. Native writes the mirrored
-     * portrait to a temporary BMP cache; Java keeps the same keyed payload in memory to avoid stale temp-file reloads.
+     * mirror, dirty-flag clear, and attack/spell action reset. Native writes the mirrored portrait to a temporary BMP
+     * cache; Java keeps the same keyed payload in memory to avoid stale temp-file reloads. Java does not construct the
+     * native grayscale display palette because the portrait mask remains a sampled region-code plane and is never
+     * rendered.
      */
     public void renderEquipmentPortrait(String outputPath, CBmp64k targetBitmap, CBmp256 maskBitmap) {
         String cacheKey = outputPath == null ? null : resolveEquipmentPortraitCacheKey(outputPath);
@@ -2303,9 +2301,6 @@ public class CUnit extends CGameObject {
         composeEquipmentPortrait(targetBitmap, maskBitmap);
         if (cacheKey != null) {
             cacheMirroredEquipmentPortrait(cacheKey, targetBitmap, maskBitmap);
-        }
-        if (maskBitmap != null) {
-            initializeEquipmentPortraitMaskPalette(maskBitmap);
         }
         if (cacheKey != null) {
             unitFlags &= ~0x08;
@@ -2344,22 +2339,6 @@ public class CUnit extends CGameObject {
             actionPhase = 0;
             actionSegments = 0;
         }
-    }
-
-    /**
-     * Native support extracted from CUnit::RenderEquipmentPortrait @004688F7 and palette pointer helper @0046DC60.
-     * Fully ported at the Java field-assignment boundary; native helper @0046DC60 only stores the CGameBitmap +0x20
-     * palette pointer before CGameBitmap::InitPalette @00424390.
-     */
-    static void initializeEquipmentPortraitMaskPalette(CBmp256 maskBitmap) {
-        Palette256 palette = Palette256.create();
-        RGB32[] entries = palette.data();
-        for (int i = 0; i < entries.length; i++) {
-            int component = (((i & 0x0F) * 0x08) - 0x80) & 0xFF;
-            entries[i] = RGB32.from(component, component, component, 0);
-        }
-        maskBitmap.palette256 = palette;
-        maskBitmap.initPalette(1, 1, 0);
     }
 
     /**
@@ -2423,9 +2402,14 @@ public class CUnit extends CGameObject {
 
     /**
      * Native support extracted from CUnit::RenderEquipmentPortrait @004688F7 CSprite256 construction and palette init.
+     * Java resource support treats a zero-byte equipment layer as the extracted corpus's class-specific no-visual
+     * placeholder; legal fighter Beard/Magic Beard tokens use this representation while mage variants have frames.
      */
     private static CSprite256 loadEquipmentPortraitSprite(String resourcePath) {
         CSprite256 sprite = new CSprite256(resourcePath);
+        if (sprite.getDataSize() == 0) {
+            return null;
+        }
         sprite.initPalette(1, 1, 0);
         return sprite;
     }
@@ -2494,7 +2478,7 @@ public class CUnit extends CGameObject {
         drawEquipmentPortraitLayer(primarySprites[7], target, mask, 7);
         drawPortraitSprite(bodySprite, target);
         if (mask != null) {
-            drawPortraitMask(bodySprite, mask, (byte) 0);
+            drawPortraitMask(bodySprite, mask, 0);
         }
         drawEquipmentPortraitLayer(primarySprites[11], target, mask, 11);
         drawEquipmentPortraitLayer(primarySprites[9], target, mask, 9);
@@ -2515,7 +2499,7 @@ public class CUnit extends CGameObject {
     private static void drawEquipmentPortraitLayer(CSprite256 sprite, CBmp64k target, CBmp256 mask, int slotIndex) {
         drawPortraitSprite(sprite, target);
         if (mask != null) {
-            drawPortraitMask(sprite, mask, (byte) (slotIndex + 1));
+            drawPortraitMask(sprite, mask, slotIndex + 1);
         }
     }
 
@@ -2535,33 +2519,30 @@ public class CUnit extends CGameObject {
      * SelectionInfoPanelVisualObject::GetText @004AE232 and InnLeftPanelVisualObject::GetText @00495BFD sample that
      * raw hit-map coordinate space directly.
      */
-    private static void drawPortraitMask(CSprite256 sprite, CBmp256 mask, byte color) {
+    private static void drawPortraitMask(CSprite256 sprite, CBmp256 mask, int color) {
         if (sprite == null) {
             return;
         }
-        var frame = sprite.frames.getFirst();
+        GameBitmapFrame frame = sprite.frame(0);
+        GameBitmapFrame.RowCoverageSpans coverageSpans = frame.coverageSpans();
         var maskFrame = mask.frames.getFirst();
-        byte[] pixels = maskFrame.data();
-        int maskWidth = maskFrame.xSize();
-        int maskHeight = maskFrame.ySize();
-        Rle8SpriteDecoder.decodeClipped(
-                0,
-                0,
-                frame.xSize(),
-                frame.ySize(),
-                frame.data(),
-                0,
-                0,
-                maskWidth,
-                maskHeight,
-                (x, y, paletteIndices, offset, count, stepX) -> {
-                    int dest = y * maskWidth + x;
-                    for (int i = 0; i < count; i++) {
-                        pixels[dest] = color;
-                        dest += stepX;
-                    }
+        int[] pixels = maskFrame.pixels();
+        int maskWidth = maskFrame.width();
+        int maskHeight = maskFrame.height();
+        int drawWidth = Math.min(frame.width(), maskWidth);
+        int drawHeight = Math.min(frame.height(), maskHeight);
+        for (int y = 0; y < drawHeight; y++) {
+            int maskRow = y * maskWidth;
+            for (int spanIndex = coverageSpans.firstSpanIndex(y);
+                 spanIndex < coverageSpans.endSpanIndex(y);
+                 spanIndex++) {
+                int start = coverageSpans.start(spanIndex);
+                int end = Math.min(coverageSpans.end(spanIndex), drawWidth);
+                if (start < end) {
+                    Arrays.fill(pixels, maskRow + start, maskRow + end, color);
                 }
-        );
+            }
+        }
     }
 
     /**
@@ -2729,18 +2710,19 @@ public class CUnit extends CGameObject {
 
     /**
      * Native support extracted from CUnit::RenderEquipmentPortrait @004688F7 target bitmap clears.
-     * Partial port. Native clears raw bitmap buffers; Java clears modeled RGB16 surfaces and frame bytes when present.
+     * Partial port. Native clears raw bitmap buffers; Java clears each resource's one canonical pixel array.
      */
     protected final void clearBitmapSurface(CGameBitmap bitmap) {
         if (bitmap == null) {
             return;
         }
         if (bitmap.surface != null) {
-            Arrays.fill(bitmap.surface.pixels(), RGB16.BLACK);
+            Arrays.fill(bitmap.surface.pixels(), RGB32.BLACK);
+            return;
         }
         if (bitmap.frames != null) {
             for (var frame : bitmap.frames) {
-                Arrays.fill(frame.data(), (byte) 0);
+                Arrays.fill(frame.pixels(), 0);
             }
         }
     }
@@ -2770,12 +2752,11 @@ public class CUnit extends CGameObject {
      * Native support: CUnit::DrawMinimap palette lookup @00465F3F.
      * Fully ported. Native resolves owner palette page 8 and reads color slot `0xA4`.
      */
-    protected final short resolveMinimapMarkerColor() {
+    protected final int resolveMinimapMarkerColor() {
         CGamePalette ownerPalette = Palettes.unitGamePalettes.get(cPlayer.color);
         return ownerPalette
                 .paletteData[8]
-                .data()[0xA4]
-                .val();
+                .data()[0xA4];
     }
 
 }

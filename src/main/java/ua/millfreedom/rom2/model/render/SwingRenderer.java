@@ -5,9 +5,7 @@ import ua.millfreedom.rom2.model.Screen;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
+import java.util.Arrays;
 
 /**
  * Swing presentation bridge for the software renderer.
@@ -28,22 +26,19 @@ public class SwingRenderer extends SoftRenderer {
     }
 
     /**
-     * Java support presentation boundary for copying the software BGRA/ARGB surface into Swing image storage.
+     * Java support presentation boundary for copying the software straight-ARGB surface into Swing image storage.
      * not ported.
      */
     @Override
     public void presentSurface(int framebufferWidth, int framebufferHeight) {
-        IntBuffer sourcePixels = ByteBuffer.wrap(screen.surface())
-                .order(ByteOrder.LITTLE_ENDIAN)
-                .asIntBuffer();
-        int sourcePitchPixels = screen.pitchBytes() / Integer.BYTES;
+        int[] sourcePixels = screen.surface();
+        int sourcePitchPixels = screen.pitchPixels();
         int width = screen.w();
         int height = screen.h();
         for (int y = 0; y < height; y++) {
             int sourceOffset = (screen.y() + y) * sourcePitchPixels + screen.x();
             int targetOffset = y * width;
-            sourcePixels.position(sourceOffset);
-            sourcePixels.get(presentationPixels, targetOffset, width);
+            System.arraycopy(sourcePixels, sourceOffset, presentationPixels, targetOffset, width);
         }
     }
 
@@ -68,18 +63,14 @@ public class SwingRenderer extends SoftRenderer {
             return;
         }
 
-        int pitchPixels = activeRenderTarget.pitchBytes() / Integer.BYTES;
+        int pitchPixels = activeRenderTarget.pitchPixels();
         int surfaceLeft = activeRenderTarget.x();
         int surfaceTop = activeRenderTarget.y();
-        IntBuffer surfacePixels = ByteBuffer.wrap(activeRenderTarget.surface())
-                .order(ByteOrder.LITTLE_ENDIAN)
-                .asIntBuffer();
+        int[] surfacePixels = activeRenderTarget.surface();
         for (int y = clippedTop; y < clippedBottom; y++) {
             int rowOffset = (y - surfaceTop) * pitchPixels + (clippedLeft - surfaceLeft);
             int rowEnd = rowOffset + clippedRight - clippedLeft;
-            for (int offset = rowOffset; offset < rowEnd; offset++) {
-                surfacePixels.put(offset, argb);
-            }
+            Arrays.fill(surfacePixels, rowOffset, rowEnd, argb);
         }
     }
 }

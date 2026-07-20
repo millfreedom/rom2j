@@ -202,7 +202,7 @@ public final class CMainApp {
     private void initializeNativeVideoMode() {
         glfwMakeContextCurrent(window);
         GL.createCapabilities();
-        glfwSwapInterval(1);
+        glfwSwapInterval(0);
         initPalettes();
         try (MemoryStack stack = stackPush()) {
             IntBuffer width = stack.mallocInt(1);
@@ -222,8 +222,8 @@ public final class CMainApp {
      * InitDirectDraw_Fullscreen @0045293C, SetVideoWindowMode @00453036,
      * InitializeDirectDrawPixelFormatState @004531FC, DDrawExists @00452220, InitLUT @0045225B,
      * CountTrailingZeros32 @004528CC, and HighestSetBitIndex16 @00452904.
-     * skipped: Java uses renderer object lifetime, fixed RGB565 color packing, BGRA OpenGL upload, and direct shade
-     * helpers instead of a DirectDraw global, mask probing, and native LUT allocation.
+     * skipped: Java uses renderer object lifetime, straight 0xAARRGGBB int storage, explicit GL_BGRA/reversed-int
+     * upload, and packed RGB32 shade helpers instead of a DirectDraw global and mask probing.
      */
     private void initializeScreenAndRenderer(int screenWidth, int screenHeight) {
         Globals.screenRect.set(0, 0, screenWidth, screenHeight);
@@ -235,7 +235,7 @@ public final class CMainApp {
                 screenWidth - mainWindowLeft,
                 screenHeight - mainWindowTop
         );
-        Globals.screen = Screen.createBgraSurface(screenWidth, screenHeight);
+        Globals.screen = Screen.createArgbSurface(screenWidth, screenHeight);
         Globals.renderer = new GLRenderer(Globals.screen);
         Globals.mousePointer = new GLCursor(window);
         Globals.presentCurrentSurface = this::presentCurrentSurface;
@@ -1192,7 +1192,8 @@ public final class CMainApp {
 
     /**
      * Native support boundary for ReleaseColorLUT @00452669 in CMainApp::ExitInstance @00481C06.
-     * skipped: Java does not allocate g_pColorLUT_UNUSED_IN_JAVA; RGB16/RGB32 shade helpers replace native LUT pages.
+     * skipped: Java packs opaque RGB32 values and shade/brightness directly, so there is no native-equivalent LUT
+     * allocation to release at this boundary.
      */
     private static void releaseNativeColorLutBoundary() {
     }

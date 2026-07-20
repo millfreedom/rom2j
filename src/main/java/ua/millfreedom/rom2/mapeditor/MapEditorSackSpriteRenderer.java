@@ -85,7 +85,7 @@ final class MapEditorSackSpriteRenderer {
         if (sackRenderer != null && sackRendererWidth == width && sackRendererHeight == height) {
             return;
         }
-        sackRenderer = new SwingRenderer(Screen.createBgraSurface(width, height));
+        sackRenderer = new SwingRenderer(Screen.createArgbSurface(width, height));
         sackRendererWidth = width;
         sackRendererHeight = height;
     }

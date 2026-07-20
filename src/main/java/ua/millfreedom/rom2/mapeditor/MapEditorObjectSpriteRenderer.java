@@ -112,7 +112,7 @@ final class MapEditorObjectSpriteRenderer {
         if (objectRenderer != null && objectRendererWidth == width && objectRendererHeight == height) {
             return;
         }
-        objectRenderer = new SwingRenderer(Screen.createBgraSurface(width, height));
+        objectRenderer = new SwingRenderer(Screen.createArgbSurface(width, height));
         objectRendererWidth = width;
         objectRendererHeight = height;
     }

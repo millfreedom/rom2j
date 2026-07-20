@@ -2,8 +2,8 @@ package ua.millfreedom.rom2.model.video;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
-import org.lwjgl.BufferUtils;
 import ua.millfreedom.rom2.Globals;
+import ua.millfreedom.rom2.model.color.RGB32;
 import ua.millfreedom.rom2.model.render.Renderer;
 import ua.millfreedom.rom2.model.sound.Sound;
 import ua.millfreedom.rom2.model.sound.SoundSystem;
@@ -45,8 +45,6 @@ public class SMKPlayer implements AutoCloseable {
     //0x28
     private final List<Panaraming> panaramings = new ArrayList<>();
     @Getter
-    private final ByteBuffer uploadBuffer;
-    @Getter
     private Smacker.SMKAudioInfo audioInfo;
     @Getter
     private Smacker.SMKVideoInfo videoInfo;
@@ -55,7 +53,6 @@ public class SMKPlayer implements AutoCloseable {
     private double microsecondsPerFrame;
     private int logicalFrameCount;
     private int audioTrackIndex;
-    private byte[] bgraFrame;
     private Sound audioTrackSound;
     private long frameDurationNanos;
     private final AtomicBoolean stopRequested = new AtomicBoolean(false);
@@ -94,10 +91,11 @@ public class SMKPlayer implements AutoCloseable {
     private int panaramingStepY;
     //0x368
     private boolean doubleSizeBlitActive;
-    private byte[] sourceViewportBgraFrame;
+    // Java-only compact presentation palette reused while a native fade is active.
+    private final int[] fadedPalette = new int[256];
 
     /**
-     * Opens the selected Smacker file, enables video decoding, and prepares the initial upload buffer.
+     * Opens the selected Smacker file and enables canonical integer-selector video decoding.
      * Native support extracted from SMKPlayer::SMKPlayer @004C3679,
      * SMKPlayer::OpenWithRegistry @004C3FF1, and
      * SMKPlayer::OpenSmackerFile @004C3B6E.
@@ -117,8 +115,6 @@ public class SMKPlayer implements AutoCloseable {
         videoInfo = smacker.infoVideo();
         initializeNativeDisplayState();
         frameDurationNanos = Math.max(1L, Math.round(microsecondsPerFrame * 1_000.0));
-        bgraFrame = new byte[videoInfo.width() * videoInfo.height() * 4];
-        uploadBuffer = BufferUtils.createByteBuffer(bgraFrame.length);
     }
 
     /**
@@ -189,8 +185,8 @@ public class SMKPlayer implements AutoCloseable {
                     return true;
                 }
                 updatePanaramingForCurrentFrame();
-                expandCurrentFrameToBgra();
-                renderCurrentFrame(renderer);
+                float paletteFade = advanceCurrentFramePaletteFade();
+                renderCurrentFrame(renderer, paletteFade);
                 presentFrame.run();
                 if (status == Smacker.LAST) {
                     // Native returns after blitting the final frame without SmackNextFrame.
@@ -211,7 +207,7 @@ public class SMKPlayer implements AutoCloseable {
     }
 
     /**
-     * not ported. Returns whether a decoded frame is ready for upload.
+     * not ported. Returns whether a decoded frame is ready for presentation.
      */
     public boolean hasNextFrame() {
         return nextFrameReady.get();
@@ -243,12 +239,7 @@ public class SMKPlayer implements AutoCloseable {
                 if (status == Smacker.DONE) {
                     return;
                 }
-                expandCurrentFrameToBgra();
-                uploadBuffer
-                        .clear()
-                        .put(bgraFrame)
-                        .flip();
-
+                advanceCurrentFramePaletteFade();
                 nextFrameReady.set(true);
                 nextFrameDeadlineNanos += frameDurationNanos;
             }
@@ -277,23 +268,13 @@ public class SMKPlayer implements AutoCloseable {
     }
 
     /**
-     * Converts the current indexed Smacker frame plus palette into the BGRA layout expected by OpenGL upload.
-     * not ported.
+     * Native support extracted from SMKPlayer::RenderFrame @004C399A and
+     * SMKPlayer::UpdateFadingForCurrentFrame @004C4561. Advances presentation-only palette state without creating a
+     * second full-frame pixel plane.
      */
-    private void expandCurrentFrameToBgra() {
-        byte[] palette = smacker.getPalette();
-        byte[] video = smacker.getVideo();
+    private float advanceCurrentFramePaletteFade() {
         updateFadingForCurrentFrame();
-        float paletteFade = advancePaletteFadeIfActive();
-        boolean applyPaletteFade = !Float.isNaN(paletteFade);
-        for (int i = 0; i < video.length; i++) {
-            int paletteIndex = (video[i] & 0xFF) * 3;
-            int outIndex = i * 4;
-            bgraFrame[outIndex] = applyPaletteFade ? fadePaletteComponent(palette[paletteIndex + 2], paletteFade) : palette[paletteIndex + 2];
-            bgraFrame[outIndex + 1] = applyPaletteFade ? fadePaletteComponent(palette[paletteIndex + 1], paletteFade) : palette[paletteIndex + 1];
-            bgraFrame[outIndex + 2] = applyPaletteFade ? fadePaletteComponent(palette[paletteIndex], paletteFade) : palette[paletteIndex];
-            bgraFrame[outIndex + 3] = (byte) 0xFF;
-        }
+        return advancePaletteFadeIfActive();
     }
 
     /**
@@ -416,10 +397,10 @@ public class SMKPlayer implements AutoCloseable {
     }
 
     /**
-     * Native support extracted from SMKPlayer::ApplyActivePaletteFade @004C38D1 palette byte multiplication.
+     * Native support extracted from SMKPlayer::ApplyActivePaletteFade @004C38D1 palette component multiplication.
      */
-    private static byte fadePaletteComponent(byte component, float fade) {
-        return (byte) (int) (Byte.toUnsignedInt(component) * fade);
+    private static int fadePaletteComponent(int component, float fade) {
+        return Byte.toUnsignedInt((byte) (int) (component * fade));
     }
 
     /**
@@ -430,23 +411,50 @@ public class SMKPlayer implements AutoCloseable {
     }
 
     /**
-     * Draws the current BGRA source viewport into the logical software surface.
+     * Draws the current selector-plane source viewport into the logical software surface, resolving the active palette
+     * directly during the scaled blit.
      * Native support extracted from SMKPlayer::RenderFrame @004C399A.
      */
-    private void renderCurrentFrame(Renderer renderer) {
+    private void renderCurrentFrame(Renderer renderer, float paletteFade) {
         int destWidth = doubleSizeBlitActive ? sourceWidth << 1 : sourceWidth;
         int destHeight = doubleSizeBlitActive ? sourceHeight << 1 : sourceHeight;
 
         renderer.clearSurface();
-        renderer.blitBgraScaled(
-                sourceViewportBgraFrame(),
+        renderer.blitOpaqueIndexedScaled(
+                smacker.getVideo(),
+                videoInfo.width(),
+                videoInfo.height(),
+                sourceX,
+                sourceY,
                 sourceWidth,
                 sourceHeight,
+                presentationPalette(paletteFade),
                 destinationX,
                 destinationY,
                 destWidth,
                 destHeight
         );
+    }
+
+    /**
+     * Native support extracted from SMKPlayer::ApplyActivePaletteFade @004C38D1. Returns the canonical decoded palette
+     * unchanged when no fade is active, or a reusable 256-color faded palette without retaining another frame.
+     */
+    private int[] presentationPalette(float paletteFade) {
+        int[] palette = smacker.getPalette();
+        if (Float.isNaN(paletteFade)) {
+            return palette;
+        }
+
+        for (int paletteIndex = 0; paletteIndex < palette.length; paletteIndex++) {
+            int color = palette[paletteIndex];
+            fadedPalette[paletteIndex] = RGB32.from(
+                    fadePaletteComponent(RGB32.r(color), paletteFade),
+                    fadePaletteComponent(RGB32.g(color), paletteFade),
+                    fadePaletteComponent(RGB32.b(color), paletteFade)
+            );
+        }
+        return fadedPalette;
     }
 
     /**
@@ -486,32 +494,6 @@ public class SMKPlayer implements AutoCloseable {
         sourceY = y1;
         sourceWidth = x2;
         sourceHeight = y2;
-    }
-
-    /**
-     * Native support extracted from SMKPlayer::RenderFrame @004C399A source-rectangle blit arguments.
-     */
-    private byte[] sourceViewportBgraFrame() {
-        if (sourceX == 0 && sourceY == 0 && sourceWidth == videoInfo.width() && sourceHeight == videoInfo.height()) {
-            return bgraFrame;
-        }
-        int viewportLength = Math.multiplyExact(Math.multiplyExact(sourceWidth, sourceHeight), 4);
-        if (sourceViewportBgraFrame == null || sourceViewportBgraFrame.length != viewportLength) {
-            sourceViewportBgraFrame = new byte[viewportLength];
-        }
-        int sourcePitchBytes = videoInfo.width() * 4;
-        int rowBytes = sourceWidth * 4;
-        int sourceOffset = (sourceY * videoInfo.width() + sourceX) * 4;
-        for (int row = 0; row < sourceHeight; row++) {
-            System.arraycopy(
-                    bgraFrame,
-                    sourceOffset + row * sourcePitchBytes,
-                    sourceViewportBgraFrame,
-                    row * rowBytes,
-                    rowBytes
-            );
-        }
-        return sourceViewportBgraFrame;
     }
 
     /**

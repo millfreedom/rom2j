@@ -2,7 +2,7 @@ package ua.millfreedom.rom2.model.render;
 
 import ua.millfreedom.rom2.Globals;
 import ua.millfreedom.rom2.model.CBitmapFont;
-import ua.millfreedom.rom2.model.color.RGB16;
+import ua.millfreedom.rom2.model.color.RGB32;
 import ua.millfreedom.rom2.model.palette.Palettes;
 
 /**
@@ -14,8 +14,8 @@ public final class FpsCounter {
     private static final int BOX_TOP = 0;
     private static final int BOX_PADDING_X = 4;
     private static final int BOX_PADDING_Y = 3;
-    private static final short BOX_COLOR = RGB16.from(0x08, 0x08, 0x08).val();
-    private static final short BOX_BORDER_COLOR = RGB16.from(0x60, 0x60, 0x60).val();
+    private static final int BOX_COLOR = RGB32.from(0x08, 0x08, 0x08);
+    private static final int BOX_BORDER_COLOR = RGB32.from(0x60, 0x60, 0x60);
 
     private static long lastSampleNanos;
     private static int framesThisSample;

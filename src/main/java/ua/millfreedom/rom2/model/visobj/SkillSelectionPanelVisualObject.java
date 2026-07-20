@@ -462,7 +462,7 @@ public class SkillSelectionPanelVisualObject extends CVisualObject {
             return -1;
         }
 
-        byte markerId = getHitMaskByte(
+        int markerId = getHitMaskCode(
                 x - ownerDialog.cRect.left - PANEL_LEFT_WITHIN_DIALOG,
                 y - ownerDialog.cRect.top
         );
@@ -477,30 +477,30 @@ public class SkillSelectionPanelVisualObject extends CVisualObject {
 
     /**
      * Java helper extracted from SkillSelectionPanelVisualObject::GetOptionIndexAtScreenPoint @0042D1A3.
-     * Native performs an unchecked linear bitmap-memory read; Java maps reads outside the modeled bitmap bytes to
+     * Native performs an unchecked linear bitmap-memory read; Java maps reads outside the decoded bitmap codes to
      * the background marker, which cannot match a selectable option.
      */
-    private byte getHitMaskByte(int localX, int localY) {
+    private int getHitMaskCode(int localX, int localY) {
         GameBitmapFrame frame = optionHitMaskBitmap.frames.getFirst();
-        int offset = localY * frame.xSize() + localX;
-        byte[] data = frame.data();
-        if (offset < 0 || offset >= data.length) {
+        int offset = localY * frame.width() + localX;
+        int[] pixels = frame.pixels();
+        if (offset < 0 || offset >= pixels.length) {
             return 0;
         }
-        return data[offset];
+        return pixels[offset];
     }
 
     /**
      * Java helper extracted from SkillSelectionPanelVisualObject::LoadSkillSelectionGraphics @0042B890
      * and SkillSelectionPanelVisualObject::GetOptionIndexAtScreenPoint @0042D1A3.
      */
-    private byte getOptionHitMarkerIdByIndex(int optionIndex) {
+    private int getOptionHitMarkerIdByIndex(int optionIndex) {
         return switch (optionIndex) {
-            case 0 -> optionHitMarkerId0;
-            case 1 -> optionHitMarkerId1;
-            case 2 -> optionHitMarkerId2;
-            case 3 -> optionHitMarkerId3;
-            case 4 -> optionHitMarkerId4;
+            case 0 -> Byte.toUnsignedInt(optionHitMarkerId0);
+            case 1 -> Byte.toUnsignedInt(optionHitMarkerId1);
+            case 2 -> Byte.toUnsignedInt(optionHitMarkerId2);
+            case 3 -> Byte.toUnsignedInt(optionHitMarkerId3);
+            case 4 -> Byte.toUnsignedInt(optionHitMarkerId4);
             default -> throw new IndexOutOfBoundsException("optionIndex: " + optionIndex);
         };
     }

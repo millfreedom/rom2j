@@ -1,6 +1,7 @@
 package ua.millfreedom.rom2.model.visobj;
 
 import ua.millfreedom.rom2.Globals;
+import ua.millfreedom.rom2.model.color.RGB32;
 import ua.millfreedom.rom2.model.CBmp64k;
 import ua.millfreedom.rom2.model.CGameBitmap;
 import ua.millfreedom.rom2.model.CRect;
@@ -88,7 +89,7 @@ public class LinkedPaletteVisualObject extends CVisualObject {
                         screenRect.top + 7,
                         screenRect.left + 0x50,
                         screenRect.top + 0x65,
-                        (short) 0
+                        RGB32.BLACK
                 );
                 CBmp64k bitmap = (CBmp64k) linkedDrawable;
                 int srcBottom = bitmap.ySizeOf(0);

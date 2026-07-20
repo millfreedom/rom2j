@@ -161,8 +161,8 @@ public class GlobalMapDialogVisualObject extends HandlerVisualObject {
         //0x20 Native short[640][480] visit grid.
         final short[] visitGrid = new short[PATH_MAP_WIDTH * PATH_MAP_HEIGHT];
 
-        //0x96020 Native byte* path pixels returned by CGameBitmap::GetPixels(pathMapBitmap).
-        final byte[] pathPixels;
+        //0x96020 Native byte* path pixels returned by CGameBitmap::GetPixels(pathMapBitmap), retained as unsigned codes.
+        final int[] pathPixels;
 
         /**
          * Native: GlobalMapLocationGraph::CreateLocationGraph @00471A75.
@@ -192,9 +192,9 @@ public class GlobalMapDialogVisualObject extends HandlerVisualObject {
          * Fully ported. Java decodes the native CBmp256 path map into pathPixels; managed lifetime replaces
          * ReleasePathMapBitmap cleanup.
          */
-        private static byte[] loadPathMapPixels(GlobalMapDialogVisualObject dialog) {
+        private static int[] loadPathMapPixels(GlobalMapDialogVisualObject dialog) {
             String pathMap = dialog.umoirMapMode == 0 ? PATH_MAP_BMP : UMOIR_PATH_BMP;
-            return new CBmp256(Resources.path(pathMap)).frames.getFirst().data();
+            return new CBmp256(Resources.path(pathMap)).frames.getFirst().pixels();
         }
 
         /**
@@ -295,7 +295,7 @@ public class GlobalMapDialogVisualObject extends HandlerVisualObject {
          * Native support extracted from path-map pixel reads in GlobalMapLocationGraph::CreateLocationGraph @00471A75.
          */
         private int pathPixel(int x, int y) {
-            return Byte.toUnsignedInt(pathPixels[pathPixelIndex(x, y)]);
+            return pathPixels[pathPixelIndex(x, y)];
         }
 
         /**

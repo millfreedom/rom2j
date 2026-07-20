@@ -835,7 +835,7 @@ public class StartGameSetupDialogVisualObject extends HandlerVisualObject {
         GameBitmapFrame hitFrame = hotspotMaskBitmap.frames.get(0);
         int localX = screenX - screenRect.left;
         int localY = screenY - screenRect.top;
-        return hitFrame.data()[localY * HIT_MASK_STRIDE + localX] & 0xFF;
+        return hitFrame.pixels()[localY * HIT_MASK_STRIDE + localX];
     }
 
     /**

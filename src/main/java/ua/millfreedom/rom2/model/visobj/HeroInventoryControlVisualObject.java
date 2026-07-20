@@ -4,7 +4,7 @@ import ua.millfreedom.rom2.GUI;
 import ua.millfreedom.rom2.Globals;
 import ua.millfreedom.rom2.Utils;
 import ua.millfreedom.rom2.model.*;
-import ua.millfreedom.rom2.model.color.RGB16;
+import ua.millfreedom.rom2.model.color.RGB32;
 import ua.millfreedom.rom2.model.enums.MessageCodes;
 import ua.millfreedom.rom2.model.enums.ShapeId;
 import ua.millfreedom.rom2.model.enums.TextAlign;
@@ -810,12 +810,11 @@ public class HeroInventoryControlVisualObject extends GridOverlayVisualObject {
      */
     private static CBmp64k createTintedInventoryBackdrop(ShapeId shape) {
         CBmp64k result = new CBmp64k(GUI.backInv.surface.width(), GUI.backInv.surface.height());
-        RGB16[] sourcePixels = GUI.backInv.surface.pixels();
-        RGB16[] resultPixels = result.surface.pixels();
+        int[] sourcePixels = GUI.backInv.surface.pixels();
+        int[] resultPixels = result.surface.pixels();
         for (int pixelIndex = 0; pixelIndex < sourcePixels.length; pixelIndex++) {
             resultPixels[pixelIndex] = tintInventoryBackdropPixel(sourcePixels[pixelIndex], shape);
         }
-        result.syncFrameBytesFromSurface();
         return result;
     }
 
@@ -823,13 +822,13 @@ public class HeroInventoryControlVisualObject extends GridOverlayVisualObject {
      * Java-only luminance-weighted inventory backdrop colorizer.
      * not ported.
      */
-    private static RGB16 tintInventoryBackdropPixel(RGB16 source, ShapeId shape) {
+    private static int tintInventoryBackdropPixel(int source, ShapeId shape) {
         int luminance = inventoryBackdropLuminance(source);
         int colorWeight = normalizedInventoryBackdropHighlight(luminance);
-        return RGB16.from(
-                blendInventoryBackdropChannel(source.r(), shape.color.r(), colorWeight),
-                blendInventoryBackdropChannel(source.g(), shape.color.g(), colorWeight),
-                blendInventoryBackdropChannel(source.b(), shape.color.b(), colorWeight)
+        return RGB32.from(
+                blendInventoryBackdropChannel(RGB32.r(source), RGB32.r(shape.color), colorWeight),
+                blendInventoryBackdropChannel(RGB32.g(source), RGB32.g(shape.color), colorWeight),
+                blendInventoryBackdropChannel(RGB32.b(source), RGB32.b(shape.color), colorWeight)
         );
     }
 
@@ -870,10 +869,10 @@ public class HeroInventoryControlVisualObject extends GridOverlayVisualObject {
      * Java-only RGB luminance helper for inventory backdrop colorization.
      * not ported.
      */
-    private static int inventoryBackdropLuminance(RGB16 color) {
-        return (color.r() * RED_LUMINANCE_WEIGHT
-                + color.g() * GREEN_LUMINANCE_WEIGHT
-                + color.b() * BLUE_LUMINANCE_WEIGHT) >> 8;
+    private static int inventoryBackdropLuminance(int color) {
+        return (RGB32.r(color) * RED_LUMINANCE_WEIGHT
+                + RGB32.g(color) * GREEN_LUMINANCE_WEIGHT
+                + RGB32.b(color) * BLUE_LUMINANCE_WEIGHT) >> 8;
     }
 
     /**

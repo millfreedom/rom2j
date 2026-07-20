@@ -111,11 +111,10 @@ public final class RadialScreenDistortion {
      */
     public void applyToRenderSurface(int centerX, int centerY) {
         Screen screen = Globals.screen;
-        byte[] surface = screen.surface();
+        int[] surface = screen.surface();
         int surfaceLeft = screen.x();
         int surfaceTop = screen.y();
-        int pitchBytes = screen.pitchBytes();
-        int bytesPerPixel = pitchBytes / screen.w();
+        int pitchPixels = screen.pitchPixels();
         CRect screenRect = new CRect(surfaceLeft, surfaceTop, screen.cx(), screen.cy());
         Point destPoint = new Point();
         Point sourcePoint = new Point();
@@ -123,16 +122,16 @@ public final class RadialScreenDistortion {
         for (int xDelta = tableSize - 1; xDelta >= 0; xDelta--) {
             for (int yDelta = tableSize - 1; yDelta >= 0; yDelta--) {
                 RadialDistortionOffset offset = offsetRows[xDelta][yDelta];
-                copyDistortedPixel(surface, pitchBytes, bytesPerPixel, surfaceLeft, surfaceTop, screenRect,
+                copyDistortedPixel(surface, pitchPixels, surfaceLeft, surfaceTop, screenRect,
                         destPoint, sourcePoint, centerX, centerY,
                         xDelta, yDelta, offset.sourceXDelta, offset.sourceYDelta);
-                copyDistortedPixel(surface, pitchBytes, bytesPerPixel, surfaceLeft, surfaceTop, screenRect,
+                copyDistortedPixel(surface, pitchPixels, surfaceLeft, surfaceTop, screenRect,
                         destPoint, sourcePoint, centerX, centerY,
                         xDelta, -yDelta, offset.sourceXDelta, -offset.sourceYDelta);
-                copyDistortedPixel(surface, pitchBytes, bytesPerPixel, surfaceLeft, surfaceTop, screenRect,
+                copyDistortedPixel(surface, pitchPixels, surfaceLeft, surfaceTop, screenRect,
                         destPoint, sourcePoint, centerX, centerY,
                         -xDelta, yDelta, -offset.sourceXDelta, offset.sourceYDelta);
-                copyDistortedPixel(surface, pitchBytes, bytesPerPixel, surfaceLeft, surfaceTop, screenRect,
+                copyDistortedPixel(surface, pitchPixels, surfaceLeft, surfaceTop, screenRect,
                         destPoint, sourcePoint, centerX, centerY,
                         -xDelta, -yDelta, -offset.sourceXDelta, -offset.sourceYDelta);
             }
@@ -142,9 +141,8 @@ public final class RadialScreenDistortion {
     /**
      * Native support extracted from RadialScreenDistortion::applyToRenderSurface @004A6B4B.
      */
-    private static void copyDistortedPixel(byte[] surface,
-                                           int pitchBytes,
-                                           int bytesPerPixel,
+    private static void copyDistortedPixel(int[] surface,
+                                           int pitchPixels,
                                            int surfaceLeft,
                                            int surfaceTop,
                                            CRect screenRect,
@@ -166,8 +164,8 @@ public final class RadialScreenDistortion {
             return;
         }
 
-        int destOffset = (destPoint.y - surfaceTop) * pitchBytes + (destPoint.x - surfaceLeft) * bytesPerPixel;
-        int sourceOffset = (sourcePoint.y - surfaceTop) * pitchBytes + (sourcePoint.x - surfaceLeft) * bytesPerPixel;
-        System.arraycopy(surface, sourceOffset, surface, destOffset, bytesPerPixel);
+        int destOffset = (destPoint.y - surfaceTop) * pitchPixels + destPoint.x - surfaceLeft;
+        int sourceOffset = (sourcePoint.y - surfaceTop) * pitchPixels + sourcePoint.x - surfaceLeft;
+        surface[destOffset] = surface[sourceOffset];
     }
 }

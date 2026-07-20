@@ -341,7 +341,7 @@ public class InnLeftPanelVisualObject extends CVisualObject {
         int localX = mouseX - screenRect.left - HOTSPOT_X_OFFSET;
         int localY = mouseY - screenRect.top - HOTSPOT_Y_OFFSET;
         var frame = detailHotspotBitmap.frames.getFirst();
-        return Byte.toUnsignedInt(frame.data()[localY * DETAIL_BITMAP_WIDTH + localX]);
+        return frame.pixels()[localY * DETAIL_BITMAP_WIDTH + localX];
     }
 
     /**
@@ -464,7 +464,7 @@ public class InnLeftPanelVisualObject extends CVisualObject {
      * Fully ported.
      */
     private void clearDetailHotspotBitmap() {
-        Arrays.fill(detailHotspotBitmap.frames.getFirst().data(), (byte) 0);
+        Arrays.fill(detailHotspotBitmap.frames.getFirst().pixels(), 0);
     }
 
     /**

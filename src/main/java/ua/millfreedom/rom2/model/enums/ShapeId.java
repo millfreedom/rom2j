@@ -16,10 +16,10 @@ public enum ShapeId {
 
     public final int id;
     public final String tableName;
-    public final RGB32 color;
+    public final int color;
     public final int rarity;
 
-    ShapeId(int id, String tableName, RGB32 color, int rarity) {
+    ShapeId(int id, String tableName, int color, int rarity) {
         this.id = id;
         this.tableName = tableName;
         this.color = color;

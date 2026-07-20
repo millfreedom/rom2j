@@ -7,7 +7,7 @@ import ua.millfreedom.rom2.model.CRect;
 import ua.millfreedom.rom2.model.enums.MessageCodes;
 import ua.millfreedom.rom2.model.enums.SfxSounds;
 import ua.millfreedom.rom2.model.enums.TextAlign;
-import ua.millfreedom.rom2.model.color.RGB16;
+import ua.millfreedom.rom2.model.color.RGB32;
 import ua.millfreedom.rom2.model.palette.Palette16;
 import ua.millfreedom.rom2.model.palette.Palettes;
 import ua.millfreedom.rom2.model.sound.SoundManager;
@@ -122,8 +122,8 @@ public class CommandButtonVisualObject extends CVisualObject {
 
             boolean pressedInBounds = screenRect.contains(Globals.mousePointer.getX(), Globals.mousePointer.getY())
                     && pressedState != 0;
-            RGB16 brightEdge = RGB16.from(0x29, 0x45, 0x3F);
-            RGB16 darkEdge = RGB16.from(0x07, 0x0C, 0x09);
+            int brightEdge = RGB32.from(0x29, 0x45, 0x3F);
+            int darkEdge = RGB32.from(0x07, 0x0C, 0x09);
             int shadowOffset = pressedInBounds ? 4 : 2;
 
             drawTextShadowed(
@@ -340,17 +340,15 @@ public class CommandButtonVisualObject extends CVisualObject {
      * Native support extracted from bevel/frame raster branches in CommandButtonVisualObject::Update @004D571A.
      * Fully ported.
      */
-    private static void drawBevelFrame(CRect screenRect, RGB16 topLeftColor, RGB16 bottomRightColor) {
-        short topLeft = topLeftColor.val();
-        short bottomRight = bottomRightColor.val();
-        Globals.renderer.drawLine(screenRect.right, screenRect.top + 2, screenRect.right, screenRect.bottom - 2, bottomRight);
-        Globals.renderer.drawLine(screenRect.right - 1, screenRect.top + 1, screenRect.right - 1, screenRect.bottom - 1, bottomRight);
-        Globals.renderer.drawLine(screenRect.left + 2, screenRect.bottom, screenRect.right - 2, screenRect.bottom, bottomRight);
-        Globals.renderer.drawLine(screenRect.left + 1, screenRect.bottom - 1, screenRect.right - 1, screenRect.bottom - 1, bottomRight);
-        Globals.renderer.drawLine(screenRect.left + 2, screenRect.top, screenRect.right - 2, screenRect.top, topLeft);
-        Globals.renderer.drawLine(screenRect.left, screenRect.top + 2, screenRect.left, screenRect.bottom - 2, topLeft);
-        Globals.renderer.drawLine(screenRect.left + 1, screenRect.top + 1, screenRect.left + 1, screenRect.top + 1, topLeft);
-        Globals.renderer.drawLine(screenRect.right - 2, screenRect.bottom - 2, screenRect.right - 2, screenRect.bottom - 2, bottomRight);
+    private static void drawBevelFrame(CRect screenRect, int topLeftColor, int bottomRightColor) {
+        Globals.renderer.drawLine(screenRect.right, screenRect.top + 2, screenRect.right, screenRect.bottom - 2, bottomRightColor);
+        Globals.renderer.drawLine(screenRect.right - 1, screenRect.top + 1, screenRect.right - 1, screenRect.bottom - 1, bottomRightColor);
+        Globals.renderer.drawLine(screenRect.left + 2, screenRect.bottom, screenRect.right - 2, screenRect.bottom, bottomRightColor);
+        Globals.renderer.drawLine(screenRect.left + 1, screenRect.bottom - 1, screenRect.right - 1, screenRect.bottom - 1, bottomRightColor);
+        Globals.renderer.drawLine(screenRect.left + 2, screenRect.top, screenRect.right - 2, screenRect.top, topLeftColor);
+        Globals.renderer.drawLine(screenRect.left, screenRect.top + 2, screenRect.left, screenRect.bottom - 2, topLeftColor);
+        Globals.renderer.drawLine(screenRect.left + 1, screenRect.top + 1, screenRect.left + 1, screenRect.top + 1, topLeftColor);
+        Globals.renderer.drawLine(screenRect.right - 2, screenRect.bottom - 2, screenRect.right - 2, screenRect.bottom - 2, bottomRightColor);
     }
 
     /**

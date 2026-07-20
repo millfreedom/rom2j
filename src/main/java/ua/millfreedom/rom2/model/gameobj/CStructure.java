@@ -7,7 +7,7 @@ import ua.millfreedom.rom2.model.CRect;
 import ua.millfreedom.rom2.model.CSprite256;
 import ua.millfreedom.rom2.model.StructureDef;
 import ua.millfreedom.rom2.model.Structures;
-import ua.millfreedom.rom2.model.color.RGB16;
+import ua.millfreedom.rom2.model.color.RGB32;
 import ua.millfreedom.rom2.model.palette.CGamePalette;
 import ua.millfreedom.rom2.model.palette.Palettes;
 
@@ -337,21 +337,21 @@ public class CStructure extends CGameObject {
      * CUnit::DrawSelectionHighlight @00460DB1.
      */
     private void drawStructureHealthBar(int left, int right, int top, int fillWidth, int hp, int maxHp) {
-        short lightColor;
-        short middleColor;
-        short darkColor;
+        int lightColor;
+        int middleColor;
+        int darkColor;
         if (hp < (maxHp + ((maxHp >> 31) & 3)) >> 2) {
-            lightColor = RGB16.from(0xFF, 0, 0).val();
-            middleColor = RGB16.from(0xC0, 0, 0).val();
-            darkColor = RGB16.from(0x80, 0, 0).val();
+            lightColor = RGB32.from(0xFF, 0, 0);
+            middleColor = RGB32.from(0xC0, 0, 0);
+            darkColor = RGB32.from(0x80, 0, 0);
         } else if (hp < maxHp / 2) {
-            lightColor = RGB16.from(0xFF, 0xFF, 0).val();
-            middleColor = RGB16.from(0xC0, 0xC0, 0).val();
-            darkColor = RGB16.from(0x80, 0x80, 0).val();
+            lightColor = RGB32.from(0xFF, 0xFF, 0);
+            middleColor = RGB32.from(0xC0, 0xC0, 0);
+            darkColor = RGB32.from(0x80, 0x80, 0);
         } else {
-            lightColor = RGB16.from(0, 0xFF, 0).val();
-            middleColor = RGB16.from(0, 0xC0, 0).val();
-            darkColor = RGB16.from(0, 0x80, 0).val();
+            lightColor = RGB32.from(0, 0xFF, 0);
+            middleColor = RGB32.from(0, 0xC0, 0);
+            darkColor = RGB32.from(0, 0x80, 0);
         }
 
         int barLeft = left + 4;
@@ -369,9 +369,9 @@ public class CStructure extends CGameObject {
         }
 
         int barRight = right - 4;
-        Globals.renderer.fillScreenRect(barLeft, top - 2, barRight, top + 2, RGB16.from(0x40, 0x40, 0x40).val());
-        Globals.renderer.fillScreenRect(barLeft, top - 1, barRight, top, RGB16.from(0x80, 0x80, 0x80).val());
-        Globals.renderer.fillScreenRect(barLeft, top, barRight, top + 1, RGB16.from(0x60, 0x60, 0x60).val());
+        Globals.renderer.fillScreenRect(barLeft, top - 2, barRight, top + 2, RGB32.from(0x40, 0x40, 0x40));
+        Globals.renderer.fillScreenRect(barLeft, top - 1, barRight, top, RGB32.from(0x80, 0x80, 0x80));
+        Globals.renderer.fillScreenRect(barLeft, top, barRight, top + 1, RGB32.from(0x60, 0x60, 0x60));
         Globals.renderer.fillScreenRect(barLeft, top - 2, fillRight, top + 2, darkColor);
         Globals.renderer.fillScreenRect(barLeft, top - 1, fillRight, top, lightColor);
         Globals.renderer.fillScreenRect(barLeft, top, fillRight, top + 1, middleColor);
@@ -396,11 +396,10 @@ public class CStructure extends CGameObject {
     /**
      * Native support extracted from CStructure::DrawMinimap @0046213E.
      */
-    private short resolveMinimapColor() {
+    private int resolveMinimapColor() {
         return Palettes.unitGamePalettes.get(cPlayer.color)
                 .paletteData[MINIMAP_OWNER_PALETTE_PAGE]
-                .data()[MINIMAP_OWNER_COLOR_INDEX]
-                .val();
+                .data()[MINIMAP_OWNER_COLOR_INDEX];
     }
 
     /**

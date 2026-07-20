@@ -7,7 +7,7 @@ import ua.millfreedom.rom2.model.CCursor;
 import ua.millfreedom.rom2.model.CGameBitmap;
 import ua.millfreedom.rom2.model.CMousePointer;
 import ua.millfreedom.rom2.model.CRect;
-import ua.millfreedom.rom2.model.color.RGB16;
+import ua.millfreedom.rom2.model.color.RGB32;
 import ua.millfreedom.rom2.model.enums.MessageCodes;
 import ua.millfreedom.rom2.model.world.MapDescriptor;
 
@@ -31,8 +31,6 @@ public class MinimapVisualObject extends CVisualObject {
     private static final int TILE_OCCUPANCY_MASK = 0xC000;
     private static final int TILE_PARTIAL_OCCUPANCY_MASK = 0x8000;
     private static final int TERRAIN_LIGHT_BASE = 0x60;
-    private static final int RGB16_QUARTER_BLEND_MASK = 0x39E7;
-    private static final int RGB16_HALF_BLEND_MASK = 0x7BEF;
     private static final int CURSOR_ACTION_CAMERA = 0;
     private static final int CURSOR_ACTION_MOVE = 1;
     private static final int CURSOR_ACTION_ATTACK = 2;
@@ -256,7 +254,6 @@ public class MinimapVisualObject extends CVisualObject {
         minimapBitmapSecondary0x64 = new CBmp64k(bitmapWidth, bitmapHeight);
         copyTerrainToPrimaryMinimapBitmap(terrainBitmap);
         applyTerrainLightToPrimaryMinimapBitmap(mapDescriptor);
-        minimapBitmapPrimary0x60.syncFrameBytesFromSurface();
     }
 
     /**
@@ -481,7 +478,7 @@ public class MinimapVisualObject extends CVisualObject {
         int top = screenRect.top + bitmapOffset.y + scalePanelOffset(mapContext.view.y - MINIMAP_INNER_MARGIN);
         int right = left - 1 + scalePanelSpan(mapContext.gridWidth);
         int bottom = top - 1 + scalePanelSpan(mapContext.gridHeight);
-        Globals.renderer.drawRect(left, top, right, bottom, (short) 0xFFFF);
+        Globals.renderer.drawRect(left, top, right, bottom, RGB32.WHITE);
     }
 
     /**
@@ -491,8 +488,8 @@ public class MinimapVisualObject extends CVisualObject {
         int bitmapWidth = mapDescriptor.getWidth() - (MINIMAP_INNER_MARGIN * 2);
         int bitmapHeight = mapDescriptor.getHeight() - (MINIMAP_INNER_MARGIN * 2);
         CBmp64k terrainBitmap = new CBmp64k(bitmapWidth, bitmapHeight);
-        RGB16[] targetPixels = terrainBitmap.surface.pixels();
-        RGB16[] sourcePixels = GUI.miniMapData.surface.pixels();
+        int[] targetPixels = terrainBitmap.surface.pixels();
+        int[] sourcePixels = GUI.miniMapData.surface.pixels();
         int sourceWidth = GUI.miniMapData.surface.width();
         int sourceHeight = GUI.miniMapData.surface.height();
 
@@ -513,8 +510,8 @@ public class MinimapVisualObject extends CVisualObject {
      * Native support extracted from MinimapVisualObject::RebuildMinimapBitmaps @004AB96C.
      */
     private void copyTerrainToPrimaryMinimapBitmap(CBmp64k terrainBitmap) {
-        RGB16[] sourcePixels = terrainBitmap.surface.pixels();
-        RGB16[] targetPixels = minimapBitmapPrimary0x60.surface.pixels();
+        int[] sourcePixels = terrainBitmap.surface.pixels();
+        int[] targetPixels = minimapBitmapPrimary0x60.surface.pixels();
         int sourceWidth = terrainBitmap.surface.width();
         int sourceHeight = terrainBitmap.surface.height();
         int targetWidth = minimapBitmapPrimary0x60.surface.width();
@@ -527,7 +524,7 @@ public class MinimapVisualObject extends CVisualObject {
                 for (int targetX = 0; targetX < targetWidth; targetX++) {
                     int sourceX0 = targetX * 2;
                     int sourceIndex = sourceX0 + sourceY0 * sourceWidth;
-                    targetPixels[targetX + targetY * targetWidth] = quarterAverageRgb16(
+                    targetPixels[targetX + targetY * targetWidth] = quarterAverageArgb(
                             sourcePixels[sourceIndex],
                             sourcePixels[sourceIndex + 1],
                             sourcePixels[sourceX0 + sourceY1 * sourceWidth],
@@ -561,7 +558,7 @@ public class MinimapVisualObject extends CVisualObject {
         int blockSize = 1 << effectiveZoom;
         int bitmapWidth = minimapBitmapPrimary0x60.surface.width();
         int bitmapHeight = minimapBitmapPrimary0x60.surface.height();
-        RGB16[] pixels = minimapBitmapPrimary0x60.surface.pixels();
+        int[] pixels = minimapBitmapPrimary0x60.surface.pixels();
         byte[] terrainLight = mapDescriptor.getTerrainLightWxH();
 
         int bitmapX = 0;
@@ -574,7 +571,7 @@ public class MinimapVisualObject extends CVisualObject {
                         + Byte.toUnsignedInt(terrainLight[lightIndex + mapDescriptor.getWidth()])
                         + Byte.toUnsignedInt(terrainLight[lightIndex + mapDescriptor.getWidth() + 1])) >> 2;
                 int sourceIndex = bitmapX + (bitmapHeight - 1 - bitmapY) * bitmapWidth;
-                RGB16 shadedPixel = shadeTerrainPixel(pixels[sourceIndex], TERRAIN_LIGHT_BASE - averageLight);
+                int shadedPixel = shadeTerrainPixel(pixels[sourceIndex], TERRAIN_LIGHT_BASE - averageLight);
                 fillMinimapBlock(pixels, bitmapWidth, bitmapHeight, bitmapX, bitmapY, blockSize, shadedPixel);
                 bitmapY += blockSize;
             }
@@ -586,8 +583,8 @@ public class MinimapVisualObject extends CVisualObject {
      * Native support extracted from MinimapVisualObject::Update @004AC414.
      */
     private void refreshSecondaryMinimapBitmap(MapVisualObject mapContext, MapDescriptor mapDescriptor, Point bitmapOffset) {
-        RGB16[] primaryPixels = minimapBitmapPrimary0x60.surface.pixels();
-        RGB16[] secondaryPixels = minimapBitmapSecondary0x64.surface.pixels();
+        int[] primaryPixels = minimapBitmapPrimary0x60.surface.pixels();
+        int[] secondaryPixels = minimapBitmapSecondary0x64.surface.pixels();
         System.arraycopy(primaryPixels, 0, secondaryPixels, 0, primaryPixels.length);
 
         int effectiveZoom = zoomLevel0x68;
@@ -602,7 +599,7 @@ public class MinimapVisualObject extends CVisualObject {
         int bitmapHeight = minimapBitmapSecondary0x64.surface.height();
         int crystalWidth = GUI.crystalR.surface.width();
         int crystalHeight = GUI.crystalR.surface.height();
-        RGB16[] crystalPixels = GUI.crystalR.surface.pixels();
+        int[] crystalPixels = GUI.crystalR.surface.pixels();
         short[] tileFlags = mapDescriptor.getTilesWxH();
 
         int bitmapY = 0;
@@ -631,7 +628,6 @@ public class MinimapVisualObject extends CVisualObject {
             bitmapY += blockSize;
         }
 
-        minimapBitmapSecondary0x64.syncFrameBytesFromSurface();
         mapContext.mapOccupancyDirty = 0;
     }
 
@@ -639,9 +635,9 @@ public class MinimapVisualObject extends CVisualObject {
      * Native support extracted from MinimapVisualObject::Update @004AC414.
      */
     private void applyCrystalCacheBlock(
-            RGB16[] primaryPixels,
-            RGB16[] secondaryPixels,
-            RGB16[] crystalPixels,
+            int[] primaryPixels,
+            int[] secondaryPixels,
+            int[] crystalPixels,
             int bitmapWidth,
             int bitmapHeight,
             int crystalWidth,
@@ -657,9 +653,9 @@ public class MinimapVisualObject extends CVisualObject {
             int crystalRow = crystalHeight - 1 - bitmapOffset.y - bitmapY - dy;
             for (int dx = 0; dx < blockSize; dx++) {
                 int bitmapIndex = bitmapX + dx + bitmapRow * bitmapWidth;
-                RGB16 crystalPixel = crystalPixels[bitmapOffset.x + bitmapX + dx + crystalRow * crystalWidth];
+                int crystalPixel = crystalPixels[bitmapOffset.x + bitmapX + dx + crystalRow * crystalWidth];
                 secondaryPixels[bitmapIndex] = halfBlend
-                        ? halfBlendRgb16(crystalPixel, primaryPixels[bitmapIndex])
+                        ? halfBlendArgb(crystalPixel, primaryPixels[bitmapIndex])
                         : crystalPixel;
             }
         }
@@ -681,13 +677,13 @@ public class MinimapVisualObject extends CVisualObject {
      * Native support extracted from MinimapVisualObject::RebuildMinimapBitmaps @004AB96C.
      */
     private static void fillMinimapBlock(
-            RGB16[] pixels,
+            int[] pixels,
             int bitmapWidth,
             int bitmapHeight,
             int bitmapX,
             int bitmapY,
             int blockSize,
-            RGB16 pixel
+            int pixel
     ) {
         for (int dy = 0; dy < blockSize; dy++) {
             int rowIndex = bitmapHeight - 1 - bitmapY - dy;
@@ -716,32 +712,33 @@ public class MinimapVisualObject extends CVisualObject {
     /**
      * Native support extracted from MinimapVisualObject::RebuildMinimapBitmaps @004AB96C.
      */
-    private static RGB16 quarterAverageRgb16(RGB16 a, RGB16 b, RGB16 c, RGB16 d) {
-        int averaged = ((Short.toUnsignedInt(a.val()) >> 2) & RGB16_QUARTER_BLEND_MASK)
-                + ((Short.toUnsignedInt(b.val()) >> 2) & RGB16_QUARTER_BLEND_MASK)
-                + ((Short.toUnsignedInt(c.val()) >> 2) & RGB16_QUARTER_BLEND_MASK)
-                + ((Short.toUnsignedInt(d.val()) >> 2) & RGB16_QUARTER_BLEND_MASK);
-        return RGB16.of(averaged);
+    private static int quarterAverageArgb(int a, int b, int c, int d) {
+        return RGB32.from(
+                (RGB32.r(a) + RGB32.r(b) + RGB32.r(c) + RGB32.r(d)) >> 2,
+                (RGB32.g(a) + RGB32.g(b) + RGB32.g(c) + RGB32.g(d)) >> 2,
+                (RGB32.b(a) + RGB32.b(b) + RGB32.b(c) + RGB32.b(d)) >> 2
+        );
     }
 
     /**
      * Native support extracted from MinimapVisualObject::Update @004AC414.
      */
-    private static RGB16 halfBlendRgb16(RGB16 a, RGB16 b) {
-        int blended = ((Short.toUnsignedInt(a.val()) >> 1) & RGB16_HALF_BLEND_MASK)
-                + ((Short.toUnsignedInt(b.val()) >> 1) & RGB16_HALF_BLEND_MASK);
-        return RGB16.of(blended);
+    private static int halfBlendArgb(int a, int b) {
+        return RGB32.from(
+                (RGB32.r(a) + RGB32.r(b)) >> 1,
+                (RGB32.g(a) + RGB32.g(b)) >> 1,
+                (RGB32.b(a) + RGB32.b(b)) >> 1
+        );
     }
 
     /**
      * Native support extracted from MinimapVisualObject::RebuildMinimapBitmaps @004AB96C.
      */
-    private static RGB16 shadeTerrainPixel(RGB16 pixel, int brightnessFactor) {
-        int packed = Short.toUnsignedInt(pixel.val());
-        int red = Math.min((((packed >> 11) & 0x1F) * brightnessFactor >> 5) << 3, 0xFF);
-        int green = Math.min((((packed >> 5) & 0x3F) * brightnessFactor >> 5) << 2, 0xFF);
-        int blue = Math.min(((packed & 0x1F) * brightnessFactor >> 5) << 3, 0xFF);
-        return RGB16.of(((red >> 3) << 11) | ((green >> 2) << 5) | (blue >> 3));
+    private static int shadeTerrainPixel(int pixel, int brightnessFactor) {
+        int red = Math.min((RGB32.r(pixel) * brightnessFactor) >> 5, 0xFF);
+        int green = Math.min((RGB32.g(pixel) * brightnessFactor) >> 5, 0xFF);
+        int blue = Math.min((RGB32.b(pixel) * brightnessFactor) >> 5, 0xFF);
+        return RGB32.from(red, green, blue);
     }
 
     /**

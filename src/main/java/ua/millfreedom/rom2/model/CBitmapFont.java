@@ -1,7 +1,6 @@
 package ua.millfreedom.rom2.model;
 
 import ua.millfreedom.rom2.Globals;
-import ua.millfreedom.rom2.model.color.RGB16;
 import ua.millfreedom.rom2.model.enums.TextAlign;
 import ua.millfreedom.rom2.model.palette.Palette16;
 import ua.millfreedom.rom2.model.palette.Palettes;
@@ -244,8 +243,8 @@ public class CBitmapFont extends CBaseFont {
             if (currentFrameIndex == 0x5E && nextFrameIndex != 0x5E) {
                 int underlineY = y + getHeight();
                 int underlineRight = x + glyphWidths[nextFrameIndex];
-                RGB16 underlineColor = palette.data()[0x0F];
-                Globals.renderer.drawLine(x, underlineY, underlineRight, underlineY, underlineColor.val());
+                int underlineColor = palette.data()[0x0F];
+                Globals.renderer.drawLine(x, underlineY, underlineRight, underlineY, underlineColor);
             } else {
                 if (currentFrameIndex == 0) {
                     x += getHeight() >> 1;

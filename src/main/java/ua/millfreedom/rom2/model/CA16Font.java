@@ -3,6 +3,7 @@ package ua.millfreedom.rom2.model;
 import ua.millfreedom.rom2.model.enums.TextAlign;
 import ua.millfreedom.rom2.model.palette.Palette16;
 import ua.millfreedom.rom2.model.palette.Palettes;
+import ua.millfreedom.rom2.model.render.A16PaletteLookup;
 
 import java.util.Arrays;
 import java.util.List;
@@ -67,13 +68,16 @@ public class CA16Font extends CBaseFont {
         }
 
         Object paletteOverride = Palettes.a16FontPaletteOverride(palette);
+        A16PaletteLookup paletteLookup = paletteOverride instanceof int[] basePalette
+                ? A16PaletteLookup.resolve(basePalette)
+                : A16PaletteLookup.resolve((Palette16[]) paletteOverride);
         byte[] nativeText = getNativeTextBytes(text);
         for (int index = 0; index < nativeText.length; index++) {
             int currentFrameIndex = getGlyphFrameIndex(nativeText[index]);
             if (currentFrameIndex == 0) {
                 x += getFrameHeight() >> 1;
             } else {
-                spr.draw(x, y, currentFrameIndex, paletteOverride, false);
+                spr.draw(x, y, currentFrameIndex, paletteLookup, false);
             }
             x += glyphWidths[currentFrameIndex] + spacing;
         }

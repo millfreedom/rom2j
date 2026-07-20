@@ -1,43 +1,60 @@
 package ua.millfreedom.rom2.model;
 
 import ua.millfreedom.rom2.Globals;
-import ua.millfreedom.rom2.model.color.RGB16;
 import ua.millfreedom.rom2.model.palette.Palette16;
+import ua.millfreedom.rom2.model.render.A16PaletteLookup;
 
 /**
- * CA16 : CSprite256 (no new members)
+ * CA16 : CSprite256 (no native members).
  */
 public class CA16 extends CSprite256 {
+    // Java-only last palette-page generation resolved to a compact A16 lookup.
+    private Palette16[] pageLookupGeneration;
+    // Java-only compact lookup paired with pageLookupGeneration; never contains frame pixels.
+    private A16PaletteLookup pageLookup;
+
     /**
      * Native: CA16::CA16 @00427ECB.
-     * Fully ported.
+     * Fully ported without retaining A16 command words.
      */
     public CA16(String path) {
-        super(path);
+        super();
+        IndexedSpriteResource.DecodedSprite decoded = IndexedSpriteResource.loadA16(path);
+        palette256 = decoded.embeddedPalette();
+        dataSize = palette256 == null ? decoded.resourceSize() : decoded.resourceSize() - 0x400L;
+        setFrames(decoded.frames());
+        surface = null;
     }
 
     /**
      * vtbl +0x18: CA16::Draw @00427EF0.
-     * Fully ported.
+     * Fully ported through canonical packed A16 frames and compact palette resolution.
      */
     @Override
     public void draw(int x, int y, int nFrameIndex, Object paletteOverride, boolean bFlipX) {
-        GameBitmapFrame gbf = this.frames.get(nFrameIndex);
-        if (paletteOverride instanceof RGB16[] pal) {
-            Globals.renderer.drawSpriteA16WithBasePalette(x, y, gbf.xSize(), gbf.ySize(), gbf.data(), pal, bFlipX);
-            return;
+        GameBitmapFrame selectedFrame = frame(nFrameIndex);
+        A16PaletteLookup paletteLookup;
+        if (paletteOverride instanceof A16PaletteLookup explicitLookup) {
+            paletteLookup = explicitLookup;
+        } else if (paletteOverride instanceof int[] basePalette) {
+            paletteLookup = A16PaletteLookup.resolve(basePalette);
+        } else if (paletteOverride instanceof Palette16[] palettePages) {
+            paletteLookup = resolvePageLookup(palettePages);
+        } else {
+            paletteLookup = resolvePageLookup(palette.paletteData);
         }
+        Globals.renderer.drawA16Sprite(x, y, selectedFrame, paletteLookup, bFlipX);
+    }
 
-        Palette16[] palettePages;
-        if (paletteOverride instanceof Palette16[] pages) {
-            palettePages = pages;
-        } else {
-            palettePages = palette.paletteData;
+    /**
+     * Java support for resolving immutable palette pages only when the effective CGamePalette generation changes.
+     * not ported.
+     */
+    private A16PaletteLookup resolvePageLookup(Palette16[] palettePages) {
+        if (pageLookupGeneration != palettePages) {
+            pageLookupGeneration = palettePages;
+            pageLookup = A16PaletteLookup.resolve(palettePages);
         }
-        if (!bFlipX) {
-            Globals.renderer.drawSpriteA16(x, y, gbf.xSize(), gbf.ySize(), gbf.data(), palettePages);
-        } else {
-            Globals.renderer.drawSpriteA16FlipX(x, y, gbf.xSize(), gbf.ySize(), gbf.data(), palettePages);
-        }
+        return pageLookup;
     }
 }

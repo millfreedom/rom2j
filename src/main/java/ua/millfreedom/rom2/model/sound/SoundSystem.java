@@ -18,7 +18,7 @@ import static org.lwjgl.openal.AL10.*;
  * Implementation note: native-facing controllers such as {@link MusicPlayer} should use this class as the actual playback backend.
  */
 public final class SoundSystem {
-    private static final int DEFAULT_CHANNELS = 32;
+    private static final int DEFAULT_CHANNELS = 64;
     private static final int MAP_TILE_PIXEL_SIZE = 0x100;
     private static final int MAP_TILE_CENTER_OFFSET = 0x80;
     private static final int MAP_NATIVE_SOUND_MIN_VOLUME = -10000;

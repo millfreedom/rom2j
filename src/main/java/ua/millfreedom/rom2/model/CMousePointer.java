@@ -2,7 +2,7 @@ package ua.millfreedom.rom2.model;
 
 import ua.millfreedom.rom2.GUI;
 import ua.millfreedom.rom2.Globals;
-import ua.millfreedom.rom2.model.color.RGB16;
+import ua.millfreedom.rom2.model.color.RGB32;
 import ua.millfreedom.rom2.model.enums.MessageCodes;
 import ua.millfreedom.rom2.model.palette.Palettes;
 import ua.millfreedom.rom2.model.render.PresentationSupport;
@@ -22,13 +22,11 @@ public class CMousePointer extends CGameBitmap {
     private static final int TOOLTIP_TOP_PADDING = 4;
     private static final int TOOLTIP_RIGHT_PADDING = 0x0B;
     private static final int TOOLTIP_PANEL_GAP = 2;
-    private static final short TOOLTIP_BACKGROUND_COLOR = RGB16.from(0x24, 0x2C, 0x27).val();
-    private static final short TOOLTIP_BORDER_LIGHT_COLOR = RGB16.from(0xA0, 0x78, 0x32).val();
-    private static final short TOOLTIP_BORDER_DARK_COLOR = RGB16.from(0x50, 0x3C, 0x18).val();
+    private static final int TOOLTIP_BACKGROUND_COLOR = RGB32.from(0x24, 0x2C, 0x27);
+    private static final int TOOLTIP_BORDER_LIGHT_COLOR = RGB32.from(0xA0, 0x78, 0x32);
+    private static final int TOOLTIP_BORDER_DARK_COLOR = RGB32.from(0x50, 0x3C, 0x18);
     private static final int SELECTION_LINE_COUNT = 8;
-    private static final int SELECTION_LINE_LONG_PIXELS = 0x640;
-    private static final int SELECTION_LINE_THICKNESS = 2;
-    private static final short SELECTION_BOX_COLOR = RGB16.WHITE.val();
+    private static final int SELECTION_BOX_COLOR = RGB32.WHITE;
 
     public static final CCursor Cursor_Default = new CCursor("graphics/cursors/default/sprites.16a", 4, 4, 2_000_000_000);
     public static final CCursor Cursor_Move = new CCursor("graphics/cursors/move/sprites.16a", 2, 3, 100);
@@ -150,8 +148,8 @@ public class CMousePointer extends CGameBitmap {
 
     /**
      * Native: CMousePointer::CreateObject @00425BC9.
-     * Fully ported for Java's final-overlay tooltip model; native tooltip background buffers at 0x64/0x68 are
-     * intentionally omitted.
+     * Fully ported for Java's platform-cursor/final-overlay model; native DirectDraw cursor, selection-line, and
+     * tooltip background surfaces are intentionally not allocated.
      */
     public CMousePointer() {
         initializeNativeStorage();
@@ -159,7 +157,7 @@ public class CMousePointer extends CGameBitmap {
 
     /**
      * Native: CMousePointer::CMousePointer @00425DF4.
-     * Fully ported for Java's platform-cursor and final-overlay tooltip model.
+     * Fully ported for Java's platform-cursor and final-overlay model without native DirectDraw backup surfaces.
      */
     public CMousePointer(CSprite256 bitmap, int x, int y, int frameCount, int animSpeed) {
         initializeNativeStorage();
@@ -168,8 +166,8 @@ public class CMousePointer extends CGameBitmap {
 
     /**
      * Native support extracted from CMousePointer::CreateObject @00425BC9 and CMousePointer::CMousePointer @00425DF4.
-     * Fully ported for Java's final-overlay tooltip model; native tooltip background buffers at 0x64/0x68 are
-     * intentionally omitted.
+     * Fully ported for Java's platform-cursor/final-overlay model; native DirectDraw cursor, selection-line, and
+     * tooltip background surfaces are intentionally not allocated.
      */
     private void initializeNativeStorage() {
         sourceBitmap = null;
@@ -194,13 +192,6 @@ public class CMousePointer extends CGameBitmap {
         lastMoveTime = 0;
         tooltipVisibleFlag = 0;
         selectionRect.set(0, 0, 0, 0);
-        for (int i = 0; i < selectionLines.length; i++) {
-            if ((i & 2) == 0) {
-                selectionLines[i] = new CBmp64k(SELECTION_LINE_LONG_PIXELS, SELECTION_LINE_THICKNESS);
-            } else {
-                selectionLines[i] = new CBmp64k(SELECTION_LINE_THICKNESS, SELECTION_LINE_LONG_PIXELS);
-            }
-        }
         selecting = 0;
         backgroundCaptureEnabled = 0;
     }
@@ -293,20 +284,8 @@ public class CMousePointer extends CGameBitmap {
         inputTimerStart = 0;
         this.animSpeed = animSpeed;
         this.frameCount = frameCount;
-        allocateCursorBuffers(bitmap);
         postInit();
         show();
-    }
-
-    /**
-     * Native support extracted from CMousePointer::Init @00426183 cursor back-buffer and draw-buffer allocation.
-     * Fully ported.
-     */
-    private void allocateCursorBuffers(CSprite256 bitmap) {
-        int width = bitmap.xSizeOf(0);
-        int height = bitmap.ySizeOf(0);
-        backBuffer = new CBmp64k(width, height);
-        cursorBuffer = new CBmp64k(width, height);
     }
 
     //not ported

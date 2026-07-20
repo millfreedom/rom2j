@@ -2,6 +2,7 @@ package ua.millfreedom.rom2.model.visobj;
 
 import ua.millfreedom.rom2.GUI;
 import ua.millfreedom.rom2.Globals;
+import ua.millfreedom.rom2.model.color.RGB32;
 import ua.millfreedom.rom2.Utils;
 import ua.millfreedom.rom2.model.*;
 import ua.millfreedom.rom2.model.enums.MessageCodes;
@@ -211,7 +212,7 @@ public class ShopDialogVisualObject extends HandlerVisualObject {
                     screenRect.top + 0x184,
                     screenRect.right + 0x1D0,
                     screenRect.bottom + 0x188,
-                    (short) 0
+                    RGB32.BLACK
             );
         } finally {
             Globals.renderer.unlockSurface();

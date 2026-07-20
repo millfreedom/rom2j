@@ -105,7 +105,7 @@ final class MapEditorUnitSpriteRenderer {
         if (unitRenderer != null && unitRendererWidth == width && unitRendererHeight == height) {
             return;
         }
-        unitRenderer = new SwingRenderer(Screen.createBgraSurface(width, height));
+        unitRenderer = new SwingRenderer(Screen.createArgbSurface(width, height));
         unitRendererWidth = width;
         unitRendererHeight = height;
     }

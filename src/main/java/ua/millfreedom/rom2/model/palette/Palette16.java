@@ -1,16 +1,20 @@
 package ua.millfreedom.rom2.model.palette;
 
-import ua.millfreedom.rom2.model.color.RGB16;
+import ua.millfreedom.rom2.model.color.RGB32;
 
 import static ua.millfreedom.rom2.console.Utils.colorReset;
 
-public record Palette16(RGB16[] data) implements Palette {
+/**
+ * Native-named palette page whose Java storage is expanded opaque ARGB.
+ */
+public record Palette16(int[] data) implements Palette {
+
     // not ported.
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append('[');
-        for (RGB16 v : data) {
-            sb.append(v);
+        for (int color : data) {
+            sb.append(RGB32.toString(color));
         }
         sb.append(colorReset());
         sb.append(']');

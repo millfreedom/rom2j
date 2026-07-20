@@ -442,7 +442,7 @@ public class MainMenuVisualObject extends HandlerVisualObject {
     private int resolveHoveredButtonIndex(int x, int y) {
         int localX = x - cRect.left;
         int localY = y - cRect.top;
-        int pixelValue = Byte.toUnsignedInt(menuMaskBitmap.frames.getFirst().data()[localX + localY * MENU_MASK_STRIDE]);
+        int pixelValue = menuMaskBitmap.frames.getFirst().pixels()[localX + localY * MENU_MASK_STRIDE];
         return switch (pixelValue) {
             case 128 -> 0;
             case 144 -> 1;

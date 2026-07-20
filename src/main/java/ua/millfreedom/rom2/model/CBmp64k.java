@@ -1,7 +1,7 @@
 package ua.millfreedom.rom2.model;
 
 import ua.millfreedom.rom2.Globals;
-import ua.millfreedom.rom2.model.color.RGB16;
+import ua.millfreedom.rom2.model.color.RGB32;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -24,17 +24,15 @@ public final class CBmp64k extends CGameBitmap {
      */
     public CBmp64k(int width, int height) {
         int linearSize = Math.multiplyExact(width, height);
-        int bytesCount = Math.multiplyExact(linearSize, 2);
 
-        RGB16[] pixels = new RGB16[linearSize];
-        Arrays.fill(pixels, RGB16.BLACK);
-        byte[] frameData = new byte[bytesCount];
+        int[] pixels = new int[linearSize];
+        Arrays.fill(pixels, RGB32.BLACK);
 
         this.frameCount = 1;
-        this.dataSize = frameData.length;
+        this.dataSize = 0;
         this.surface = new GameBitmapSurface(width, height, pixels);
         this.frames = List.of(
-                new GameBitmapFrame(width, height, frameData.length, frameData)
+                GameBitmapFrame.bitmap(width, height, pixels)
         );
         this.palette256 = null;
     }
@@ -49,28 +47,24 @@ public final class CBmp64k extends CGameBitmap {
         int h = source.getInt(0x16);
 
         int linearSize = Math.multiplyExact(w, h);
-        int bytesCount = Math.multiplyExact(linearSize, 2);
 
-        RGB16[] pixels = new RGB16[linearSize];
-        byte[] frameData = new byte[bytesCount];
+        int[] pixels = new int[linearSize];
 
         source.position(BITMAP_PIXEL_START_OFFSET);
-        ByteBuffer bb = ByteBuffer.wrap(frameData).order(ByteOrder.LITTLE_ENDIAN);
         for (int p = 0; p < linearSize; p++) {
             int blue = Byte.toUnsignedInt(source.get());
             int green = Byte.toUnsignedInt(source.get());
             int red = Byte.toUnsignedInt(source.get());
-            RGB16 rgb16 = RGB16.from(red, green, blue);
-            pixels[p] = rgb16;
-            bb.putShort(rgb16.val());
+            int color = RGB32.from(red, green, blue);
+            pixels[p] = color;
         }
 
         this.frameCount = 1;
-        this.dataSize = frameData.length + 8L;
+        this.dataSize = Math.multiplyExact(linearSize, Short.BYTES) + 8L;
 
         this.surface = new GameBitmapSurface(w, h, pixels);
         this.frames = List.of(
-                new GameBitmapFrame(w, h, frameData.length, frameData)
+                GameBitmapFrame.bitmap(w, h, pixels)
         );
 
         // 64k bitmap => no palette table source
@@ -88,19 +82,20 @@ public final class CBmp64k extends CGameBitmap {
         int linearSize = Math.multiplyExact(width, height);
 
         source.position(BITMAP_PIXEL_START_OFFSET);
-        ByteBuffer frameBytes = ByteBuffer.wrap(frames.getFirst().data()).order(ByteOrder.LITTLE_ENDIAN);
-        RGB16[] pixels = surface.pixels();
+        int[] pixels = surface.pixels();
         for (int pixelIndex = 0; pixelIndex < linearSize; pixelIndex++) {
             int blue = Byte.toUnsignedInt(source.get());
             int green = Byte.toUnsignedInt(source.get());
             int red = Byte.toUnsignedInt(source.get());
-            RGB16 rgb16 = RGB16.from(red, green, blue);
-            pixels[pixelIndex] = rgb16;
-            frameBytes.putShort(pixelIndex * 2, rgb16.val());
+            int color = RGB32.from(red, green, blue);
+            pixels[pixelIndex] = color;
         }
 
         if (maskBitmap != null) {
-            source.get(maskBitmap.frames.getFirst().data(), 0, linearSize);
+            int[] maskPixels = maskBitmap.frames.getFirst().pixels();
+            for (int pixelIndex = 0; pixelIndex < linearSize; pixelIndex++) {
+                maskPixels[pixelIndex] = Byte.toUnsignedInt(source.get());
+            }
         }
     }
 
@@ -138,15 +133,18 @@ public final class CBmp64k extends CGameBitmap {
         header.putInt(0);
         file.writeBytes(header.array());
 
-        RGB16[] pixels = surface.pixels();
+        int[] pixels = surface.pixels();
         for (int i = 0; i < pixelCount; i++) {
-            RGB16 pixel = pixels[i];
-            file.write(pixel.b());
-            file.write(pixel.g());
-            file.write(pixel.r());
+            int pixel = pixels[i];
+            file.write(RGB32.b(pixel));
+            file.write(RGB32.g(pixel));
+            file.write(RGB32.r(pixel));
         }
         if (maskBitmap != null) {
-            file.write(maskBitmap.frames.getFirst().data(), 0, pixelCount);
+            int[] maskPixels = maskBitmap.frames.getFirst().pixels();
+            for (int pixelIndex = 0; pixelIndex < pixelCount; pixelIndex++) {
+                file.write(maskPixels[pixelIndex]);
+            }
         }
 
         try {
@@ -220,8 +218,8 @@ public final class CBmp64k extends CGameBitmap {
     public void mirrorY() {
         int width = surface.width();
         int height = surface.height();
-        RGB16[] pixels = surface.pixels();
-        RGB16[] tmpRow = new RGB16[width];
+        int[] pixels = surface.pixels();
+        int[] tmpRow = new int[width];
         for (int y = 0, half = height / 2; y < half; y++) {
             int top = y * width;
             int bottom = (height - 1 - y) * width;
@@ -229,7 +227,6 @@ public final class CBmp64k extends CGameBitmap {
             System.arraycopy(pixels, bottom, pixels, top, width);
             System.arraycopy(tmpRow, 0, pixels, bottom, width);
         }
-        mirrorFrameBytesInPlace();
     }
 
     /**
@@ -246,17 +243,6 @@ public final class CBmp64k extends CGameBitmap {
     @Override
     public int ySizeOf(int i) {
         return surface.height();
-    }
-
-    /**
-     * Java support for direct CBmp64k surface composition paths.
-     * not ported.
-     */
-    public void syncFrameBytesFromSurface() {
-        ByteBuffer buffer = ByteBuffer.wrap(frames.getFirst().data()).order(ByteOrder.LITTLE_ENDIAN);
-        for (RGB16 pixel : surface.pixels()) {
-            buffer.putShort(pixel == null ? RGB16.BLACK.val() : pixel.val());
-        }
     }
 
     /**
@@ -277,36 +263,18 @@ public final class CBmp64k extends CGameBitmap {
         int sourceWidth = surface.width();
         int sourceHeight = surface.height();
         int targetWidth = target.surface.width();
-        RGB16[] sourcePixels = surface.pixels();
-        RGB16[] targetPixels = target.surface.pixels();
+        int[] sourcePixels = surface.pixels();
+        int[] targetPixels = target.surface.pixels();
 
         for (int row = 0; row < height; row++) {
             int sourceIndex = (sourceHeight - 1 - srcTop - row) * sourceWidth + srcLeft;
             int targetIndex = (dstY + row) * targetWidth + dstX;
             for (int x = 0; x < width; x++) {
-                RGB16 pixel = sourcePixels[sourceIndex + x];
-                if (!zeroTransparent || pixel.val() != 0) {
+                int pixel = sourcePixels[sourceIndex + x];
+                if (!zeroTransparent || (pixel & 0x00FF_FFFF) != 0) {
                     targetPixels[targetIndex + x] = pixel;
                 }
             }
-        }
-    }
-
-    /**
-     * Java helper for keeping the packed 16-bit frame bytes aligned with {@link #surface} row swaps.
-     * not ported.
-     */
-    private void mirrorFrameBytesInPlace() {
-        GameBitmapFrame frame = frames.getFirst();
-        int rowBytes = Math.multiplyExact(surface.width(), 2);
-        byte[] data = frame.data();
-        byte[] tmpRow = new byte[rowBytes];
-        for (int y = 0, half = surface.height() / 2; y < half; y++) {
-            int top = y * rowBytes;
-            int bottom = (surface.height() - 1 - y) * rowBytes;
-            System.arraycopy(data, top, tmpRow, 0, rowBytes);
-            System.arraycopy(data, bottom, data, top, rowBytes);
-            System.arraycopy(tmpRow, 0, data, bottom, rowBytes);
         }
     }
 }

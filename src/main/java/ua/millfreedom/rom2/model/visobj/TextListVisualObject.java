@@ -3,7 +3,7 @@ package ua.millfreedom.rom2.model.visobj;
 import ua.millfreedom.rom2.Globals;
 import ua.millfreedom.rom2.model.CBitmapFont;
 import ua.millfreedom.rom2.model.CRect;
-import ua.millfreedom.rom2.model.color.RGB16;
+import ua.millfreedom.rom2.model.color.RGB32;
 import ua.millfreedom.rom2.model.enums.MessageCodes;
 import ua.millfreedom.rom2.model.palette.Palette16;
 import ua.millfreedom.rom2.model.palette.Palettes;
@@ -131,10 +131,10 @@ public class TextListVisualObject extends CVisualObject {
                 int bevelPitch = rowPitch - 2;
                 int verticalBottom = y - 3 + bevelPitch;
                 int bottomLineY = y - 2 + bevelPitch;
-                Globals.renderer.drawLine(screenRect.left + 1, y - 2, screenRect.right - 5, y - 2, RGB16.from(8, 8, 8).val());
-                Globals.renderer.drawLine(screenRect.left, y - 1, screenRect.left, verticalBottom, RGB16.from(8, 8, 8).val());
-                Globals.renderer.drawLine(screenRect.left + 1, bottomLineY, screenRect.right - 5, bottomLineY, RGB16.from(0x5E, 0x73, 0x65).val());
-                Globals.renderer.drawLine(screenRect.right - 4, y - 1, screenRect.right - 4, verticalBottom, RGB16.from(0x5E, 0x73, 0x65).val());
+                Globals.renderer.drawLine(screenRect.left + 1, y - 2, screenRect.right - 5, y - 2, RGB32.from(8, 8, 8));
+                Globals.renderer.drawLine(screenRect.left, y - 1, screenRect.left, verticalBottom, RGB32.from(8, 8, 8));
+                Globals.renderer.drawLine(screenRect.left + 1, bottomLineY, screenRect.right - 5, bottomLineY, RGB32.from(0x5E, 0x73, 0x65));
+                Globals.renderer.drawLine(screenRect.right - 4, y - 1, screenRect.right - 4, verticalBottom, RGB32.from(0x5E, 0x73, 0x65));
 
                 if (rowIndex == selectedRow) {
                     drawSelectionFrame(screenRect.left, y, screenRect);

@@ -589,9 +589,9 @@ public class BasicTownDialogVisualObject extends HandlerVisualObject {
 
         int localX = x - cRect.left;
         int localY = y - cRect.top;
-        byte[] pixels = hoverMaskBitmap.frames.getFirst().data();
+        int[] pixels = hoverMaskBitmap.frames.getFirst().pixels();
 
-        return switch (pixels[localX + localY * 0x280] & 0xFF) {
+        return switch (pixels[localX + localY * 0x280]) {
             case 0x20 -> 0x400;
             case 0x40 -> 0x800;
             case 0x50 -> 0x1000;

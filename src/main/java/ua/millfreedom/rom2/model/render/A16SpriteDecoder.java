@@ -1,18 +1,18 @@
 package ua.millfreedom.rom2.model.render;
 
-import ua.millfreedom.rom2.model.color.RGB16;
 import ua.millfreedom.rom2.model.color.RGB32;
 import ua.millfreedom.rom2.model.palette.Palette16;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import static ua.millfreedom.rom2.model.color.Utils.clamp255;
-
 /**
  * Shared decoder for the engine's CA16 word-coded sprite streams.
  */
 public final class A16SpriteDecoder {
+    private static final int A16_BLEND_DENOMINATOR = 16;
+    private static final int ARGB_ALPHA_MAX = 0xFF;
+
     /**
      * Utility class.
      * not ported.
@@ -167,37 +167,51 @@ public final class A16SpriteDecoder {
 
     /**
      * Native support extracted from DrawSprite_A16 @0045889B and DrawSprite_A16_FlipX @00458C10.
-     * Source color lookup matches the native `pPaletteData + encodedPixel` page-offset addressing.
+     * Converts the native preweighted source contribution into straight ARGB for source-over composition.
      */
-    public static RGB32 composeColor(int encodedPixel, RGB32 destinationColor, Palette16[] palettePages) {
+    public static int sourceColor(int encodedPixel, Palette16[] palettePages) {
         int color8 = (encodedPixel >>> 1) & 0xFF;
-        int page4 = (encodedPixel >>> 9) & 0x0F;
-        RGB32 srcPart = palettePages[page4].data()[color8].toRGB32();
-        RGB32 dstPart = destinationColor.withShade(page4);
-        return RGB32.from(
-                clamp255(srcPart.r() + dstPart.r()),
-                clamp255(srcPart.g() + dstPart.g()),
-                clamp255(srcPart.b() + dstPart.b())
-        );
+        int alphaLevel = (encodedPixel >>> 9) & 0x0F;
+        if (alphaLevel == 0) {
+            return RGB32.TBLACK;
+        }
+        int sourceContribution = palettePages[alphaLevel].data()[color8];
+        return toStraightArgb(sourceContribution, alphaLevel);
     }
 
     /**
      * Native support extracted from CA16Font::DrawTextInternal @0045E8FD explicit color-table dispatch.
-     * bits 1..8 = 256-entry source index
-     * bits 9..12 = 4-bit blend factor
-     * blend factor applies:
-     * directly to source
-     * inversely to destination
+     * Converts the native LUT-weighted source contribution into straight ARGB for source-over composition.
      */
-    public static RGB32 composeColor(int encodedPixel, RGB32 destinationColor, RGB16[] palette16) {
+    public static int sourceColor(int encodedPixel, int[] palette) {
         int color8 = (encodedPixel >>> 1) & 0xFF;
-        int page4 = (encodedPixel >>> 9) & 0x0F;
-        RGB32 srcPart = palette16[color8].toRGB32().withBrightness(page4);
-        RGB32 dstPart = destinationColor.withShade(page4);
-        return RGB32.from(
-                clamp255(srcPart.r() + dstPart.r()),
-                clamp255(srcPart.g() + dstPart.g()),
-                clamp255(srcPart.b() + dstPart.b())
+        int alphaLevel = (encodedPixel >>> 9) & 0x0F;
+        if (alphaLevel == 0) {
+            return RGB32.TBLACK;
+        }
+        // CGamePalette mode 4 page index 0 stores direct brightness level 1, so base-palette dispatch uses level + 1.
+        int sourceContribution = RGB32.withBrightness(palette[color8], alphaLevel + 1);
+        return toStraightArgb(sourceContribution, alphaLevel);
+    }
+
+    /**
+     * not ported. Reconstructs straight ARGB from the native A16 preweighted RGB contribution.
+     */
+    private static int toStraightArgb(int sourceContribution, int alphaLevel) {
+        int alpha = (alphaLevel * ARGB_ALPHA_MAX + A16_BLEND_DENOMINATOR / 2) / A16_BLEND_DENOMINATOR;
+        return RGB32.ARGB(
+                unpremultiplySourceChannel(RGB32.r(sourceContribution), alpha),
+                unpremultiplySourceChannel(RGB32.g(sourceContribution), alpha),
+                unpremultiplySourceChannel(RGB32.b(sourceContribution), alpha),
+                alpha
         );
+    }
+
+    /**
+     * not ported. Reconstructs one straight color channel from a native A16 source contribution.
+     */
+    private static int unpremultiplySourceChannel(int sourceContribution, int alpha) {
+        return Math.min(ARGB_ALPHA_MAX,
+                (sourceContribution * ARGB_ALPHA_MAX + alpha / 2) / alpha);
     }
 }

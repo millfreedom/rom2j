@@ -176,7 +176,7 @@ public class StringListVariantBVisualObject extends StringListVisualObject {
      * Fully ported.
      */
     private static int getRadioButtonWidth() {
-        return GUI.sprRadioButtons.frames.get(0).xSize();
+        return GUI.sprRadioButtons.frames.get(0).width();
     }
 
     /**

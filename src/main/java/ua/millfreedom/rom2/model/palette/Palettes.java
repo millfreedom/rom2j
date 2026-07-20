@@ -1,7 +1,6 @@
 package ua.millfreedom.rom2.model.palette;
 
 import ua.millfreedom.rom2.Globals;
-import ua.millfreedom.rom2.model.color.RGB16;
 import ua.millfreedom.rom2.model.color.RGB32;
 import ua.millfreedom.rom2.res.Resources;
 
@@ -9,7 +8,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static ua.millfreedom.rom2.res.Constants.GRAPHICS;
 
@@ -26,26 +27,26 @@ public final class Palettes {
 
     public static final int SIZE16 = 16;
     public static final int SIZE256 = 256;
-    public static final Palette16 flat = new Palette16(new RGB16[SIZE16]);
-    public static final Palette16 gray = new Palette16(new RGB16[SIZE16]);
-    public static final Palette16 grayDim = new Palette16(new RGB16[SIZE16]);
-    public static final Palette16 yellowish = new Palette16(new RGB16[SIZE16]);
-    public static final Palette16 greenLeaningGray = new Palette16(new RGB16[SIZE16]);
-    public static final Palette16 orangeish = new Palette16(new RGB16[SIZE16]);
-    public static final Palette16 redish = new Palette16(new RGB16[SIZE16]);
-    public static final Palette16 greenish = new Palette16(new RGB16[SIZE16]);
-    public static final Palette16 sepia = new Palette16(new RGB16[SIZE16]);
-    public static final Palette16 darkRed = new Palette16(new RGB16[SIZE16]);
-    public static final Palette16 brownish = new Palette16(new RGB16[SIZE16]);
-    public static final Palette16 greenToRed = new Palette16(new RGB16[SIZE16]);
-    public static final Palette16 highlight = new Palette16(new RGB16[SIZE16]);
-    public static final Palette16 hover = new Palette16(new RGB16[SIZE16]);
+    public static final Palette16 flat = new Palette16(new int[SIZE16]);
+    public static final Palette16 gray = new Palette16(new int[SIZE16]);
+    public static final Palette16 grayDim = new Palette16(new int[SIZE16]);
+    public static final Palette16 yellowish = new Palette16(new int[SIZE16]);
+    public static final Palette16 greenLeaningGray = new Palette16(new int[SIZE16]);
+    public static final Palette16 orangeish = new Palette16(new int[SIZE16]);
+    public static final Palette16 redish = new Palette16(new int[SIZE16]);
+    public static final Palette16 greenish = new Palette16(new int[SIZE16]);
+    public static final Palette16 sepia = new Palette16(new int[SIZE16]);
+    public static final Palette16 darkRed = new Palette16(new int[SIZE16]);
+    public static final Palette16 brownish = new Palette16(new int[SIZE16]);
+    public static final Palette16 greenToRed = new Palette16(new int[SIZE16]);
+    public static final Palette16 highlight = new Palette16(new int[SIZE16]);
+    public static final Palette16 hover = new Palette16(new int[SIZE16]);
 
-    public static final Palette256 warmYellowBrown = new Palette256(new RGB32[SIZE256]);
-    public static final Palette256 brightYellow = new Palette256(new RGB32[SIZE256]);
-    public static final Palette256 black = new Palette256(new RGB32[SIZE256]);
-    public static final Palette256 darkBrown = new Palette256(new RGB32[SIZE256]);
-    public static final Palette256 purple = new Palette256(new RGB32[SIZE256]);
+    public static final Palette256 warmYellowBrown = new Palette256(new int[SIZE256]);
+    public static final Palette256 brightYellow = new Palette256(new int[SIZE256]);
+    public static final Palette256 black = new Palette256(new int[SIZE256]);
+    public static final Palette256 darkBrown = new Palette256(new int[SIZE256]);
+    public static final Palette256 purple = new Palette256(new int[SIZE256]);
 
     public static final CGamePalette p1 = new CGamePalette();
     public static final CGamePalette p2 = new CGamePalette();
@@ -61,6 +62,22 @@ public final class Palettes {
      * initializer @0047636C, constructor @0047637B, atexit wrapper @0047638A, destructor @0047639C.
      */
     public static final List<CGamePalette> unitGamePalettes = new ArrayList<>();
+    /**
+     * Java retention for the stable entries backing native {@code GamePaletteArray_units @00622960}.
+     */
+    private static final List<CGamePalette> UNIT_GAME_PALETTE_STORAGE = initUnitGamePaletteStorage();
+    /**
+     * Java cache for the immutable mode-5 conversion selected by CUnit::Draw @004632A1.
+     */
+    private static final Map<Palette256, CGamePalette> UNIT_GRAYSCALE_PALETTES = new IdentityHashMap<>();
+    /**
+     * Java retention for the raw {@code human.pal} sources read by UnitTypes::loadUnitTypes @00479B1E.
+     */
+    private static Palette256[] unitOwnerPaletteSources;
+    /**
+     * Packed effective tint recipe used by CGamePalette::Init @0042339E for the retained owner palettes.
+     */
+    private static int unitOwnerPaletteTintRecipe = -1;
     public static final Palette16[] unitPaletteComplements = initUnitPaletteComplements();
     private static Palette16 messagePrimary = gray;
     private static Palette16 messageDim = grayDim;
@@ -85,6 +102,17 @@ public final class Palettes {
         return List.of(p1, p2, p3, p4, p5);
     }
 
+    /**
+     * Native support for the 17 stable entries in {@code GamePaletteArray_units @00622960}.
+     */
+    private static List<CGamePalette> initUnitGamePaletteStorage() {
+        List<CGamePalette> palettes = new ArrayList<>(UNIT_OWNER_PALETTE_COUNT + 1);
+        for (int paletteIndex = 0; paletteIndex <= UNIT_OWNER_PALETTE_COUNT; paletteIndex++) {
+            palettes.add(new CGamePalette());
+        }
+        return List.copyOf(palettes);
+    }
+
     // Native support extracted from Global::InitPalettes @0045EA70 256-color RGB ramp initialization.
     private static List<Palette256> initP256() {
         for (int i = 0; i < SIZE256; i += 1) {
@@ -100,20 +128,20 @@ public final class Palettes {
     // Native support extracted from Global::InitPalettes @0045EA70 16-color palette initialization.
     private static List<Palette16> initP16() {
         for (int i = 0; i < SIZE16; i += 1) {
-            flat.data()[i] = RGB16.from(8, 8, 8);
-            gray.data()[i] = RGB16.from(i * 0x11, i * 0x11, i * 0x11);
-            grayDim.data()[i] = RGB16.from(i * 0xe, i * 0xe, i * 0xe);
-            yellowish.data()[i] = RGB16.from((i * 0xb9) / 0xf, (i * 0x9f) / 0xf, (i * 0x49) / 0xf);
-            greenLeaningGray.data()[i] = RGB16.from((i * 0x6b) / 0xf, (i * 0x9a) / 0xf, (i * 0x78) / 0xf);
-            orangeish.data()[i] = RGB16.from((i * 0xff) / 0xf, (i * 0xff) / 0xf, (i << 6) / 0xf);
-            redish.data()[i] = RGB16.from((i * 0xff) / 0xf, (i << 6) / 0xf, (i << 6) / 0xf);
-            greenish.data()[i] = RGB16.from((i << 6) / 0xf, (i * 0xff) / 0xf, (i << 6) / 0xf);
-            sepia.data()[i] = RGB16.from((i * 0xa0) / 0xf, (i * 0x78) / 0xf, (i * 0x32) / 0xf);
-            darkRed.data()[i] = RGB16.from((i * 0x8b) / 0xf, (i * 0x41) / 0xf, (i << 5) / 0xf);
-            brownish.data()[i] = RGB16.from((i * 0x96) / 0xf, (i * 0x5a) / 0xf, 0);
-            greenToRed.data()[i] = RGB16.from(0x8d - (i * 0x3d) / 0xf, (i * 0x7e) / 0xf, (i * 0x31) / 0xf);
-            highlight.data()[i] = RGB16.from(0xff - (i * 0xaf) / 0xf, (i * 0xfc) / 0xf, (i * 0x62) / 0xf);
-            hover.data()[i] = RGB16.from(((0xf - i) * 0xa0) / 0xf + 0x20, ((0xf - i) * 0x94) / 0xf + 0x20, ((0xf - i) * 0x58) / 0xf + 0x20);
+            flat.data()[i] = RGB32.from(8, 8, 8);
+            gray.data()[i] = RGB32.from(i * 0x11, i * 0x11, i * 0x11);
+            grayDim.data()[i] = RGB32.from(i * 0xe, i * 0xe, i * 0xe);
+            yellowish.data()[i] = RGB32.from((i * 0xb9) / 0xf, (i * 0x9f) / 0xf, (i * 0x49) / 0xf);
+            greenLeaningGray.data()[i] = RGB32.from((i * 0x6b) / 0xf, (i * 0x9a) / 0xf, (i * 0x78) / 0xf);
+            orangeish.data()[i] = RGB32.from((i * 0xff) / 0xf, (i * 0xff) / 0xf, (i << 6) / 0xf);
+            redish.data()[i] = RGB32.from((i * 0xff) / 0xf, (i << 6) / 0xf, (i << 6) / 0xf);
+            greenish.data()[i] = RGB32.from((i << 6) / 0xf, (i * 0xff) / 0xf, (i << 6) / 0xf);
+            sepia.data()[i] = RGB32.from((i * 0xa0) / 0xf, (i * 0x78) / 0xf, (i * 0x32) / 0xf);
+            darkRed.data()[i] = RGB32.from((i * 0x8b) / 0xf, (i * 0x41) / 0xf, (i << 5) / 0xf);
+            brownish.data()[i] = RGB32.from((i * 0x96) / 0xf, (i * 0x5a) / 0xf, 0);
+            greenToRed.data()[i] = RGB32.from(0x8d - (i * 0x3d) / 0xf, (i * 0x7e) / 0xf, (i * 0x31) / 0xf);
+            highlight.data()[i] = RGB32.from(0xff - (i * 0xaf) / 0xf, (i * 0xfc) / 0xf, (i * 0x62) / 0xf);
+            hover.data()[i] = RGB32.from(((0xf - i) * 0xa0) / 0xf + 0x20, ((0xf - i) * 0x94) / 0xf + 0x20, ((0xf - i) * 0x58) / 0xf + 0x20);
         }
         return List.of(flat, gray, grayDim, yellowish, greenLeaningGray, orangeish, redish, greenish, sepia, darkRed, brownish, greenToRed, highlight, hover);
     }
@@ -192,6 +220,20 @@ public final class Palettes {
     }
 
     /**
+     * Native evidence: CUnit::Draw @004632A1 constructs a 16-page mode-5 palette from the unit type's raw palette.
+     * Java reuses that immutable conversion by the stable raw {@link Palette256} identity.
+     */
+    public static CGamePalette unitGrayscalePalette(Palette256 rawPalette) {
+        CGamePalette grayscalePalette = UNIT_GRAYSCALE_PALETTES.get(rawPalette);
+        if (grayscalePalette == null) {
+            grayscalePalette = new CGamePalette();
+            grayscalePalette.init(rawPalette, UNIT_OWNER_PALETTE_COUNT, 5, 0);
+            UNIT_GRAYSCALE_PALETTES.put(rawPalette, grayscalePalette);
+        }
+        return grayscalePalette;
+    }
+
+    /**
      * Native support extracted from CA16Font::DrawTextInternal @0045E8FD forwarding pColorTable to CA16::Draw @00427EF0.
      */
     public static Object a16FontPaletteOverride(Palette16 palette) {
@@ -210,20 +252,29 @@ public final class Palettes {
      */
     public static void loadUnitOwnerPalettes() {
         unitGamePalettes.clear();
-        clearUnitPaletteComplements();
+        Palette256[] rawPalettes = getOrLoadUnitOwnerPaletteSources();
+        unitGamePalettes.addAll(UNIT_GAME_PALETTE_STORAGE);
 
-        ByteBuffer humanPaletteData = Globals.gameFileManager.get(HUMAN_UNIT_PALETTE_PATH).duplicate().order(ByteOrder.LITTLE_ENDIAN);
-        for (int paletteIndex = 0; paletteIndex < UNIT_OWNER_PALETTE_COUNT; paletteIndex++) {
-            Palette256 rawPalette = readUnitOwnerPalette(humanPaletteData, paletteIndex);
-            CGamePalette gamePalette = new CGamePalette();
-            gamePalette.init(rawPalette, UNIT_OWNER_PALETTE_COUNT, 2, 1);
-            unitGamePalettes.add(gamePalette);
-            writeUnitPaletteComplement(gamePalette, unitPaletteComplements[paletteIndex]);
+        CGamePalette grayscalePalette = UNIT_GAME_PALETTE_STORAGE.get(UNIT_OWNER_PALETTE_COUNT);
+        if (grayscalePalette.paletteData == null) {
+            grayscalePalette.init(rawPalettes[0], UNIT_OWNER_PALETTE_COUNT, 5, 0);
         }
 
-        CGamePalette grayscalePalette = new CGamePalette();
-        grayscalePalette.init(readUnitOwnerPalette(humanPaletteData, 0), UNIT_OWNER_PALETTE_COUNT, 5, 0);
-        unitGamePalettes.add(grayscalePalette);
+        int tintRed = Globals.lighting.tintR & 0xFF;
+        int tintGreen = Globals.lighting.tintG & 0xFF;
+        int tintBlue = Globals.lighting.tintB & 0xFF;
+        int tintRecipe = (tintRed << 16) | (tintGreen << 8) | tintBlue;
+        if (unitOwnerPaletteTintRecipe == tintRecipe) {
+            return;
+        }
+
+        clearUnitPaletteComplements();
+        for (int paletteIndex = 0; paletteIndex < UNIT_OWNER_PALETTE_COUNT; paletteIndex++) {
+            CGamePalette gamePalette = UNIT_GAME_PALETTE_STORAGE.get(paletteIndex);
+            gamePalette.init(rawPalettes[paletteIndex], UNIT_OWNER_PALETTE_COUNT, 2, 1);
+            writeUnitPaletteComplement(gamePalette, unitPaletteComplements[paletteIndex]);
+        }
+        unitOwnerPaletteTintRecipe = tintRecipe;
     }
 
     /**
@@ -231,6 +282,23 @@ public final class Palettes {
      */
     public static void releaseUnitOwnerGamePalettesForShutdown() {
         unitGamePalettes.clear();
+    }
+
+    /**
+     * Native support extracted from the one-time `human.pal` read in UnitTypes::loadUnitTypes @00479B1E.
+     */
+    private static Palette256[] getOrLoadUnitOwnerPaletteSources() {
+        if (unitOwnerPaletteSources == null) {
+            ByteBuffer humanPaletteData = Globals.gameFileManager.get(HUMAN_UNIT_PALETTE_PATH)
+                    .duplicate()
+                    .order(ByteOrder.LITTLE_ENDIAN);
+            Palette256[] rawPalettes = new Palette256[UNIT_OWNER_PALETTE_COUNT];
+            for (int paletteIndex = 0; paletteIndex < UNIT_OWNER_PALETTE_COUNT; paletteIndex++) {
+                rawPalettes[paletteIndex] = readUnitOwnerPalette(humanPaletteData, paletteIndex);
+            }
+            unitOwnerPaletteSources = rawPalettes;
+        }
+        return unitOwnerPaletteSources;
     }
 
     /**
@@ -249,8 +317,8 @@ public final class Palettes {
     private static Palette16[] initUnitPaletteComplements() {
         Palette16[] palettes = new Palette16[UNIT_OWNER_PALETTE_COUNT];
         for (int paletteIndex = 0; paletteIndex < UNIT_OWNER_PALETTE_COUNT; paletteIndex++) {
-            RGB16[] data = new RGB16[SIZE16];
-            Arrays.fill(data, RGB16.BLACK);
+            int[] data = new int[SIZE16];
+            Arrays.fill(data, RGB32.BLACK);
             palettes[paletteIndex] = new Palette16(data);
         }
         return palettes;
@@ -261,7 +329,7 @@ public final class Palettes {
      */
     private static void clearUnitPaletteComplements() {
         for (Palette16 unitPaletteComplement : unitPaletteComplements) {
-            Arrays.fill(unitPaletteComplement.data(), RGB16.BLACK);
+            Arrays.fill(unitPaletteComplement.data(), RGB32.BLACK);
         }
     }
 
@@ -270,7 +338,7 @@ public final class Palettes {
      */
     private static void writeUnitPaletteComplement(CGamePalette gamePalette, Palette16 target) {
         for (int pairIndex = 0; pairIndex < 8; pairIndex++) {
-            RGB16 color = gamePalette.paletteData[0x0F - pairIndex].data()[UNIT_OWNER_COMPLEMENT_COLOR_INDEX];
+            int color = gamePalette.paletteData[0x0F - pairIndex].data()[UNIT_OWNER_COMPLEMENT_COLOR_INDEX];
             target.data()[pairIndex * 2] = color;
             target.data()[pairIndex * 2 + 1] = color;
         }

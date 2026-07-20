@@ -2,6 +2,7 @@ package ua.millfreedom.rom2.model.visobj;
 
 import ua.millfreedom.rom2.CTextFile;
 import ua.millfreedom.rom2.Globals;
+import ua.millfreedom.rom2.model.color.RGB32;
 import ua.millfreedom.rom2.model.CBmp64k;
 import ua.millfreedom.rom2.model.CRect;
 import ua.millfreedom.rom2.model.enums.MessageCodes;
@@ -123,7 +124,7 @@ public class CreditsDialogVisualObject extends HandlerVisualObject {
         boolean shouldClose;
         Globals.renderer.pushClip(screenRect.left, screenRect.top, screenRect.right, screenRect.bottom);
         try {
-            Globals.renderer.fillScreenRect(screenRect.left, screenRect.top, screenRect.right, screenRect.bottom, (short) 0);
+            Globals.renderer.fillScreenRect(screenRect.left, screenRect.top, screenRect.right, screenRect.bottom, RGB32.BLACK);
 
             int lastVisibleLineExclusive = firstVisibleCreditsLineIndex + 1 + (CREDITS_SCROLL_HEIGHT / fontHeight);
             int lineCount = creditsTextFile.getLineCount();

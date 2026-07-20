@@ -1,7 +1,6 @@
 package ua.millfreedom.rom2.mapeditor;
 
 import ua.millfreedom.rom2.Globals;
-import ua.millfreedom.rom2.model.CSprite256;
 import ua.millfreedom.rom2.model.Screen;
 import ua.millfreedom.rom2.model.StructureDef;
 import ua.millfreedom.rom2.model.Structures;
@@ -92,7 +91,7 @@ final class MapEditorStructureSpriteRenderer {
         if (structureRenderer != null && structureRendererWidth == width && structureRendererHeight == height) {
             return;
         }
-        structureRenderer = new SwingRenderer(Screen.createBgraSurface(width, height));
+        structureRenderer = new SwingRenderer(Screen.createArgbSurface(width, height));
         structureRendererWidth = width;
         structureRendererHeight = height;
     }

@@ -1191,16 +1191,12 @@ public class CMainWindow extends CFrameWnd {
     private static void captureAllodsDebugBmp() {
         Screen screen = Globals.screen;
         BufferedImage image = new BufferedImage(screen.w(), screen.h(), BufferedImage.TYPE_INT_RGB);
-        byte[] surface = screen.surface();
-        int pitch = screen.pitchBytes();
+        int[] surface = screen.surface();
+        int pitchPixels = screen.pitchPixels();
         for (int y = 0; y < screen.h(); y++) {
-            int rowOffset = y * pitch;
+            int rowOffset = y * pitchPixels;
             for (int x = 0; x < screen.w(); x++) {
-                int pixelOffset = rowOffset + x * 4;
-                int blue = surface[pixelOffset] & 0xFF;
-                int green = surface[pixelOffset + 1] & 0xFF;
-                int red = surface[pixelOffset + 2] & 0xFF;
-                image.setRGB(x, screen.h() - 1 - y, (red << 16) | (green << 8) | blue);
+                image.setRGB(x, screen.h() - 1 - y, surface[rowOffset + x]);
             }
         }
         int captureIndex = allodsBmpCaptureIndex;

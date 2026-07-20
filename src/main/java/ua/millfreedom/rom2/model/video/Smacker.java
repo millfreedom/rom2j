@@ -1,5 +1,7 @@
 package ua.millfreedom.rom2.model.video;
 
+import ua.millfreedom.rom2.model.color.RGB32;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
@@ -380,7 +382,7 @@ public final class Smacker implements AutoCloseable {
      * Port of {@code smk_get_palette()}.
      * not ported.
      */
-    public byte[] getPalette() {
+    public int[] getPalette() {
         requireOpen();
         return video.palette;
     }
@@ -389,7 +391,7 @@ public final class Smacker implements AutoCloseable {
      * Port of {@code smk_get_video()}.
      * not ported.
      */
-    public byte[] getVideo() {
+    public int[] getVideo() {
         requireOpen();
         return video.frame;
     }
@@ -538,7 +540,7 @@ public final class Smacker implements AutoCloseable {
      */
     private static void renderPalette(VideoState state, byte[] source, int offset, int size) throws IOException {
         int index = 0;
-        byte[] oldPalette = state.palette.clone();
+        int[] oldPalette = state.palette.clone();
         while (index < 256 && size > 0) {
             int control = source[offset] & 0xFF;
             if ((control & 0x80) != 0) {
@@ -562,21 +564,21 @@ public final class Smacker implements AutoCloseable {
                 if (index + count > 256 || src + count > 256 || (src < index && src + count > index)) {
                     throw new IOException("Palette copy overflow");
                 }
-                System.arraycopy(oldPalette, src * 3, state.palette, index * 3, count * 3);
+                System.arraycopy(oldPalette, src, state.palette, index, count);
                 index += count;
             } else {
                 if (size < 3) {
                     throw new IOException("Palette literal block truncated");
                 }
-                for (int component = 0; component < 3; component++) {
-                    int value = source[offset] & 0xFF;
-                    if (value > 0x3F) {
-                        throw new IOException("Palette component exceeds 6-bit range");
-                    }
-                    state.palette[index * 3 + component] = (byte) PALETTE_MAP[value];
-                    offset++;
-                    size--;
+                int red = source[offset] & 0xFF;
+                int green = source[offset + 1] & 0xFF;
+                int blue = source[offset + 2] & 0xFF;
+                if ((red | green | blue) > 0x3F) {
+                    throw new IOException("Palette component exceeds 6-bit range");
                 }
+                state.palette[index] = RGB32.from(PALETTE_MAP[red], PALETTE_MAP[green], PALETTE_MAP[blue]);
+                offset += 3;
+                size -= 3;
                 index++;
             }
         }
@@ -647,7 +649,7 @@ public final class Smacker implements AutoCloseable {
         int temp = 0x01;
         for (int y = 0; y < 4; y++) {
             for (int x = 0; x < 4; x++) {
-                state.frame[skip + x] = (byte) ((mask & temp) != 0 ? color1 : color2);
+                state.frame[skip + x] = (mask & temp) != 0 ? color1 : color2;
                 temp <<= 1;
             }
             skip += state.width;
@@ -661,12 +663,12 @@ public final class Smacker implements AutoCloseable {
     private static void renderFullBlock(VideoState state, BitStream bitStream, int skip) throws IOException {
         for (int y = 0; y < 4; y++) {
             int unpack = state.trees[TREE_FULL].lookup(bitStream);
-            state.frame[skip + 3] = (byte) ((unpack >>> 8) & 0xFF);
-            state.frame[skip + 2] = (byte) (unpack & 0xFF);
+            state.frame[skip + 3] = (unpack >>> 8) & 0xFF;
+            state.frame[skip + 2] = unpack & 0xFF;
 
             unpack = state.trees[TREE_FULL].lookup(bitStream);
-            state.frame[skip + 1] = (byte) ((unpack >>> 8) & 0xFF);
-            state.frame[skip] = (byte) (unpack & 0xFF);
+            state.frame[skip + 1] = (unpack >>> 8) & 0xFF;
+            state.frame[skip] = unpack & 0xFF;
             skip += state.width;
         }
     }
@@ -676,13 +678,13 @@ public final class Smacker implements AutoCloseable {
      * not ported.
      */
     private static void renderSolidBlock(VideoState state, int skip, int typeData) {
-        Arrays.fill(state.frame, skip, skip + 4, (byte) typeData);
+        Arrays.fill(state.frame, skip, skip + 4, typeData);
         skip += state.width;
-        Arrays.fill(state.frame, skip, skip + 4, (byte) typeData);
+        Arrays.fill(state.frame, skip, skip + 4, typeData);
         skip += state.width;
-        Arrays.fill(state.frame, skip, skip + 4, (byte) typeData);
+        Arrays.fill(state.frame, skip, skip + 4, typeData);
         skip += state.width;
-        Arrays.fill(state.frame, skip, skip + 4, (byte) typeData);
+        Arrays.fill(state.frame, skip, skip + 4, typeData);
     }
 
     /**
@@ -693,8 +695,8 @@ public final class Smacker implements AutoCloseable {
         for (int block = 0; block < 2; block++) {
             int unpack = state.trees[TREE_FULL].lookup(bitStream);
             for (int repeat = 0; repeat < 2; repeat++) {
-                Arrays.fill(state.frame, skip, skip + 2, (byte) (unpack & 0xFF));
-                Arrays.fill(state.frame, skip + 2, skip + 4, (byte) ((unpack >>> 8) & 0xFF));
+                Arrays.fill(state.frame, skip, skip + 2, unpack & 0xFF);
+                Arrays.fill(state.frame, skip + 2, skip + 4, (unpack >>> 8) & 0xFF);
                 skip += state.width;
             }
         }
@@ -707,16 +709,16 @@ public final class Smacker implements AutoCloseable {
     private static void renderHalfBlock(VideoState state, BitStream bitStream, int skip) throws IOException {
         for (int block = 0; block < 2; block++) {
             int unpack = state.trees[TREE_FULL].lookup(bitStream);
-            state.frame[skip + 3] = (byte) ((unpack >>> 8) & 0xFF);
-            state.frame[skip + 2] = (byte) (unpack & 0xFF);
-            state.frame[skip + state.width + 3] = (byte) ((unpack >>> 8) & 0xFF);
-            state.frame[skip + state.width + 2] = (byte) (unpack & 0xFF);
+            state.frame[skip + 3] = (unpack >>> 8) & 0xFF;
+            state.frame[skip + 2] = unpack & 0xFF;
+            state.frame[skip + state.width + 3] = (unpack >>> 8) & 0xFF;
+            state.frame[skip + state.width + 2] = unpack & 0xFF;
 
             unpack = state.trees[TREE_FULL].lookup(bitStream);
-            state.frame[skip + 1] = (byte) ((unpack >>> 8) & 0xFF);
-            state.frame[skip] = (byte) (unpack & 0xFF);
-            state.frame[skip + state.width + 1] = (byte) ((unpack >>> 8) & 0xFF);
-            state.frame[skip + state.width] = (byte) (unpack & 0xFF);
+            state.frame[skip + 1] = (unpack >>> 8) & 0xFF;
+            state.frame[skip] = unpack & 0xFF;
+            state.frame[skip + state.width + 1] = (unpack >>> 8) & 0xFF;
+            state.frame[skip + state.width] = unpack & 0xFF;
             skip += state.width << 1;
         }
     }
@@ -1162,8 +1164,8 @@ public final class Smacker implements AutoCloseable {
         private final int yScaleMode;
         private final int version;
         private final Huff16Tree[] trees = new Huff16Tree[4];
-        private byte[] palette;
-        private byte[] frame;
+        private int[] palette;
+        private int[] frame;
 
         /**
          * Port of the video-state initialization done by {@code smk_open_generic()}.
@@ -1174,8 +1176,9 @@ public final class Smacker implements AutoCloseable {
             this.height = height;
             this.yScaleMode = yScaleMode;
             this.version = version;
-            this.palette = new byte[256 * 3];
-            this.frame = new byte[width * height];
+            this.palette = new int[256];
+            Arrays.fill(this.palette, RGB32.BLACK);
+            this.frame = new int[width * height];
         }
 
         /**
@@ -1183,8 +1186,8 @@ public final class Smacker implements AutoCloseable {
          * not ported.
          */
         private void clear() {
-            palette = new byte[0];
-            frame = new byte[0];
+            palette = new int[0];
+            frame = new int[0];
             Arrays.fill(trees, null);
         }
     }

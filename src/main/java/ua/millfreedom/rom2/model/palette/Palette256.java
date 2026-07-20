@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 
 import static ua.millfreedom.rom2.console.Utils.colorReset;
 
-public record Palette256(RGB32[] data) implements Palette32 {
+public record Palette256(int[] data) implements Palette32 {
 
     public static final int DEFAULT_SIZE = 256;
 
@@ -17,14 +17,14 @@ public record Palette256(RGB32[] data) implements Palette32 {
 
     // not ported.
     public static Palette256 create(int size) {
-        return new Palette256(new RGB32[size]);
+        return new Palette256(new int[size]);
     }
 
     // not ported.
     public static Palette256 read(ByteBuffer bb) {
-        RGB32[] palData = new RGB32[DEFAULT_SIZE];
+        int[] palData = new int[DEFAULT_SIZE];
         for (int i = 0; i < palData.length; i++) {
-            palData[i] = new RGB32(bb.getInt());
+            palData[i] = RGB32.opaque(bb.getInt());
         }
         return new Palette256(palData);
     }
@@ -34,8 +34,8 @@ public record Palette256(RGB32[] data) implements Palette32 {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append('[');
-        for (RGB32 v : data) {
-            sb.append(v);
+        for (int color : data) {
+            sb.append(RGB32.toString(color));
         }
         sb.append(colorReset());
         sb.append(']');

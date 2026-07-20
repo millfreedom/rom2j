@@ -8,11 +8,9 @@ import ua.millfreedom.rom2.Globals;
 import ua.millfreedom.rom2.model.CA16;
 import ua.millfreedom.rom2.model.CMousePointer;
 import ua.millfreedom.rom2.model.GameBitmapFrame;
-import ua.millfreedom.rom2.model.color.RGB16;
-import ua.millfreedom.rom2.model.palette.Palette16;
+import ua.millfreedom.rom2.model.color.RGB32;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -60,31 +58,26 @@ public final class GLCursor extends CMousePointer {
         hotSpotY = (int) Math.max(1, Math.round(sourceHotSpotY * scale));
         this.cursors = new long[frameCount];
         //this.pixelData = new ByteBuffer[frameCount];
-        boolean isA16Cursor = sourceBitmap instanceof CA16;
-        Palette16[] palettePages = sourceBitmap.palette.paletteData;
-        Palette16 basePalette = palettePages[0];
 
-        int w = sourceBitmap.frames.getFirst().xSize();
-        int h = sourceBitmap.frames.getFirst().ySize();
+        GameBitmapFrame firstFrame = sourceBitmap.frame(0);
+        int w = firstFrame.width();
+        int h = firstFrame.height();
+        boolean a16 = sourceBitmap instanceof CA16;
+        A16PaletteLookup a16PaletteLookup = a16
+                ? A16PaletteLookup.resolve(sourceBitmap.palette.paletteData)
+                : null;
+        int[] indexedPalette = a16 ? null : sourceBitmap.palette.paletteData[0].data();
         ByteBuffer bb = BufferUtils.createByteBuffer(w * h * 4);
-        byte b = (byte) 0;
         for (int i = 0; i < frameCount; i++) {
-            GameBitmapFrame frame = sourceBitmap.frames.get(i);
+            GameBitmapFrame frame = sourceBitmap.frame(i);
             bb.clear();
-            while (bb.hasRemaining()) {
-                bb.put(b);
-            }
-            bb.clear();
-            if (isA16Cursor) {
-                A16SpriteDecoder.decodeClipped(0, 0, w, h, frame.data(), 0, 0, w, h,
-                        (x, y, encodedPixels, offset, count, stepX) ->
-                                writeA16RgbaRun(bb, w, x, y, encodedPixels, offset, count, stepX, palettePages)
-                );
-            } else {
-                Rle8SpriteDecoder.decodeClipped(0, 0, w, h, frame.data(), 0, 0, w, h,
-                        (x, y, paletteIndices, offset, count, stepX) ->
-                                writeRgbaRun(bb, w, x, y, paletteIndices, offset, count, stepX, basePalette)
-                );
+            int[] pixelCodes = frame.pixels();
+            for (int pixel = 0; pixel < pixelCodes.length; pixel++) {
+                int pixelCode = pixelCodes[pixel];
+                int color = a16
+                        ? a16PaletteLookup.sourceColor(pixelCode)
+                        : pixelCode == GameBitmapFrame.TRANSPARENT_INDEX ? RGB32.TBLACK : indexedPalette[pixelCode];
+                writeRgbaPixel(bb, pixel * 4, color);
             }
             bb.position(bb.capacity());
             GLFWImage image = glfwImage(w, h, bb.flip(), (float) scale);
@@ -272,70 +265,15 @@ public final class GLCursor extends CMousePointer {
     }
 
     /**
-     * Writes one decoded cursor run into the RGBA buffer expected by GLFW cursor images.
-     * not ported.
-     */
-    private static void writeRgbaRun(
-            ByteBuffer target,
-            int width,
-            int x,
-            int y,
-            byte[] paletteIndices,
-            int offset,
-            int count,
-            int stepX,
-            Palette16 palette
-    ) {
-        RGB16[] pal = palette.data();
-        int di = (y * width + x) * 4;
-        for (int i = 0; i < count; i++) {
-            RGB16 rgb16 = pal[paletteIndices[offset + i] & 0xFF];
-            writeRgbaPixel(target, di, rgb16.r(), rgb16.g(), rgb16.b(), 0xFF);
-            di += stepX * 4;
-        }
-    }
-
-    /**
-     * Writes one decoded CA16 cursor run into the RGBA buffer expected by GLFW cursor images.
-     * not ported.
-     */
-    private static void writeA16RgbaRun(
-            ByteBuffer target,
-            int width,
-            int x,
-            int y,
-            byte[] encodedPixels,
-            int offset,
-            int count,
-            int stepX,
-            Palette16[] palettePages
-    ) {
-        int di = (y * width + x) * 4;
-        ByteBuffer bb = ByteBuffer.wrap(encodedPixels)
-                .order(ByteOrder.LITTLE_ENDIAN)
-                .position(offset);
-
-        for (int i = 0; i < count; i++) {
-            int encodedPixel = bb.getShort() & 0xFFFF;
-            int alphaLevel = (encodedPixel >>> 9) & 0x0F;
-            if (alphaLevel != 0) {
-                RGB16 rgb16 = palettePages[alphaLevel].data()[(encodedPixel >>> 1) & 0xff];
-                writeRgbaPixel(target, di, rgb16.r(), rgb16.g(), rgb16.b(), alphaLevel * 0x11);
-            }
-            di += stepX * 4;
-        }
-    }
-
-    /**
      * Java GLFW cursor image support. GLFWImage pixels are byte-addressed RGBA; do not use packed Java ints here
      * because ByteBuffer.putInt writes in big-endian order unless the buffer order is changed.
      * not ported.
      */
-    private static void writeRgbaPixel(ByteBuffer target, int offset, int r, int g, int b, int a) {
-        target.put(offset, (byte) r);
-        target.put(offset + 1, (byte) g);
-        target.put(offset + 2, (byte) b);
-        target.put(offset + 3, (byte) a);
+    private static void writeRgbaPixel(ByteBuffer target, int offset, int color) {
+        target.put(offset, (byte) RGB32.r(color));
+        target.put(offset + 1, (byte) RGB32.g(color));
+        target.put(offset + 2, (byte) RGB32.b(color));
+        target.put(offset + 3, (byte) RGB32.a(color));
     }
 
 }

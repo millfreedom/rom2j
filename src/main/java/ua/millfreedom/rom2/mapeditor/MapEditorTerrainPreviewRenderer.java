@@ -175,7 +175,7 @@ final class MapEditorTerrainPreviewRenderer {
         if (terrainRenderer != null && terrainRendererWidth == width && terrainRendererHeight == height) {
             return;
         }
-        terrainRenderer = new SwingRenderer(Screen.createBgraSurface(width, height));
+        terrainRenderer = new SwingRenderer(Screen.createArgbSurface(width, height));
         terrainRendererWidth = width;
         terrainRendererHeight = height;
     }
@@ -228,7 +228,7 @@ final class MapEditorTerrainPreviewRenderer {
 
         GameBitmapFrame frame = tileBitmap.frames.getFirst();
         int sourceOffset = (tileWord & TERRAIN_TILE_FRAME_MASK) * TERRAIN_TILE_PIXELS;
-        if (sourceOffset + TERRAIN_TILE_PIXELS > frame.data().length) {
+        if (sourceOffset + TERRAIN_TILE_PIXELS > frame.pixels().length) {
             return;
         }
 
@@ -246,7 +246,7 @@ final class MapEditorTerrainPreviewRenderer {
                     brightness,
                     brightness,
                     brightness,
-                    frame.data(),
+                    frame.pixels(),
                     sourceOffset,
                     palettePages
             );
@@ -263,7 +263,7 @@ final class MapEditorTerrainPreviewRenderer {
                 brightness,
                 brightness,
                 brightness,
-                frame.data(),
+                frame.pixels(),
                 sourceOffset,
                 palettePages
         );

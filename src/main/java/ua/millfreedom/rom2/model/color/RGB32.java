@@ -1,101 +1,190 @@
 package ua.millfreedom.rom2.model.color;
 
 import static ua.millfreedom.rom2.console.Utils.color24;
-import static ua.millfreedom.rom2.model.color.Utils.clamp255;
 
-public record RGB32(int val) implements RGBA {
+/**
+ * Stateless plain-int ARGB utilities.
+ */
+public final class RGB32 {
+    public static final int BLACK = 0xFF00_0000;
+    public static final int WHITE = 0xFFFF_FFFF;
+    public static final int RED = 0xFFFF_0000;
+    public static final int GREEN = 0xFF00_FF00;
+    public static final int BLUE = 0xFF00_00FF;
+    public static final int TBLACK = 0x0000_0000;
 
-    public static RGB32 BLACK = RGB32.from(0, 0, 0);
-    public static RGB32 WHITE = RGB32.from(255, 255, 255);
-    public static RGB32 RED = RGB32.from(255, 0, 0);
-    public static RGB32 GREEN = RGB32.from(0, 255, 0);
-    public static RGB32 BLUE = RGB32.from(0, 0, 255);
-    public static RGB32 TBLACK = RGB32.from(0, 0, 0, 0);
-
-    // not ported.
-    public static RGB32 from(int r, int g, int b, int a) {
-        return new RGB32(ARGB(r, g, b, a));
+    // not ported. Utility class.
+    private RGB32() {
     }
 
     // not ported.
-    public static RGB32 from(int r, int g, int b) {
-        return from(r, g, b, 0xFF);
+    public static int from(int red, int green, int blue, int alpha) {
+        return ARGB(red, green, blue, alpha);
     }
 
     // not ported.
-    public RGB16 toRGB16() {
-        return RGB16.from(r(), g(), b());
-    }
-
-    // not ported.
-    public static int ARGB(int r, int g, int b, int a) {
-        return (a & 0xFF) << 24 | (r & 0xFF) << 16 | (g & 0xFF) << 8 | (b & 0xFF);
-    }
-
-    // not ported.
-    public static int ABGR(int r, int g, int b, int a) {
-        return (a & 0xFF) << 24 | (b & 0xFF) << 16 | (g & 0xFF) << 8 | (r & 0xFF);
-    }
-
-    // not ported.
-    public int toARGB() {
-        return val;
-    }
-
-    // not ported.
-    public int toABGR() {
-        return a() << 24 | b() << 16 | g() << 8 | r();
+    public static int from(int red, int green, int blue) {
+        return ARGB(red, green, blue, 0xFF);
     }
 
     /**
-     * @param level direct brightness level: 0 -> black, 16 -> this (100%)
-     * @return RGB32
-     * not ported.
+     * not ported. Forces opaque alpha while preserving the low RGB24 bits.
      */
-    public RGB32 withBrightness(int level) {
-        if (level < 1) return BLACK;
-        if (level > 15) return this;
-        int r = clamp255((r() * level) >> 4);
-        int g = clamp255((g() * level) >> 4);
-        int b = clamp255((b() * level) >> 4);
-        return from(r, g, b);
+    public static int opaque(int rgb24) {
+        return BLACK | (rgb24 & 0x00FF_FFFF);
+    }
+
+
+    // not ported.
+    public static int ARGB(int red, int green, int blue, int alpha) {
+        return (alpha & 0xFF) << 24
+                | (red & 0xFF) << 16
+                | (green & 0xFF) << 8
+                | (blue & 0xFF);
+    }
+
+    // not ported.
+    public static int ABGR(int red, int green, int blue, int alpha) {
+        return (alpha & 0xFF) << 24
+                | (blue & 0xFF) << 16
+                | (green & 0xFF) << 8
+                | (red & 0xFF);
+    }
+
+    // not ported.
+    public static int toARGB(int color) {
+        return color;
+    }
+
+    // not ported.
+    public static int toABGR(int color) {
+        return a(color) << 24 | b(color) << 16 | g(color) << 8 | r(color);
+    }
+
+    /**
+     * not ported. Applies native 0..16 brightness with packed channel multiplication.
+     */
+    public static int withBrightness(int color, int level) {
+        int redBlue = ((color & 0x00FF_00FF) * level) >> 4;
+        int green = ((color & 0x0000_FF00) * level) >> 4;
+        return (color & 0xFF00_0000) | (redBlue & 0x00FF_00FF) | (green & 0x0000_FF00);
     }
 
     /**
      * Native support extracted from InitLUT @0045225B native LUT shade-page semantics.
-     * Fully ported expanded-32bpp replacement for g_pColorLUT_UNUSED_IN_JAVA page lookup.
      */
-    public RGB32 withShade(int page) {
-        return withBrightness(16 - page);
+    public static int withShade(int color, int page) {
+        return withBrightness(color, 16 - page);
     }
 
-    @Override
-    // not ported.
-    public int r() {
-        return (val >>> 16) & 0xFF;
+    /**
+     * not ported. Replaces a straight-ARGB color's alpha channel.
+     */
+    public static int withAlpha(int color, int alpha) {
+        return (Utils.clamp255(alpha) << 24) | (color & 0x00FF_FFFF);
     }
 
-    @Override
-    // not ported.
-    public int g() {
-        return (val >>> 8) & 0xFF;
+    /**
+     * not ported. Scales a straight-ARGB color's alpha by an additional 0..255 opacity.
+     */
+    public static int scaleAlpha(int color, int opacity) {
+        int scaledAlpha = (a(color) * Utils.clamp255(opacity) + 0x7F) / 0xFF;
+        return withAlpha(color, scaledAlpha);
     }
 
-    @Override
-    // not ported.
-    public int b() {
-        return val & 0xFF;
+    /**
+     * not ported. Applies the native fixed-half blend for opaque source and destination pixels.
+     */
+    public static int blendHalfOpaque(int source, int destination) {
+        return ARGB(
+                (r(source) * 0x80 + r(destination) * 0x7F + 0x7F) / 0xFF,
+                (g(source) * 0x80 + g(destination) * 0x7F + 0x7F) / 0xFF,
+                (b(source) * 0x80 + b(destination) * 0x7F + 0x7F) / 0xFF,
+                0xFF
+        );
     }
 
-    @Override
-    // not ported.
-    public int a() {
-        return (val >>> 24) & 0xFF;
+    /**
+     * not ported. Composites straight-ARGB source over straight-ARGB destination.
+     */
+    public static int sourceOver(int source, int destination) {
+        int sourceAlpha = a(source);
+        if (sourceAlpha == 0) {
+            return destination;
+        }
+        if (sourceAlpha == 0xFF) {
+            return source;
+        }
+
+        int destinationAlpha = a(destination);
+        if (destinationAlpha == 0) {
+            return source;
+        }
+
+        int inverseSourceAlpha = 0xFF - sourceAlpha;
+        int outputAlphaNumerator = sourceAlpha * 0xFF + destinationAlpha * inverseSourceAlpha;
+        int outputAlpha = (outputAlphaNumerator + 0x7F) / 0xFF;
+        int rounding = outputAlphaNumerator >>> 1;
+        int red = (r(source) * sourceAlpha * 0xFF
+                + r(destination) * destinationAlpha * inverseSourceAlpha
+                + rounding) / outputAlphaNumerator;
+        int green = (g(source) * sourceAlpha * 0xFF
+                + g(destination) * destinationAlpha * inverseSourceAlpha
+                + rounding) / outputAlphaNumerator;
+        int blue = (b(source) * sourceAlpha * 0xFF
+                + b(destination) * destinationAlpha * inverseSourceAlpha
+                + rounding) / outputAlphaNumerator;
+        return ARGB(red, green, blue, outputAlpha);
     }
 
-    @Override
+    /**
+     * not ported. Adds straight-ARGB source light over destination while carrying source-over alpha.
+     */
+    public static int additiveOver(int source, int destination) {
+        int sourceAlpha = a(source);
+        if (sourceAlpha == 0) {
+            return destination;
+        }
+
+        int destinationAlpha = a(destination);
+        int inverseSourceAlpha = 0xFF - sourceAlpha;
+        int outputAlpha = sourceAlpha + (destinationAlpha * inverseSourceAlpha + 0x7F) / 0xFF;
+        int redPremultiplied = Math.min(outputAlpha * 0xFF,
+                r(source) * sourceAlpha + r(destination) * destinationAlpha);
+        int greenPremultiplied = Math.min(outputAlpha * 0xFF,
+                g(source) * sourceAlpha + g(destination) * destinationAlpha);
+        int bluePremultiplied = Math.min(outputAlpha * 0xFF,
+                b(source) * sourceAlpha + b(destination) * destinationAlpha);
+        return ARGB(
+                (redPremultiplied + (outputAlpha >>> 1)) / outputAlpha,
+                (greenPremultiplied + (outputAlpha >>> 1)) / outputAlpha,
+                (bluePremultiplied + (outputAlpha >>> 1)) / outputAlpha,
+                outputAlpha
+        );
+    }
+
     // not ported.
-    public String toString() {
-        return color24(r(), g(), b()) + '█';
+    public static int r(int color) {
+        return (color >>> 16) & 0xFF;
+    }
+
+    // not ported.
+    public static int g(int color) {
+        return (color >>> 8) & 0xFF;
+    }
+
+    // not ported.
+    public static int b(int color) {
+        return color & 0xFF;
+    }
+
+    // not ported.
+    public static int a(int color) {
+        return (color >>> 24) & 0xFF;
+    }
+
+    // not ported.
+    public static String toString(int color) {
+        return color24(r(color), g(color), b(color)) + '█';
     }
 }
